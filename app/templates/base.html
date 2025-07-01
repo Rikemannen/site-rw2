@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My Site{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100">
+    <header id="main-header"
+        class="sticky bg-slate-400 text-white p-4 mb-0 rounded-none shadow-none w-full top-0 left-0 transition-all duration-300 z-50">
+        <div class="flex items-center justify-between">
+            <a href="/">
+                <h1 class="text-2xl font-bold content-center">Hem</h1>
+            </a>
+            <button id="profile-button" class="top-0 right-0">
+                <img src="https://cdn-icons-png.flaticon.com/512/15494/15494722.png" width="30px">
+            </button>
+        </div>
+        <div class="absolute right-4 top-16 min-w-[160px] hidden" id="profile-menu" style="z-index:1000;">
+            <ul class="bg-white text-gray-800 rounded-lg shadow-lg mt-2 border border-gray-200">
+            {% if user.is_authenticated %}
+            <li class="px-4 py-2 hover:bg-gray-200"><a href="/profile">Profil</a></li>
+            <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings">Inställningar</a></li>
+            <li class="px-4 py-2 hover:bg-gray-200"><a href="/logout">Logga ut</a></li>
+            {% else %}
+            <li class="px-4 py-2 hover:bg-gray-200"><a href="/login">Logga in</a></li>
+            <li class="px-4 py-2 hover:bg-gray-200"><a href="/register">Skapa Konto</a></li>
+            {% endif %}
+            </ul>
+        </div>
+        <script>
+            document.getElementById('profile-button').addEventListener('click', function() {
+                const menu = document.getElementById('profile-menu');
+                menu.classList.toggle('hidden');
+            });
+        </script>
+    </header>
+    <main class="p-4">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

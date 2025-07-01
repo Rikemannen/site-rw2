@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Hem{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Nya Övningar</h2>
+            <ul id="latest-exercises" class="space-y-2">
+                {% for exercise in recent_exercises %}
+                <li>
+                    <div class="flex justify-between items-center">
+                        <a href="/exercise/{{ exercise.id }}">{{ exercise.name }}</a>
+                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
+                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.username ~ ')' if
+                            exercise.owner.display_name and exercise.owner.display_name != exercise.owner.username
+                            else exercise.owner.username }}
+                        </a>
+                    </div>
+                    <p class="text-slate-600 text-sm">Skapades: {{ exercise.created | datetimeformat }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Populära Övningar</h2>
+            <ul id="popular-exercises" class="space-y-2">
+                {% for exercise in popular_exercises %}
+                <li>
+                    <div class="flex justify-between items-center">
+                        <a href="/exercise/{{ exercise.id }}">{{ exercise.name }}</a>
+                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
+                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.username ~ ')' if
+                            exercise.owner.display_name and exercise.owner.display_name !=
+                            exercise.owner.username else exercise.owner.username }}
+                        </a>
+                    </div>
+                    <a href="/exercise/{{ exercise.id }}/likes">
+                        <p class="text-slate-600 text-sm">Gillar: {{ exercise.likes }}</p>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
