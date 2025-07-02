@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ exercise.name }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+    <div class="bg-slate-200 rounded-md shadow-md p-2">
+        <h1 class="text-2xl font-bold mb-4">{{ exercise.name }}</h1>
+        <p class="mb-2 bg-slate-300 p-2 rounded-md">{{ exercise.description }}</p>
+        <div class="flex flex-wrap gap-4 text-gray-600 mb-2 items-center justify-between">
+            <div class="flex flex-wrap gap-4">
+                <span>Skapad: {{ exercise.created | datetimeformat }}</span>
+                <span>{{ exercise.attempts }} försök</span>
+                <span>Avklarad {{ exercise.finished if exercise.finished else 0 }} gånger</span>
+                <span><a class="hover:underline" href="{{ url_for('exercise.likes', exercise_id=exercise.id) }}">Gillar:
+                        {{
+                        exercise.likes()
+                        }}</a></span>
+            </div>
+            <p class="text-gray-600 mb-0">Skapad av:
+                <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
+                    {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if exercise.owner.display_name
+                    and
+                    exercise.owner.display_name != exercise.owner.name else exercise.owner.name }}
+                </a>
+            </p>
+        </div>
+    </div>
+    <hr class="my-6 border-t border-gray-300">
+    {% include "exercises/" ~ exercise.id ~ "/exercise.html" %}
+    {% endblock %}

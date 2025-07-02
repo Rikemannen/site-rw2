@@ -7,7 +7,7 @@ def search_users(query):
     if not query:
         return []
 
-    results = db.session.query(User).filter(User.username.ilike(f'%{query}%')).all()
+    results = db.session.query(User).filter(user.name.ilike(f'%{query}%')).all()
     # Returns a list of user objects that match the query username,
     # has to later be linked to profile(s) via id
     return results

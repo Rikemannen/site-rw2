@@ -1,5 +1,6 @@
+from sqlalchemy import func
 from app.extensions import db
-from app.models.exercise import Exercise
+from app.models.exercise import Exercise, exercise_likes
 from app.services.file_service import create_exercise_files, delete_exercise_files
 
 def get_exercise_by_id(exercise_id):
@@ -44,11 +45,19 @@ def update_exercise(exercise_id, name=None, description=None):
 
 def get_popular_exercises(amount=3):
     """Retrieve the most popular exercises based on the number of likes."""
-    return db.session.query(Exercise).order_by(Exercise.likes.desc()).limit(amount).all()
+    return (
+        db.session.query(Exercise, func.count(exercise_likes.c.user_id).label('likes_count'))
+        .outerjoin(exercise_likes, Exercise.id == exercise_likes.c.exercise_id)
+        .filter(Exercise.approved == True)
+        .group_by(Exercise.id)
+        .order_by(func.count(exercise_likes.c.user_id).desc())
+        .limit(amount)
+        .all()
+    )
 
 def get_recent_exercises(amount=3):
     """Retrieve the most recently created exercises."""
-    return db.session.query(Exercise).order_by(Exercise.id.desc()).limit(amount).all()
+    return db.session.query(Exercise).filter(Exercise.approved == True).order_by(Exercise.created.desc()).limit(amount).all()
 
 def increment_attempts(exercise_id):
     """Increment the attempt count for a specific exercise."""
@@ -68,11 +77,23 @@ def increment_finishes(exercise_id):
     else:
         raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
 
-def increment_likes(exercise_id):
-    """Increment the like count for a specific exercise."""
+def liked(user, exercise_id):
+    """Add a user to the "liked users" of an exercise."""
     exercise = get_exercise_by_id(exercise_id)
     if exercise:
-        exercise.likes += 1
+        exercise.liked_by.append(user)
         db.session.commit()
+    else:
+        raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
+
+def unliked(user, exercise_id):
+    """Remove a user from the "liked users" of an exercise."""
+    exercise = get_exercise_by_id(exercise_id)
+    if exercise:
+        if user in exercise.liked_by:
+            exercise.liked_by.remove(user)
+            db.session.commit()
+        else:
+            raise ValueError(f"User {user.name} has not liked exercise {exercise_id}.")
     else:
         raise ValueError(f"Exercise with ID {exercise_id} does not exist.")

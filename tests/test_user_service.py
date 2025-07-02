@@ -32,7 +32,7 @@ def monkey_db(monkeypatch):
 
 def test_get_user_by_id(monkey_db):
     user = user_service.get_user_by_id(1)
-    assert user.username == "alice"
+    assert user.name == "alice"
     assert user_service.get_user_by_id(999) is None
 
 def test_get_user_by_username(monkey_db):

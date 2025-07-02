@@ -1,3 +1,4 @@
+import sqlalchemy.exc
 from app.extensions import db
 from app.models.user import User
 
@@ -7,11 +8,19 @@ def get_user_by_id(user_id):
 
 def get_user_by_username(username):
     """Retrieve user data based on their username."""
-    return db.session.query(User).filter_by(username=username).first()
+    return db.session.query(User).filter_by(name=username).first()
 
-def create_user(username, password_hash):
-    """Create a new user with the given username and password hash."""
-    user = User(username=username, password_hash=password_hash)
+def user_exists(username):
+    """Check if a user with the given username exists."""
+    return db.session.query(User).filter_by(username=username).count() > 0
+
+def create_user(username, display_name, password_hash):
+    """Create a new user with the given username, display name, and password hash."""
+    user = User(name=username, display_name=display_name, password_hash=password_hash)
     db.session.add(user)
-    db.session.commit()
-    return user
+    try:
+        db.session.commit()
+        return user
+    except sqlalchemy.exc.IntegrityError as e:
+        db.session.rollback()
+        return None

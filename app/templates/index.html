@@ -5,17 +5,18 @@
 {% block content %}
 <div class="container mx-auto p-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg shadow-md p-4">
+        <div class="bg-slate-200 rounded-lg shadow-md p-4">
             <h2 class="text-xl font-semibold mb-4 text-gray-800">Nya Övningar</h2>
             <ul id="latest-exercises" class="space-y-2">
                 {% for exercise in recent_exercises %}
-                <li>
+                <li class="bg-slate-300 rounded-sm p-2">
                     <div class="flex justify-between items-center">
-                        <a href="/exercise/{{ exercise.id }}">{{ exercise.name }}</a>
+                        <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
+                            exercise.name[:30] }}</a>
                         <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
-                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.username ~ ')' if
-                            exercise.owner.display_name and exercise.owner.display_name != exercise.owner.username
-                            else exercise.owner.username }}
+                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
+                            exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
+                            else exercise.owner.name }}
                         </a>
                     </div>
                     <p class="text-slate-600 text-sm">Skapades: {{ exercise.created | datetimeformat }}</p>
@@ -23,22 +24,22 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="bg-white rounded-lg shadow-md p-4">
+        <div class="bg-slate-200 rounded-lg shadow-md p-4">
             <h2 class="text-xl font-semibold mb-4 text-gray-800">Populära Övningar</h2>
             <ul id="popular-exercises" class="space-y-2">
-                {% for exercise in popular_exercises %}
-                <li>
+                {% for exercise, likes_count in popular_exercises %}
+                <li class="bg-slate-300 rounded-sm p-2">
                     <div class="flex justify-between items-center">
-                        <a href="/exercise/{{ exercise.id }}">{{ exercise.name }}</a>
+                        <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
+                            exercise.name[:30] }}</a>
                         <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
-                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.username ~ ')' if
+                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
                             exercise.owner.display_name and exercise.owner.display_name !=
-                            exercise.owner.username else exercise.owner.username }}
+                            exercise.owner.name else exercise.owner.name }}
                         </a>
                     </div>
-                    <a href="/exercise/{{ exercise.id }}/likes">
-                        <p class="text-slate-600 text-sm">Gillar: {{ exercise.likes }}</p>
-                    </a>
+                    <a href="/exercise/{{ exercise.id }}/likes" class="text-slate-600 text-sm hover:underline">Gillar: {{ likes_count
+                        }}</a>
                 </li>
                 {% endfor %}
             </ul>

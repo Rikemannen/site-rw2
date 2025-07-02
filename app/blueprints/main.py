@@ -1,6 +1,6 @@
 """Handles main application routes and views."""
 
-from flask import Blueprint, abort, render_template, request
+from flask import Blueprint, abort, render_template, request, redirect
 from flask_login import current_user, login_required
 from app.services.exercise_service import get_popular_exercises, get_recent_exercises
 from app.services.user_service import get_user_by_id
@@ -32,7 +32,7 @@ def user_profile(user_id):
 @login_required
 def profile():
     """Render the current user's profile page."""
-    return render_template('user/profile.html', user=current_user)
+    return redirect(f'/user/{current_user.id}')
 
 @bp.route('/search')
 def search():

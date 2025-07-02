@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.display_name if user.display_name else user.name }}s profil{% endblock %}
+
+{% block content %}
+<div class="flex gap-4 p-4">
+    <div class="flex-grow">
+        <div class="bg-slate-200 p-2 rounded-md shadow-md">
+            <div class="flex items-center">
+                {% set emblem_color = user.equipped_emblem.color if user.equipped_emblem else 'inherit' %}
+                <h1 class="text-2xl font-bold m-2" style="color: {{ emblem_color }};">
+                    {{ user.display_name ~ ' (@' ~ user.name ~ ')' if user.display_name and user.display_name !=
+                    user.name else user.name }}
+                </h1>
+                {% if user.equipped_emblem %}
+                <div class="bg-slate-200 rounded-md inline-block m-1"
+                    style="color: {{ emblem_color }}; background-color: {{ emblem_color }}33;">
+                    <p class="text-xl pr-2 pl-2 p-1">{{ user.equipped_emblem.name }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="bg-slate-200 rounded-md p-2">
+                <h2 class="text-xl font-bold">Beskrivning:</h2>
+                <p>{{ user.description if user.description else 'Tomt D;' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex w-[400px] h-[650px] z-50 t-4">
+        {% include "chat/chat_window.html" %}
+    </div>
+</div>
+{% endblock %}

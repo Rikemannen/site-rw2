@@ -2,7 +2,7 @@
 
 from flask import Blueprint, flash, redirect, request, render_template, url_for
 import flask
-from flask_login import login_user, current_user, login_required
+from flask_login import login_user, current_user, login_required, logout_user
 #from werkzeug.urls import url_has_allowed_host_and_scheme
 from app.services.user_service import get_user_by_username, create_user
 from app.utils.security import verify_password, hash_password
@@ -14,10 +14,12 @@ bp = Blueprint('auth', __name__)
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     """Handle user login."""
+    if current_user.is_authenticated:
+        return redirect(flask.url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = get_user_by_username(form.username.data)
-        if not user or not verify_password(form.password.data, user.password_hash):
+        if not user or not verify_password(user.password_hash, form.password.data):
             flash('Invalid username or password.')
             return redirect(flask.url_for('auth.login'))
 
@@ -32,25 +34,38 @@ def login():
         return redirect(next_url or flask.url_for('main.index'))
     return render_template('auth/login.html', form=form)
 
-@bp.route('/signup', methods=['GET', 'POST'])
-def signup():
-    """Handle user signup."""
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    """Handle user registration."""
     form = SignupForm()
     if form.validate_on_submit():
         password = hash_password(form.password.data)
 
+        if user_exists := get_user_by_username(form.username.data):
+            flash('Användarnamnet taget, använd ett annat!')
+            return redirect(flask.url_for('auth.register'))
+        
         user = create_user(
             username=form.username.data,
+            display_name=form.display_name.data or None,
             password_hash=password
         )
 
         if user:
             login_user(user)
-            flash('Signup successful! Welcome!')
+            flash('Registration successful! Welcome!')
             return redirect(flask.url_for('main.index'))
         else:
-            flash('Signup failed. Please try again.')
-    return render_template('auth/signup.html', form=form)
+            flash('Registration failed. Please try again.')
+    return render_template('auth/register.html', form=form)
+
+@bp.route('/logout')
+@login_required
+def logout():
+    """Handle user logout."""
+    logout_user()
+    flash('You have been logged out.')
+    return redirect(flask.url_for('main.index'))
 
 @bp.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -58,25 +73,27 @@ def settings():
     """Handle user settings."""
     form = SettingsForm()
 
-    # Populate emblem choices dynamically
-    form.emblem.choices = [(e.id, e.name) for e in current_user.emblems]
+    form.emblem.choices = [(0, 'None')] + [(e.id, e.name) for e in current_user.emblems]
 
     if request.method == 'GET':
-        form.username.data = current_user.username
+        form.username.data = current_user.name
         form.display_name.data = current_user.display_name
         form.emblem.data = current_user.equipped_emblem_id
-        # add other fields like description here if needed
 
     if form.validate_on_submit():
-        if current_user.username != form.username.data:
-            current_user.username = form.username.data
-            # Optionally check username uniqueness here
+        if current_user.name != form.username.data:
+            current_user.name = form.username.data
 
         current_user.display_name = form.display_name.data
         current_user.equipped_emblem_id = form.emblem.data
 
         if form.password.data:
             current_user.password_hash = hash_password(form.password.data)
+
+        if form.emblem.data == 0:
+            current_user.equipped_emblem_id = None
+        else:
+            current_user.equipped_emblem_id = form.emblem.data
 
         db.session.commit()
         flash('Settings updated successfully.', 'success')
