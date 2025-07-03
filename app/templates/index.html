@@ -38,12 +38,17 @@
                             exercise.owner.name else exercise.owner.name }}
                         </a>
                     </div>
-                    <a href="/exercise/{{ exercise.id }}/likes" class="text-slate-600 text-sm hover:underline">Gillar: {{ likes_count
+                    <a href="/exercise/{{ exercise.id }}/likes" class="text-slate-600 text-sm hover:underline">Gillar:
+                        {{ likes_count
                         }}</a>
                 </li>
                 {% endfor %}
             </ul>
         </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+        <div class="mt-4"
+        {% include 'chat/chat_window.html' %}
     </div>
 </div>
 {% endblock %}

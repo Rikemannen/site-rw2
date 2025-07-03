@@ -8,6 +8,7 @@ from app.extensions import login_manager
 from app.services.user_service import get_user_by_id
 from app.extensions import socketio, db
 from flask_login import current_user
+from app.blueprints.chat import messages
 
 def create_app():
     """Create and configure the Flask application."""
@@ -50,5 +51,9 @@ def create_app():
     @app.context_processor
     def inject_user():
         return {'user': current_user}
+    
+    @app.context_processor
+    def inject_messages():
+        return dict(messages=messages)
 
     return app

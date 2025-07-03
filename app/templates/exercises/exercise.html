@@ -12,10 +12,22 @@
                 <span>Skapad: {{ exercise.created | datetimeformat }}</span>
                 <span>{{ exercise.attempts }} försök</span>
                 <span>Avklarad {{ exercise.finished if exercise.finished else 0 }} gånger</span>
-                <span><a class="hover:underline" href="{{ url_for('exercise.likes', exercise_id=exercise.id) }}">Gillar:
-                        {{
-                        exercise.likes()
-                        }}</a></span>
+                <span>
+                    <a class="hover:underline" href="{{ url_for('exercise.likes', exercise_id=exercise.id) }}">
+                        {{ exercise.likes() }} gillar
+                    </a>
+                    <form action="{{ url_for('exercise.like', exercise_id=exercise.id) }}" method="post"
+                        style="display:inline;">
+                        <button type="submit"
+                            class="bg-transparent border-none hover:underline cursor-pointer ml-2">
+                            {% if user.has_liked_exercise(exercise) %}
+                            <p class="text-green-600">Gillar</p>
+                            {% else %}
+                            <p>Gilla</p>
+                            {% endif %}
+                        </button>
+                    </form>
+                </span>
             </div>
             <p class="text-gray-600 mb-0">Skapad av:
                 <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">

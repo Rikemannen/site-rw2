@@ -19,10 +19,10 @@ class Exercise(db.Model):
     name = Column(String(100), nullable=False)
     description = Column(String(), nullable=False)
     owner_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
-    owner = relationship('User', backref='exercises')
+    owner = relationship('User', back_populates='exercises')
     created = Column(Integer, nullable=False)
     attempts = Column(Integer, default=0)
-    finishes = Column(Integer, default=0)
+    finished = Column(Integer, default=0)
     approved = Column(Boolean, default=False)
     liked_by = relationship('User', secondary='exercise_likes', back_populates='liked_exercises')
 

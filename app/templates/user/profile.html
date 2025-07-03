@@ -24,10 +24,55 @@
                 <p>{{ user.description if user.description else 'Tomt D;' }}</p>
             </div>
         </div>
-    </div>
-
-    <div class="flex w-[400px] h-[650px] z-50 t-4">
-        {% include "chat/chat_window.html" %}
-    </div>
-</div>
-{% endblock %}
+        {% set has_approved_exercise = user.exercises | selectattr('approved') | list | length > 0 %}
+        {% if has_approved_exercise %}
+        <div class="bg-slate-200 p-2 rounded-md shadow-md mt-4">
+            <h1 class="text-xl font-bold mb-2">Skapade Övningar</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for exercise in user.exercises %}
+                {% if exercise.approved %}
+                <div class="p-2 rounded-md shadow-md bg-slate-300">
+                    <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
+                            }}</a></p>
+                    <div class="flex flex-row gap-4">
+                        <p>Gillar: {{ exercise.likes() }}</p>
+                        <p>Skapad: {{ exercise.created | datetimeformat }}</p>
+                        <p>Försök: {{ exercise.attempts }}</p>
+                        <p>Avklarad: {{ exercise.finished }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% set likes_approved_exercise = user.liked_exercises | selectattr('approved') | list | length > 0 %}
+        {% if likes_approved_exercise %}
+        <div class="bg-slate-200 p-2 rounded-md shadow-md mt-4">
+            <h1 class="text-xl font-bold mb-2">Gillade Övningar</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for exercise in user.liked_exercises %}
+                {% if exercise.approved %}
+                <div class="p-2 rounded-md shadow-md bg-slate-300">
+                    <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
+                            }}</a>
+                    <p>Skapare: <a href="/user/{{ user.id }}" class="hover:underline"
+                            style="color: {{ exercise.owner.equipped_emblem.color }}">{{
+                            user.display_name ~ ' (@' ~ user.name ~ ')' if
+                            user.display_name and user.display_name != user.name
+                            else user.name }}
+                        </a></p>
+                    </p>
+                    <div class="flex flex-row gap-4">
+                        <p>Gillar: {{ exercise.likes() }}</p>
+                        <p>Skapad: {{ exercise.created | datetimeformat }}</p>
+                        <p>Försök: {{ exercise.attempts }}</p>
+                        <p>Avklarad: {{ exercise.finished }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endblock %}

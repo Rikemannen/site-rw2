@@ -24,6 +24,7 @@ class User(db.Model, UserMixin):
     equipped_emblem_id = Column(Integer, ForeignKey('emblems.id'), nullable=True)
     equipped_emblem = relationship('Emblem', foreign_keys=[equipped_emblem_id])
     liked_exercises = relationship('Exercise', secondary='exercise_likes', back_populates='liked_by')
+    exercises = relationship('Exercise', back_populates='owner')  # Explicitly define the backref
 
     # Additional columns to consider:
     #profile_picture = Column(String(), nullable=True) # Url
@@ -35,3 +36,11 @@ class User(db.Model, UserMixin):
     def owns_exercise(self, exercise):
         """Check if the user owns a specific exercise."""
         return exercise.owner_id == self.id
+
+    def has_liked_exercise(self, exercise):
+        """Check if user has liked an exercise."""
+        return self in exercise.liked_by
+
+    def get_exercises(self):
+        """Return a list of exercises owned by the user."""
+        return self.exercises

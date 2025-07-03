@@ -48,7 +48,7 @@ def get_popular_exercises(amount=3):
     return (
         db.session.query(Exercise, func.count(exercise_likes.c.user_id).label('likes_count'))
         .outerjoin(exercise_likes, Exercise.id == exercise_likes.c.exercise_id)
-        .filter(Exercise.approved == True)
+        .filter(Exercise.approved)
         .group_by(Exercise.id)
         .order_by(func.count(exercise_likes.c.user_id).desc())
         .limit(amount)
@@ -59,41 +59,37 @@ def get_recent_exercises(amount=3):
     """Retrieve the most recently created exercises."""
     return db.session.query(Exercise).filter(Exercise.approved == True).order_by(Exercise.created.desc()).limit(amount).all()
 
-def increment_attempts(exercise_id):
+def increment_attempts(exercise):
     """Increment the attempt count for a specific exercise."""
-    exercise = get_exercise_by_id(exercise_id)
     if exercise:
         exercise.attempts += 1
         db.session.commit()
     else:
-        raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
+        raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
 
-def increment_finishes(exercise_id):
+def increment_finishes(exercise):
     """Increment the finish count for a specific exercise."""
-    exercise = get_exercise_by_id(exercise_id)
     if exercise:
-        exercise.finishes += 1
+        exercise.finished += 1
         db.session.commit()
     else:
-        raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
+        raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
 
-def liked(user, exercise_id):
+def liked(user, exercise):
     """Add a user to the "liked users" of an exercise."""
-    exercise = get_exercise_by_id(exercise_id)
     if exercise:
         exercise.liked_by.append(user)
         db.session.commit()
     else:
-        raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
+        raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
 
-def unliked(user, exercise_id):
+def unliked(user, exercise):
     """Remove a user from the "liked users" of an exercise."""
-    exercise = get_exercise_by_id(exercise_id)
     if exercise:
         if user in exercise.liked_by:
             exercise.liked_by.remove(user)
             db.session.commit()
         else:
-            raise ValueError(f"User {user.name} has not liked exercise {exercise_id}.")
+            raise ValueError(f"User {user.name} has not liked exercise {exercise.id}.")
     else:
-        raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
+        raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
