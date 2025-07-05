@@ -2,13 +2,13 @@
 
 from datetime import datetime
 from os import environ
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, request
 from app.blueprints import main, auth, exercises, chat, admin
 from app.extensions import login_manager
 from app.services.user_service import get_user_by_id
 from app.extensions import socketio, db
 from flask_login import current_user
-from app.blueprints.chat import messages
+from app.blueprints.chat import get_messages
 
 def create_app():
     """Create and configure the Flask application."""
@@ -41,12 +41,17 @@ def create_app():
 
     @app.template_filter('datetimeformat')
     def datetimeformat(value):
-        return datetime.fromtimestamp(value).strftime('%d/%m %H:%M:%S')
+        return datetime.fromtimestamp(value).strftime('%d/%m %H:%M')
 
     @app.errorhandler(404)
     def not_found(error):
         """Render the 404 Not Found page."""
         return render_template('404.html'), 404
+    
+    @app.errorhandler(401)
+    def unauthorized(error):
+        """Redirect to login route if user needs to be logged in."""
+        return redirect(url_for('auth.login', next=request.url))
     
     @app.context_processor
     def inject_user():
@@ -54,6 +59,6 @@ def create_app():
     
     @app.context_processor
     def inject_messages():
-        return dict(messages=messages)
+        return dict(messages=get_messages())
 
     return app

@@ -1,13 +1,16 @@
 """Handles user authentication routes and views."""
 
-from flask import Blueprint, flash, redirect, request, render_template, url_for
+from flask import Blueprint, flash, redirect, request, render_template, url_for, abort
 import flask
 from flask_login import login_user, current_user, login_required, logout_user
-#from werkzeug.urls import url_has_allowed_host_and_scheme
+from urllib.parse import urlparse
+import datetime
 from app.services.user_service import get_user_by_username, create_user
 from app.utils.security import verify_password, hash_password
-from app.forms.auth_forms import LoginForm, SignupForm, SettingsForm
+from app.forms.auth_forms import LoginForm, SignupForm
+from app.forms.settings_forms import ProfileSettingsForm, UsernameChangeForm, PasswordChangeForm, DeleteUserForm
 from app.extensions import db
+from app.utils.security import verify_password, hash_password
 
 bp = Blueprint('auth', __name__)
 
@@ -27,11 +30,12 @@ def login():
 
         flash('Login successful!')
 
-        next_url = request.args.get('next')
-        # TODO: Fix url validation check!
-        #if not url_has_allowed_host_and_scheme(next_url, request.host):
-        #    return flask.abort(400)
-        return redirect(next_url or flask.url_for('main.index'))
+        next_url = request.form.get('next')
+
+        if next_url:
+            return redirect(next_url)
+        return redirect(url_for('main.index'))
+
     return render_template('auth/login.html', form=form)
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -67,28 +71,21 @@ def logout():
     flash('You have been logged out.')
     return redirect(flask.url_for('main.index'))
 
-@bp.route('/settings', methods=['GET', 'POST'])
+@bp.route('/settings/profile', methods=['GET', 'POST'])
 @login_required
-def settings():
-    """Handle user settings."""
-    form = SettingsForm()
+def profile_settings():
+    """Handle profile settings."""
+    form = ProfileSettingsForm()
 
     form.emblem.choices = [(0, 'None')] + [(e.id, e.name) for e in current_user.emblems]
 
     if request.method == 'GET':
-        form.username.data = current_user.name
         form.display_name.data = current_user.display_name
         form.emblem.data = current_user.equipped_emblem_id
 
     if form.validate_on_submit():
-        if current_user.name != form.username.data:
-            current_user.name = form.username.data
-
         current_user.display_name = form.display_name.data
         current_user.equipped_emblem_id = form.emblem.data
-
-        if form.password.data:
-            current_user.password_hash = hash_password(form.password.data)
 
         if form.emblem.data == 0:
             current_user.equipped_emblem_id = None
@@ -97,6 +94,40 @@ def settings():
 
         db.session.commit()
         flash('Settings updated successfully.', 'success')
-        return redirect(url_for('auth.settings'))
+        return redirect(url_for('auth.profile_settings'))
 
     return render_template('auth/settings.html', form=form)
+
+@bp.route('/settings/account', methods=['GET', 'POST'])
+@login_required
+def account_settings():
+    """Handle settings to username, password and account deletion."""
+    nameForm = UsernameChangeForm()
+    passForm = PasswordChangeForm()
+    deleteForm = DeleteUserForm()
+
+    if request.method == 'GET':
+        nameForm.username.data = current_user.name
+
+    if nameForm.validate_on_submit():
+        current_user.name = nameForm.username.data
+        current_user.name_last_change = datetime.utcnow()
+
+    if passForm.validate_on_submit():
+        if not passForm.new_password.data == passForm.confirm_password.data:
+            flash('Passwords do not match!')
+            return redirect(url_for('auth.account_settings'))
+        if verify_password(current_user.password_hash, passForm.new_password.data):
+            current_user.password_hash = hash_password(passForm.new_password.data)
+
+    if deleteForm.validate_on_submit():
+        if not deleteForm.username.data == current_user.name or not verify_password(current_user.password_hash, deleteForm.password.data) or not confirm:
+            abort(403)
+
+        db.session.delete(current_user)
+    db.session.commit()
+
+@bp.route('/settings')
+def settings_redirect():
+    """Redirects /settings to /settings/profile"""
+    return redirect(url_for('auth.profile_settings'))

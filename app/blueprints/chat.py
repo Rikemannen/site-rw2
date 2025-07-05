@@ -3,6 +3,7 @@ from flask_socketio import emit
 from flask_login import current_user
 import bleach
 from app.extensions import socketio
+from app.services.user_service import get_user_by_id
 
 bp = Blueprint('chat', __name__, url_prefix='/')
 
@@ -14,13 +15,16 @@ def handle_send_message(data):
     if not current_user.is_authenticated:
         return
     message = data.get('message')
+    if len(message) > 100:
+        return
+    color = current_user.equipped_emblem.color if current_user.equipped_emblem else None
     clean_message = bleach.clean(message)
     emit('receive_message',
         {'message': clean_message, 'display_name': current_user.display_name,
-         'username': current_user.name, 'id': current_user.id},
+         'username': current_user.name, 'id': current_user.id, 'color': color},
          broadcast=True)
 
-    messages.append({"message": clean_message, "display_name": current_user.display_name, "name": current_user.name, "id": current_user.id})
+    messages.append({"message": clean_message, "id": current_user.id})
 
 @bp.route('/chat', methods=['GET'])
 def chat():
@@ -30,4 +34,20 @@ def chat():
 @bp.route('/chat/messages', methods=['GET'])
 def get_messages():
     """Returns a list with all stored messages along with author data."""
-    return messages
+    result = []
+    for msg in messages:
+        user = get_user_by_id(msg["id"])
+        color = ""
+        if user.equipped_emblem:
+            color = user.equipped_emblem.color
+        
+        if user:
+            result.append({
+                "message": msg["message"],
+                "display_name": user.display_name,
+                "name": user.name,
+                "id": user.id,
+                "color": color
+            })
+
+    return result

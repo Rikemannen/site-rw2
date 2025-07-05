@@ -11,16 +11,15 @@
             <div class="flex flex-wrap gap-4">
                 <span>Skapad: {{ exercise.created | datetimeformat }}</span>
                 <span>{{ exercise.attempts }} försök</span>
-                <span>Avklarad {{ exercise.finished if exercise.finished else 0 }} gånger</span>
+                <span>Avklarad {{ exercise.finished }} gånger</span>
+                {% set has_liked = current_user.is_authenticated and current_user.has_liked_exercise(exercise) %}
                 <span>
                     <a class="hover:underline" href="{{ url_for('exercise.likes', exercise_id=exercise.id) }}">
-                        {{ exercise.likes() }} gillar
-                    </a>
-                    <form action="{{ url_for('exercise.like', exercise_id=exercise.id) }}" method="post"
+                        {{ exercise.likes() }} gillar</a>
+                    <form action="{{ url_for('exercise.like', exercise_id=exercise.id) if user.is_authenticated else url_for('auth.login', next=request.url) }}" method="post"
                         style="display:inline;">
-                        <button type="submit"
-                            class="bg-transparent border-none hover:underline cursor-pointer ml-2">
-                            {% if user.has_liked_exercise(exercise) %}
+                        <button type="submit" class="bg-transparent border-none hover:underline cursor-pointer ml-2">
+                            {% if has_liked %}
                             <p class="text-green-600">Gillar</p>
                             {% else %}
                             <p>Gilla</p>
@@ -30,7 +29,8 @@
                 </span>
             </div>
             <p class="text-gray-600 mb-0">Skapad av:
-                <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
+                <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline"
+                    style="color: {{ exercise.owner.color }};">
                     {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if exercise.owner.display_name
                     and
                     exercise.owner.display_name != exercise.owner.name else exercise.owner.name }}
@@ -39,5 +39,6 @@
         </div>
     </div>
     <hr class="my-6 border-t border-gray-300">
-    {% include "exercises/" ~ exercise.id ~ "/exercise.html" %}
-    {% endblock %}
+</div>
+{% include "exercises/" ~ exercise.id ~ "/exercise.html" %}
+{% endblock %}

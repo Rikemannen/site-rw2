@@ -18,7 +18,7 @@ def index():
     """Render the index page."""
     return render_template('index.html',
                            popular_exercises=get_popular_exercises(),
-                           recent_exercises=get_recent_exercises())
+                           recent_exercises=get_recent_exercises(), show_chat_window=False)
 
 @bp.route('/user/<user_id>')
 def user_profile(user_id):

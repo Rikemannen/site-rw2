@@ -14,11 +14,3 @@ class SignupForm(FlaskForm):
     username = StringField('Användarnamn', validators=[DataRequired(), Length(min=3, max=25)])
     password = PasswordField('Lösenord', validators=[DataRequired(), Length(min=8, max=100)])
     submit = SubmitField('Registrera')
-
-class SettingsForm(FlaskForm):
-    """Form for user settings."""
-    display_name = StringField('Visningsnamn', validators=[Length(max=50)])
-    username = StringField('Användarnamn', validators=[DataRequired(), Length(min=3, max=25)])
-    password = PasswordField('Lösenord', validators=[DataRequired(), Length(min=8, max=100)])
-    emblem = SelectField('Utrustad Emblem', coerce=int, choices=[])
-    submit = SubmitField('Uppdatera Inställningar')

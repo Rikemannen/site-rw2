@@ -13,7 +13,7 @@
                     <div class="flex justify-between items-center">
                         <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
                             exercise.name[:30] }}</a>
-                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
+                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline" style="color: {{ exercise.owner.color }};">
                             {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
                             exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
                             else exercise.owner.name }}
@@ -32,15 +32,15 @@
                     <div class="flex justify-between items-center">
                         <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
                             exercise.name[:30] }}</a>
-                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline">
+                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline" style="color: {{ exercise.owner.color }};">
                             {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
                             exercise.owner.display_name and exercise.owner.display_name !=
                             exercise.owner.name else exercise.owner.name }}
                         </a>
                     </div>
-                    <a href="/exercise/{{ exercise.id }}/likes" class="text-slate-600 text-sm hover:underline">Gillar:
+                    <p class="text-slate-600 text-sm"><a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar:
                         {{ likes_count
-                        }}</a>
+                        }}</a></p>
                 </li>
                 {% endfor %}
             </ul>

@@ -35,7 +35,8 @@
                     <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
                             }}</a></p>
                     <div class="flex flex-row gap-4">
-                        <p>Gillar: {{ exercise.likes() }}</p>
+                        <a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar: {{ exercise.likes()
+                            }}</a>
                         <p>Skapad: {{ exercise.created | datetimeformat }}</p>
                         <p>Försök: {{ exercise.attempts }}</p>
                         <p>Avklarad: {{ exercise.finished }}</p>
@@ -64,7 +65,8 @@
                         </a></p>
                     </p>
                     <div class="flex flex-row gap-4">
-                        <p>Gillar: {{ exercise.likes() }}</p>
+                        <a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar: {{ exercise.likes()
+                            }}</a>
                         <p>Skapad: {{ exercise.created | datetimeformat }}</p>
                         <p>Försök: {{ exercise.attempts }}</p>
                         <p>Avklarad: {{ exercise.finished }}</p>
@@ -74,5 +76,7 @@
                 {% endfor %}
             </div>
         </div>
-        {% endif %}
-        {% endblock %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

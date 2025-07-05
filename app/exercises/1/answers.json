@@ -1,0 +1,5 @@
+{
+    "q1": ["Hallo!", true],
+    "q2": ["Danke!", false],
+    "q3": ["Bitte!", false]
+}

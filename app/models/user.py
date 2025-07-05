@@ -1,6 +1,6 @@
 """User model for the application."""
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from app.extensions import db
@@ -24,7 +24,8 @@ class User(db.Model, UserMixin):
     equipped_emblem_id = Column(Integer, ForeignKey('emblems.id'), nullable=True)
     equipped_emblem = relationship('Emblem', foreign_keys=[equipped_emblem_id])
     liked_exercises = relationship('Exercise', secondary='exercise_likes', back_populates='liked_by')
-    exercises = relationship('Exercise', back_populates='owner')  # Explicitly define the backref
+    exercises = relationship('Exercise', back_populates='owner')
+    name_last_change = Column(DateTime, nullable=True)
 
     # Additional columns to consider:
     #profile_picture = Column(String(), nullable=True) # Url
@@ -41,6 +42,14 @@ class User(db.Model, UserMixin):
         """Check if user has liked an exercise."""
         return self in exercise.liked_by
 
-    def get_exercises(self):
+    @property
+    def owned_exercises(self):
         """Return a list of exercises owned by the user."""
         return self.exercises
+
+    @property
+    def color(self):
+        """Returns the color of the user's equipped emblem"""
+        if self.equipped_emblem and self.equipped_emblem.color:
+            return self.equipped_emblem.color
+        return "#155DFC"
