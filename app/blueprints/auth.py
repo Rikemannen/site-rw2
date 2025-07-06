@@ -84,7 +84,7 @@ def profile_settings():
         form.emblem.data = current_user.equipped_emblem_id
 
     if form.validate_on_submit():
-        current_user.display_name = form.display_name.data
+        current_user.display_name = form.display_name.data #TODO: Fix this, doesnt change data for some reason
         current_user.equipped_emblem_id = form.emblem.data
 
         if form.emblem.data == 0:
@@ -96,7 +96,7 @@ def profile_settings():
         flash('Settings updated successfully.', 'success')
         return redirect(url_for('auth.profile_settings'))
 
-    return render_template('auth/settings.html', form=form)
+    return render_template('auth/profile_settings.html', form=form)
 
 @bp.route('/settings/account', methods=['GET', 'POST'])
 @login_required
@@ -109,9 +109,34 @@ def account_settings():
     if request.method == 'GET':
         nameForm.username.data = current_user.name
 
+    return render_template(
+        'auth/account_settings.html',
+        nameForm=nameForm,
+        passForm=passForm,
+        deleteForm=deleteForm
+    )
+
+@bp.route('/settings/account/username', methods=['POST'])
+@login_required
+def username_change():
+    nameForm = UsernameChangeForm()
+
     if nameForm.validate_on_submit():
-        current_user.name = nameForm.username.data
-        current_user.name_last_change = datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc)
+        if current_user.name_last_change is None or current_user.name_last_change + datetime.timedelta(days=14) <= now:
+            current_user.name = nameForm.username.data
+            current_user.name_last_change = now
+            db.session.commit()
+            flash('Användarnamnet har ändrats!')
+            return redirect(url_for('auth.account_settings'))
+        else:
+            flash('Du måste vänta 14 dagar innan du ändrar ditt namn igen.')
+            return redirect(url_for('auth.account_settings'))
+
+@bp.route('/settings/account/password', methods=['POST'])
+@login_required
+def password_change():
+    passForm = PasswordChangeForm()
 
     if passForm.validate_on_submit():
         if not passForm.new_password.data == passForm.confirm_password.data:
@@ -119,13 +144,24 @@ def account_settings():
             return redirect(url_for('auth.account_settings'))
         if verify_password(current_user.password_hash, passForm.new_password.data):
             current_user.password_hash = hash_password(passForm.new_password.data)
+            db.session.commit()
+            flash('Lösenordet har ändrats!')
+            return redirect(url_for('auth.account_settings'))
+
+@bp.route('/settings/account/delete', methods=['POST'])
+@login_required
+def account_deletion():
+    deleteForm = DeleteUserForm()
 
     if deleteForm.validate_on_submit():
-        if not deleteForm.username.data == current_user.name or not verify_password(current_user.password_hash, deleteForm.password.data) or not confirm:
-            abort(403)
+        if not deleteForm.username.data == current_user.name or not verify_password(current_user.password_hash, deleteForm.password.data) or not deleteForm.confirm.data:
+            flash('Felaktig information!')
+            return redirect(url_for('auth.account_settings'))
 
         db.session.delete(current_user)
-    db.session.commit()
+        db.session.commit()
+        flash('Kontot har tagits bort :(')
+        return redirect(url_for('main.index'))
 
 @bp.route('/settings')
 def settings_redirect():

@@ -25,7 +25,7 @@ class User(db.Model, UserMixin):
     equipped_emblem = relationship('Emblem', foreign_keys=[equipped_emblem_id])
     liked_exercises = relationship('Exercise', secondary='exercise_likes', back_populates='liked_by')
     exercises = relationship('Exercise', back_populates='owner')
-    name_last_change = Column(DateTime, nullable=True)
+    name_last_change = Column(DateTime(timezone=True), nullable=True)
 
     # Additional columns to consider:
     #profile_picture = Column(String(), nullable=True) # Url

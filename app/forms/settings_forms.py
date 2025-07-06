@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length, EqualTo
 
 class ProfileSettingsForm(FlaskForm):
     """Form for profile settings."""
-    display_name = StringField('Visningsnamn', validators=[Length(min=3, max=20)])
+    display_name = StringField('Visningsnamn', validators=[Length(max=20)])
     emblem = SelectField('Utrustad Emblem', coerce=int, choices=[])
     submit = SubmitField('Uppdatera Profil')
 
