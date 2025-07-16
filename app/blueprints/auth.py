@@ -1,16 +1,14 @@
 """Handles user authentication routes and views."""
 
-from flask import Blueprint, flash, redirect, request, render_template, url_for, abort
+from flask import Blueprint, flash, redirect, request, render_template, url_for
 import flask
-from flask_login import login_user, current_user, login_required, logout_user
-from urllib.parse import urlparse
 import datetime
+from flask_login import login_user, current_user, login_required, logout_user
 from app.services.user_service import get_user_by_username, create_user
 from app.utils.security import verify_password, hash_password
 from app.forms.auth_forms import LoginForm, SignupForm
 from app.forms.settings_forms import ProfileSettingsForm, UsernameChangeForm, PasswordChangeForm, DeleteUserForm
 from app.extensions import db
-from app.utils.security import verify_password, hash_password
 
 bp = Blueprint('auth', __name__)
 
