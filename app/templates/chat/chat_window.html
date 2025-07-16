@@ -3,11 +3,12 @@
         <h1 class="text-2xl font-bold mb-4"><a href="/chat" class="hover:underline">Chatt</a></h1>
         <div id="chat-box" class="bg-white h-64 overflow-y-scroll p-2 mb-4 rounded-md border border-gray-300">
             {% for msg in messages %}
-            <div class="mt-1 mb-1 p-1 rounded-md shadow-sm"
+            <div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between"
                 style="color: {{ msg.color }}; background-color: {{ msg.color }}33;">
-                <a href="/user/{{ msg.id }}" class="hover:underline">
-                    {{ msg.display_name ~ ' (@' ~ msg.name ~ ')' if msg.display_name and msg.display_name != msg.name
-                    else msg.name }}</a>: {{ msg.message }}
+                <p><a href="/user/${id}" class="hover:underline">{{ msg.display_name ~ ' (@' ~ msg.name ~ ')' if
+                        msg.display_name and msg.display_name != msg.name
+                        else msg.name }}</a>: {{ msg.message }}</p>
+                <p class="text-gray-600 text-sm">{{ msg.time | datetimeformat('time') }}</p>
             </div>
             {% endfor %}
         </div>
@@ -20,6 +21,11 @@
 </div>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
+    window.onload = function () {
+        const chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
     const socket = io();
 
     const form = document.getElementById('chat-form');
@@ -34,6 +40,11 @@
         }
     });
 
+    function formatTime(unixTime) {
+        const date = new Date(unixTime * 1000);
+        return date.toLocaleTimeString(undefined, { hour12: false });
+    }
+
     socket.on('receive_message', function (data) {
         const msg = document.createElement('div');
         const displayName = data.display_name;
@@ -41,12 +52,13 @@
         const id = data.id;
         const message = data.message;
         const color = data.color;
+        const time = formatTime(data.time);
 
         const nameText = (displayName && displayName !== username)
             ? `${displayName} (@${username})`
             : username;
 
-        msg.innerHTML = `<div class="mt-1 mb-1 p-1 rounded-md shadow-sm" style="color: ${color}; background-color: ${color}33;"><a href="/user/${id}" class="hover:underline">${nameText}</a>: ${message}</div>`;
+        msg.innerHTML = `<div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between" style="color: ${color}; background-color: ${color}33;"><p><a href="/user/${id}" class="hover:underline">${nameText}</a>: ${message}</p><p class="text-gray-600 text-sm">${time}</p></div>`;
         chatBox.appendChild(msg);
         chatBox.scrollTop = chatBox.scrollHeight;
     });

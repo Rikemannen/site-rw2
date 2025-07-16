@@ -2,6 +2,7 @@ from flask import Blueprint, render_template
 from flask_socketio import emit
 from flask_login import current_user
 import bleach
+import datetime
 from app.extensions import socketio
 from app.services.user_service import get_user_by_id
 
@@ -17,14 +18,17 @@ def handle_send_message(data):
     message = data.get('message')
     if len(message) > 100:
         return
-    color = current_user.equipped_emblem.color if current_user.equipped_emblem else None
+    color = "#FFFFFF"
+    if current_user.equipped_emblem:
+        color = current_user.equipped_emblem.color
     clean_message = bleach.clean(message)
+    now = datetime.datetime.now(datetime.timezone.utc).timestamp()
     emit('receive_message',
         {'message': clean_message, 'display_name': current_user.display_name,
-         'username': current_user.name, 'id': current_user.id, 'color': color},
+         'username': current_user.name, 'id': current_user.id, 'color': color, 'time': now},
          broadcast=True)
 
-    messages.append({"message": clean_message, "id": current_user.id})
+    messages.append({"message": clean_message, "id": current_user.id, "time": now})
 
 @bp.route('/chat', methods=['GET'])
 def chat():
@@ -38,7 +42,7 @@ def get_messages():
     for msg in messages:
         user = get_user_by_id(msg["id"])
         color = ""
-        if user.equipped_emblem:
+        if user and user.equipped_emblem:
             color = user.equipped_emblem.color
         
         if user:
@@ -47,7 +51,8 @@ def get_messages():
                 "display_name": user.display_name,
                 "name": user.name,
                 "id": user.id,
-                "color": color
+                "color": color,
+                "time": msg["time"]
             })
 
     return result
