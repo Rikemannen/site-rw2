@@ -17,7 +17,7 @@ Steps to reproduce the behavior:
 What should happen:
 
 **Screenshots/demos**
-Include screenshots or demonstrations if wanted!
+Include screenshots or demonstrations if any.
 
 **Additional Context**
 Any other info.
