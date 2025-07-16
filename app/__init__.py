@@ -40,8 +40,17 @@ def create_app():
         return get_user_by_id(user_id)
 
     @app.template_filter('datetimeformat')
-    def datetimeformat(value):
-        return datetime.fromtimestamp(value).strftime('%d/%m %H:%M')
+    def datetimeformat(value, variant="full"):
+        dt = datetime.fromtimestamp(value)
+        if variant == "full":
+            return dt.strftime('%Y-%m-%d %H:%M:%S')
+        elif variant == "datetime":
+            return dt.strftime('%d/%m %H:%M')
+        elif variant == "time":
+            return dt.strftime('%H:%M:%S')
+        elif variant == "date":
+            return dt.strftime('%Y-%m-%d')
+        return dt.strftime('%Y-%m-%d %H:%M:%S') # Fallback
 
     @app.errorhandler(404)
     def not_found(error):

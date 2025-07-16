@@ -9,7 +9,7 @@
         <p class="mb-2 bg-slate-300 p-2 rounded-md">{{ exercise.description }}</p>
         <div class="flex flex-wrap gap-4 text-gray-600 mb-2 items-center justify-between">
             <div class="flex flex-wrap gap-4">
-                <span>Skapad: {{ exercise.created | datetimeformat }}</span>
+                <span>Skapad: {{ exercise.created | datetimeformat('datetime') }}</span>
                 <span>{{ exercise.attempts }} försök</span>
                 <span>Avklarad {{ exercise.finished }} gånger</span>
                 {% set has_liked = current_user.is_authenticated and current_user.has_liked_exercise(exercise) %}

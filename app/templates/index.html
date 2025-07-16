@@ -19,7 +19,7 @@
                             else exercise.owner.name }}
                         </a>
                     </div>
-                    <p class="text-slate-600 text-sm">Skapades: {{ exercise.created | datetimeformat }}</p>
+                    <p class="text-slate-600 text-sm">Skapades: {{ exercise.created | datetimeformat('datetime') }}</p>
                 </li>
                 {% endfor %}
             </ul>
