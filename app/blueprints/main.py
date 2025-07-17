@@ -2,8 +2,8 @@
 
 from flask import Blueprint, abort, render_template, request, redirect
 from flask_login import current_user, login_required
-from app.services.exercise_service import get_popular_exercises, get_recent_exercises
-from app.services.user_service import get_user_by_id
+from app.services.exercise_service import get_popular_exercises, get_recent_exercises, get_all_exercises
+from app.services.user_service import get_user_by_id, get_all_users
 from app.services.search_service import (
     search_users,
     search_users_by_id_partial,
@@ -43,7 +43,7 @@ def search():
     user_results = []
     exercise_results = []
 
-    if query:
+    if query and query != "*":
         if search_type in ('all', 'users'):
             user_results.extend(search_users(query))
             if query.isdigit():
@@ -57,6 +57,12 @@ def search():
                 id_results = search_exercises_by_id_partial(query)
                 existing_ids = {user.id for user in id_results}
                 exercise_results.extend(user for user in id_results if user.id not in existing_ids)
+    elif query == "*":
+        if search_type in ('all', 'users'):
+            user_results.extend(get_all_users())
+
+        if search_type in ('all', 'exercises'):
+            exercise_results.extend(get_all_exercises())
 
     return render_template(
         'search/results.html',

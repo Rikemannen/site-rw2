@@ -93,3 +93,7 @@ def unliked(user, exercise):
             raise ValueError(f"User {user.name} has not liked exercise {exercise.id}.")
     else:
         raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
+
+def get_all_exercises():
+    """Returns a list with every exercise object."""
+    return db.session.query(Exercise)

@@ -24,3 +24,7 @@ def create_user(username, display_name, password_hash):
     except sqlalchemy.exc.IntegrityError as e:
         db.session.rollback()
         return None
+
+def get_all_users():
+    """Returns a list with every user object."""
+    return db.session.query(User)

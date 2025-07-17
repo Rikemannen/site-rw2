@@ -39,9 +39,9 @@
                 </p>
                 <p>Skapare: <a href="/user/{{ user.id }}" class="hover:underline"
                         style="color: {{ exercise.owner.equipped_emblem.color }}">{{
-                        user.display_name ~ ' (@' ~ user.name ~ ')' if
-                        user.display_name and user.display_name != user.name
-                        else user.name }}
+                        exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
+                        exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
+                        else exercise.owner.name }}
                     </a></p>
                 <div class="flex flex-row gap-4">
                     <p>ID: {{ exercise.id }}</p>
