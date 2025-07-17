@@ -47,12 +47,16 @@ def search():
         if search_type in ('all', 'users'):
             user_results.extend(search_users(query))
             if query.isdigit():
-                user_results.extend(search_users_by_id_partial(query))
+                id_results = search_users_by_id_partial(query)
+                existing_ids = {user.id for user in user_results}
+                user_results.extend(user for user in id_results if user.id not in existing_ids)
 
         if search_type in ('all', 'exercises'):
             exercise_results.extend(search_exercises(query))
             if query.isdigit():
-                exercise_results.extend(search_exercises_by_id_partial(query))
+                id_results = search_exercises_by_id_partial(query)
+                existing_ids = {user.id for user in id_results}
+                exercise_results.extend(user for user in id_results if user.id not in existing_ids)
 
     return render_template(
         'search/results.html',
