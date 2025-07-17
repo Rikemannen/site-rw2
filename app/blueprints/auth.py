@@ -137,14 +137,18 @@ def password_change():
     passForm = PasswordChangeForm()
 
     if passForm.validate_on_submit():
+        print("validate")
         if not passForm.new_password.data == passForm.confirm_password.data:
             flash('Passwords do not match!')
+            print("no")
             return redirect(url_for('auth.account_settings'))
-        if verify_password(current_user.password_hash, passForm.new_password.data):
+        if verify_password(current_user.password_hash, passForm.current_password.data):
             current_user.password_hash = hash_password(passForm.new_password.data)
             db.session.commit()
             flash('Lösenordet har ändrats!')
+            print("yes,", current_user.password_hash)
             return redirect(url_for('auth.account_settings'))
+    return redirect(url_for('auth.account_settings'))
 
 @bp.route('/settings/account/delete', methods=['POST'])
 @login_required
