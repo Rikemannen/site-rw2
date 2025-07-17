@@ -7,6 +7,7 @@ from app.services.user_service import get_user_by_id, get_all_users
 from app.services.search_service import (
     search_users,
     search_users_by_id_partial,
+    search_users_by_display_name,
     search_exercises,
     search_exercises_by_id_partial
 )
@@ -46,9 +47,10 @@ def search():
     if query and query != "*":
         if search_type in ('all', 'users'):
             user_results.extend(search_users(query))
+            existing_ids = {user.id for user in user_results}
+            user_results.extend(user for user in search_users_by_display_name(query) if user.id not in existing_ids)
             if query.isdigit():
                 id_results = search_users_by_id_partial(query)
-                existing_ids = {user.id for user in user_results}
                 user_results.extend(user for user in id_results if user.id not in existing_ids)
 
         if search_type in ('all', 'exercises'):

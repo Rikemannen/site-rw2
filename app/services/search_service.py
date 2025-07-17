@@ -23,10 +23,13 @@ def search_users_by_id_partial(user_id):
     # Returns users whose IDs start with the given digits
     return results
 
-# TODO: Implement display names
-
 def search_users_by_display_name(display_name):
-    pass
+    """Search for users based on display names."""
+    if not display_name:
+        return []
+
+    results = db.session.query(User).filter(User.display_name.ilike(f'%{display_name}%')).all()
+    return results
 
 def search_exercises(query):
     """Search for exercises based on names."""
