@@ -56,6 +56,11 @@ def create_app():
     def not_found(error):
         """Render the 404 Not Found page."""
         return render_template('404.html'), 404
+
+    @app.errorhandler(403)
+    def forbidden(error):
+        """Render the 403 Not Found page."""
+        return render_template('403.html'), 403
     
     @app.errorhandler(401)
     def unauthorized(error):
