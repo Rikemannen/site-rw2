@@ -3,89 +3,87 @@
 {% block title %}Kontoinställningar{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-4">
-    <div class="bg-slate-200 rounded-md shadow-md p-4">
-        <h2 class="text-2xl font-bold mb-4">
-            <span class="text-blue-600 hover:underline"><a href="/settings/profile">Profilinställningar</a></span> |
-            <span class="text-green-600">Kontoinställningar</span>
-        </h2>
-        <form method="POST" action="/settings/account/username">
-            {{ nameForm.hidden_tag() }}
-            <div class="mb-4">
-                {{ nameForm.username.label(class="block text-sm font-md text-gray-700")}}
-                {{ nameForm.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in nameForm.username.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="mb-4">
-                {{ nameForm.password.label(class="block text-sm font-md text-gray-700")}}
-                {{ nameForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in nameForm.password.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            {{ nameForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
-        </form>
-        <form method="POST" action="/settings/account/password">
-            {{ passForm.hidden_tag() }}
-            <div class="mb-4">
-                {{ passForm.current_password.label(class="block text-sm font-md text-gray-700")}}
-                {{ passForm.current_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in passForm.current_password.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="mb-4">
-                {{ passForm.new_password.label(class="block text-sm font-md text-gray-700")}}
-                {{ passForm.new_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in passForm.new_password.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="mb-4">
-                {{ passForm.confirm_password.label(class="block text-sm font-md text-gray-700")}}
-                {{ passForm.confirm_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in passForm.confirm_password.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            {{ passForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
-        </form>
-        <form method="POST" action="/settings/account/delete">
-            {{ deleteForm.hidden_tag() }}
-            <div class="mb-4">
-                {{ deleteForm.username.label(class="block text-sm font-md text-gray-700")}}
-                {{ deleteForm.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in deleteForm.username.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="mb-4">
-                {{ deleteForm.password.label(class="block text-sm font-md text-gray-700")}}
-                {{ deleteForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in deleteForm.password.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="mb-4">
-                {{ deleteForm.confirm.label(class="block text-sm font-md text-gray-700")}}
-                {{ deleteForm.confirm(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
-                {% for error in deleteForm.confirm.errors %}
-                <span class="text-red-500 text-xs">{{ error }}</span>
-                {% endfor %}
-            </div>
-            {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
-        </form>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul class="flash-messages">
-            {% for msg in messages %}
-            <li>{{ msg }}</li>
+<div class="bg-slate-200 rounded-md shadow-md p-4">
+    <h2 class="text-2xl font-bold mb-4">
+        <span class="text-blue-600 hover:underline"><a href="/settings/profile">Profilinställningar</a></span> |
+        <span class="text-green-600">Kontoinställningar</span>
+    </h2>
+    <form method="POST" action="/settings/account/username">
+        {{ nameForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ nameForm.username.label(class="block text-sm font-md text-gray-700")}}
+            {{ nameForm.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in nameForm.username.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-    </div>
+        </div>
+        <div class="mb-4">
+            {{ nameForm.password.label(class="block text-sm font-md text-gray-700")}}
+            {{ nameForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in nameForm.password.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ nameForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <form method="POST" action="/settings/account/password">
+        {{ passForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ passForm.current_password.label(class="block text-sm font-md text-gray-700")}}
+            {{ passForm.current_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in passForm.current_password.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ passForm.new_password.label(class="block text-sm font-md text-gray-700")}}
+            {{ passForm.new_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in passForm.new_password.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ passForm.confirm_password.label(class="block text-sm font-md text-gray-700")}}
+            {{ passForm.confirm_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in passForm.confirm_password.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ passForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <form method="POST" action="/settings/account/delete">
+        {{ deleteForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ deleteForm.username.label(class="block text-sm font-md text-gray-700")}}
+            {{ deleteForm.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in deleteForm.username.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ deleteForm.password.label(class="block text-sm font-md text-gray-700")}}
+            {{ deleteForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in deleteForm.password.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ deleteForm.confirm.label(class="block text-sm font-md text-gray-700")}}
+            {{ deleteForm.confirm(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in deleteForm.confirm.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
+    </form>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for msg in messages %}
+        <li>{{ msg }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 </div>
 {% endblock %}
