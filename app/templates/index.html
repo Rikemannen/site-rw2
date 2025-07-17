@@ -13,7 +13,8 @@
                     <div class="flex justify-between items-center">
                         <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
                             exercise.name[:30] }}</a>
-                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline" style="color: {{ exercise.owner.color }};">
+                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline"
+                            style="color: {{ exercise.owner.color }};">
                             {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
                             exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
                             else exercise.owner.name }}
@@ -32,23 +33,25 @@
                     <div class="flex justify-between items-center">
                         <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
                             exercise.name[:30] }}</a>
-                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline" style="color: {{ exercise.owner.color }};">
+                        <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline"
+                            style="color: {{ exercise.owner.color }};">
                             {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
                             exercise.owner.display_name and exercise.owner.display_name !=
                             exercise.owner.name else exercise.owner.name }}
                         </a>
                     </div>
-                    <p class="text-slate-600 text-sm"><a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar:
-                        {{ likes_count
-                        }}</a></p>
+                    <p class="text-slate-600 text-sm"><a href="/exercise/{{ exercise.id }}/likes"
+                            class="hover:underline">Gillar:
+                            {{ likes_count
+                            }}</a></p>
                 </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-        <div class="mt-4"
-        {% include 'chat/chat_window.html' %}
+        <div class="mt-4">
+            {% include 'chat/chat_window.html' %}
+        </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}
