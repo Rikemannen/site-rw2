@@ -82,7 +82,7 @@ def profile_settings():
         form.emblem.data = current_user.equipped_emblem_id
 
     if form.validate_on_submit():
-        current_user.display_name = form.display_name.data #TODO: Fix this, doesnt change data for some reason
+        current_user.display_name = form.display_name.data
         current_user.equipped_emblem_id = form.emblem.data
 
         if form.emblem.data == 0:
