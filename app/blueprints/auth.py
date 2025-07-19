@@ -1,12 +1,13 @@
 """Handles user authentication routes and views."""
 
-from flask import Blueprint, flash, redirect, request, render_template, url_for
+from flask import Blueprint, flash, redirect, request, render_template, url_for, abort
 import flask
 import datetime
 from flask_login import login_user, current_user, login_required, logout_user
-from app.services.user_service import get_user_by_username, create_user
+from app.services.user_service import get_user_by_username, create_user, get_user_by_id
+from app.services.token_service import get_token_by_secret, invalidate_token
 from app.utils.security import verify_password, hash_password
-from app.forms.auth_forms import LoginForm, SignupForm
+from app.forms.auth_forms import LoginForm, SignupForm, RecoveryForm
 from app.forms.settings_forms import ProfileSettingsForm, UsernameChangeForm, PasswordChangeForm, DeleteUserForm
 from app.extensions import db
 
@@ -166,3 +167,21 @@ def account_deletion():
 def settings_redirect():
     """Redirects /settings to /settings/profile"""
     return redirect(url_for('auth.profile_settings'))
+
+@bp.route('/recover/<secret>', methods=['GET', 'POST'])
+def recovery(secret):
+    """Recover accounts using token."""
+    recoveryForm = RecoveryForm()
+    token = get_token_by_secret(secret)
+    if not token or not token.is_valid:
+        abort(403)
+    user = get_user_by_id(token.user_id)
+    
+    if recoveryForm.validate_on_submit():
+        user.password_hash = hash_password(recoveryForm.new_password.data)
+        db.session.commit()
+        invalidate_token(token)
+        flash('Kontots lösenord har ändrats!')
+        return redirect(url_for('auth.login'))
+
+    return render_template('auth/recovery.html', form=recoveryForm, recover=user)

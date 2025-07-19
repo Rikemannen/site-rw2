@@ -28,6 +28,9 @@
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline" onclick="toggleChat()">Visa/Göm
                         Chatt</a></li>
                 {% endif %}
+                {% if user.admin %}
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin" class="hover:underline">Admin</a></li>
+                {% endif %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings" class="hover:underline">Inställningar</a></li>
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/logout" class="hover:underline">Logga ut</a></li>
                 {% else %}
