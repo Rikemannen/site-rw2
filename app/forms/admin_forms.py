@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField, IntegerField, TextAreaField
+from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField, IntegerField, TextAreaField, ColorField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired, Length
 
@@ -73,3 +73,21 @@ class ExerciseHTMLForm(FlaskForm):
 class DeleteExerciseForm(FlaskForm):
     """Form for deleting an exercise."""
     submit = SubmitField('Ta bort övning')
+
+# Emblem forms
+
+class EmblemAppearanceForm(FlaskForm):
+    """Form for changing emblem appearance."""
+    name = StringField('Namn', validators=[DataRequired()])
+    color = ColorField('Färg', validators=[DataRequired()])
+    submit = SubmitField('Uppdatera')
+
+class DeleteEmblemForm(FlaskForm):
+    """Form for deleting an emblem."""
+    submit = SubmitField('Ta bort emblem')
+
+class EmblemCreationForm(FlaskForm):    # Used in separate template
+    """Form for creating an emblem"""
+    name = StringField('Namn', validators=[DataRequired()])
+    color = ColorField('Färg', validators=[DataRequired()])
+    submit = SubmitField('Skapa')

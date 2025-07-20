@@ -6,6 +6,7 @@ from app.services.user_service import get_user_by_id
 from app.services.exercise_service import get_exercise_by_id
 from app.services.token_service import generate_token, get_url
 from app.services.file_service import create_exercise_files, delete_exercise_files, get_exercise_html, get_exercise_answers
+from app.services.emblem_service import get_emblem_by_id, create_emblem as createEmblem
 from app.models.emblems import Emblem
 from app.extensions import db
 from app.forms.admin_forms import (
@@ -21,7 +22,10 @@ from app.forms.admin_forms import (
     ExerciseStatisticForm,
     ExerciseHTMLForm,
     ExerciseAnswerForm,
-    DeleteExerciseForm
+    DeleteExerciseForm,
+    EmblemAppearanceForm,
+    DeleteEmblemForm,
+    EmblemCreationForm
 )
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -280,6 +284,61 @@ def delete_exercise(id):
 
     if deleteForm.validate_on_submit():
         delete_exercise_files(editing.id)
+        db.session.delete(editing)
+        db.session.commit()
+        return redirect(url_for('admin.admin'))
+    return redirect(url_for('admin.admin'))
+
+# --- Emblem related routes within /admin ---
+
+@bp.route('/emblem/<id>')
+@admin_required
+def edit_emblem(id):
+    appearanceForm = EmblemAppearanceForm()
+    deleteForm = DeleteEmblemForm()
+    editing = get_emblem_by_id(id)
+
+    if not editing:
+        abort(404)
+
+    if request.method == 'GET':
+        appearanceForm.name.data = editing.name
+        appearanceForm.color.data = editing.color
+    
+    return render_template('admin/emblem.html', user=user, editing=editing,
+                           appearanceForm=appearanceForm,
+                           deleteForm=deleteForm)
+
+@bp.route('/emblem', methods=['GET','POST'])
+@admin_required
+def create_emblem():
+    createForm = EmblemCreationForm()
+    
+    if createForm.validate_on_submit():
+        emblem = createEmblem(name=createForm.name.data, color=createForm.color.data)
+        return redirect(url_for('admin.edit_emblem', id=emblem.id))
+    return render_template('admin/create_emblem.html', user=user, createForm=createForm)
+
+@bp.route('/emblem/<id>/appearance', methods=['POST'])
+@admin_required
+def edit_emblem_appearance(id):
+    appearanceForm = EmblemAppearanceForm()
+    editing = get_emblem_by_id(id)
+
+    if appearanceForm.validate_on_submit():
+        editing.name = appearanceForm.name.data
+        editing.color = appearanceForm.color.data
+        db.session.commit()
+        return redirect(url_for('admin.edit_emblem', id=editing.id))
+    return redirect(url_for('admin.admin'))
+
+@bp.route('/emblem/<id>/delete', methods=['POST'])
+@admin_required
+def delete_emblem(id):
+    deleteForm = DeleteEmblemForm()
+    editing = get_emblem_by_id(id)
+
+    if deleteForm.validate_on_submit():
         db.session.delete(editing)
         db.session.commit()
         return redirect(url_for('admin.admin'))
