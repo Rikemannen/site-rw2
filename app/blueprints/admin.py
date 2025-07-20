@@ -1,8 +1,11 @@
 from flask import Blueprint, render_template, request, abort, redirect, url_for, flash
+import ast
 from flask_login import current_user as user
 from app.utils.security import admin_required
 from app.services.user_service import get_user_by_id
+from app.services.exercise_service import get_exercise_by_id
 from app.services.token_service import generate_token, get_url
+from app.services.file_service import create_exercise_files, delete_exercise_files, get_exercise_html, get_exercise_answers
 from app.models.emblems import Emblem
 from app.extensions import db
 from app.forms.admin_forms import (
@@ -12,7 +15,13 @@ from app.forms.admin_forms import (
     PasswordResetForm,
     DeleteUserForm,
     VerifyUserForm,
-    ElevateUserForm
+    ElevateUserForm,
+    ExerciseInfoForm,
+    ExerciseDataForm,
+    ExerciseStatisticForm,
+    ExerciseHTMLForm,
+    ExerciseAnswerForm,
+    DeleteExerciseForm
 )
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -22,6 +31,8 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 def admin():
     """Render the base admin page."""
     return render_template('admin/admin.html')
+
+# --- User related routes within /admin. ---
 
 @bp.route('/user/<user_id>')
 @admin_required
@@ -157,4 +168,119 @@ def elevate(user_id):
         editing.admin = elevateForm.admin.data
         db.session.commit()
         return redirect(url_for('admin.edit_user', user_id=editing.id))
+    return redirect(url_for('admin.admin'))
+
+# --- Exercise related routes within /admin. ---
+
+@bp.route('/exercise/<id>')
+@admin_required
+def edit_exercise(id):
+    infoForm = ExerciseInfoForm()
+    dataForm = ExerciseDataForm()
+    statisticForm = ExerciseStatisticForm()
+    htmlForm = ExerciseHTMLForm()
+    answerForm = ExerciseAnswerForm()
+    deleteForm = DeleteExerciseForm()
+    editing = get_exercise_by_id(id)
+    if not editing:
+        abort(404)
+
+    json = get_exercise_answers(editing.id)
+    html = get_exercise_html(editing)
+
+
+    if request.method == 'GET':
+        infoForm.name.data = editing.name
+        infoForm.description.data = editing.description
+        dataForm.owner.data = editing.owner_id
+        dataForm.created.data = editing.created
+        dataForm.approved.data = editing.approved
+        statisticForm.attempts.data = editing.attempts
+        statisticForm.completions.data = editing.finished
+        answerForm.json.data = json
+        htmlForm.html.data = html
+
+    return render_template('admin/exercise.html', user=user, editing=editing,
+                           basicForm=infoForm,
+                           staticForm=dataForm,
+                           statisticForm=statisticForm,
+                           htmlForm=htmlForm,
+                           answerForm=answerForm,
+                           deleteForm=deleteForm)
+
+@bp.route('/exercise/<id>/info', methods=['POST'])
+@admin_required
+def edit_info(id):
+    infoForm = ExerciseInfoForm()
+    editing = get_exercise_by_id(id)
+
+    if infoForm.validate_on_submit():
+        editing.name = infoForm.name.data
+        editing.description = infoForm.description.data
+        db.session.commit()
+        return redirect(url_for('admin.edit_exercise', id=editing.id))
+    return redirect(url_for('admin.admin'))
+
+@bp.route('/exercise/<id>/static', methods=['POST'])
+@admin_required
+def edit_static(id):
+    dataForm = ExerciseDataForm()
+    editing = get_exercise_by_id(id)
+
+    if dataForm.validate_on_submit():
+        editing.owner_id = dataForm.owner.data
+        editing.created = dataForm.created.data
+        editing.approved = dataForm.approved.data
+        db.session.commit()
+        return redirect(url_for('admin.edit_exercise', id=editing.id))
+    return redirect(url_for('admin.admin'))
+
+@bp.route('/exercise/<id>/statistics', methods=['POST'])
+@admin_required
+def edit_stats(id):
+    statisticForm = ExerciseStatisticForm()
+    editing = get_exercise_by_id(id)
+
+    if statisticForm.validate_on_submit():
+        editing.attempts = statisticForm.attempts.data
+        editing.finished = statisticForm.completions.data
+        db.session.commit()
+        return redirect(url_for('admin.edit_exercise', id=editing.id))
+    return redirect(url_for('admin.admin'))
+
+@bp.route('/exercise/<id>/json', methods=['POST'])
+@admin_required
+def edit_json(id):
+    answerForm = ExerciseAnswerForm()
+    editing = get_exercise_by_id(id)
+
+    if answerForm.validate_on_submit():
+        json_data = ast.literal_eval(answerForm.json.data)
+        create_exercise_files(editing.id, get_exercise_html(editing), json_data)
+        return redirect(url_for('admin.edit_exercise', id=editing.id))
+    return redirect(url_for('admin.admin'))
+
+@bp.route('/exercise/<id>/html', methods=['POST'])
+@admin_required
+def edit_html(id):
+    htmlForm = ExerciseHTMLForm()
+    editing = get_exercise_by_id(id)
+
+    if htmlForm.validate_on_submit():
+        html_data = htmlForm.html.data
+        create_exercise_files(editing.id, html_data, get_exercise_answers(editing.id))
+        return redirect(url_for('admin.edit_exercise', id=editing.id))
+    return redirect(url_for('admin.admin'))
+
+@bp.route('/exercise/<id>/delete', methods=['POST'])
+@admin_required
+def delete_exercise(id):
+    deleteForm = DeleteExerciseForm()
+    editing = get_exercise_by_id(id)
+
+    if deleteForm.validate_on_submit():
+        delete_exercise_files(editing.id)
+        db.session.delete(editing)
+        db.session.commit()
+        return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))

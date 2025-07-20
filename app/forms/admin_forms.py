@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField
+from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField, IntegerField, TextAreaField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired, Length
+
+# User forms
 
 class ProfileSettingsForm(FlaskForm):
     """Form for profile settings."""
@@ -36,3 +38,38 @@ class ElevateUserForm(FlaskForm):
     """Form for giving a user admin rights."""
     admin = BooleanField('Admin')
     submit = SubmitField('Uppdatera (Bara om du litar på denna användare!)')
+
+# Exercise forms
+
+class ExerciseInfoForm(FlaskForm):
+    """Form for setting basic data, name and description."""
+    name = StringField('Namn', validators=[DataRequired()])
+    description = StringField('Beskrivning', validators=[DataRequired()])
+    submit = SubmitField('Uppdatera')
+
+class ExerciseDataForm(FlaskForm):
+    """Form for setting static data, owner_id, created (date+time), approval status."""
+    owner = IntegerField('Ägare (id)', validators=[DataRequired()])
+    created = IntegerField('Skapad (unix)', validators=[DataRequired()])
+    approved = BooleanField('Godkänd')
+    submit = SubmitField('Uppdatera')
+
+class ExerciseStatisticForm(FlaskForm):
+    """Form for setting statistic data, attempts, finished."""
+    attempts = IntegerField('Försök', validators=[DataRequired()])
+    completions = IntegerField('Avklarad', validators=[DataRequired()])
+    submit = SubmitField('Uppdatera')
+
+class ExerciseAnswerForm(FlaskForm):
+    """Form for editing correct answers. (raw json)"""
+    json = TextAreaField(validators=[DataRequired()])
+    submit = SubmitField('Uppdatera')
+
+class ExerciseHTMLForm(FlaskForm):
+    """Form for editing exercise html."""
+    html = TextAreaField(validators=[DataRequired()])
+    submit = SubmitField('Uppdatera')
+
+class DeleteExerciseForm(FlaskForm):
+    """Form for deleting an exercise."""
+    submit = SubmitField('Ta bort övning')
