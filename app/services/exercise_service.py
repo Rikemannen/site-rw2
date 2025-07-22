@@ -5,11 +5,11 @@ from app.services.file_service import create_exercise_files, delete_exercise_fil
 
 def get_exercise_by_id(exercise_id):
     """Retrieve exercise data based on its ID."""
-    return db.session.query(Exercise).filter_by(id=exercise_id).first()
+    return Exercise.query.filter_by(id=exercise_id).first()
 
 def get_exercise_by_name(name):
     """Retrieve exercise data based on its name."""
-    return db.session.query(Exercise).filter_by(name=name).first()
+    return Exercise.query.filter_by(name=name).first()
 
 def create_exercise(name, owner, html_data, json_data, description=None):
     """Create a new exercise with the given name and optional description."""
@@ -57,7 +57,7 @@ def get_popular_exercises(amount=3):
 
 def get_recent_exercises(amount=3):
     """Retrieve the most recently created exercises."""
-    return db.session.query(Exercise).filter(Exercise.approved == True).order_by(Exercise.created.desc()).limit(amount).all()
+    return Exercise.query.filter(Exercise.approved == True).order_by(Exercise.created.desc()).limit(amount).all()
 
 def increment_attempts(exercise):
     """Increment the attempt count for a specific exercise."""
@@ -96,4 +96,4 @@ def unliked(user, exercise):
 
 def get_all_exercises():
     """Returns a list with every exercise object."""
-    return db.session.query(Exercise)
+    return Exercise.query.all()

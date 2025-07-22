@@ -5,15 +5,15 @@ from app.models.user import User
 
 def get_user_by_id(user_id):
     """Retrieve user data based on their ID."""
-    return db.session.query(User).filter_by(id=user_id).first()
+    return User.query.filter_by(id=user_id).first()
 
 def get_user_by_username(username):
     """Retrieve user data based on their username."""
-    return db.session.query(User).filter_by(name=username).first()
+    return User.query.filter_by(name=username).first()
 
 def user_exists(username):
     """Check if a user with the given username exists."""
-    return db.session.query(User).filter_by(username=username).count() > 0
+    return User.query.filter_by(username=username).count() > 0
 
 def create_user(username, display_name, password_hash):
     """Create a new user with the given username, display name, and password hash."""
@@ -33,4 +33,4 @@ def create_user(username, display_name, password_hash):
 
 def get_all_users():
     """Returns a list with every user object."""
-    return db.session.query(User)
+    return User.query.all()
