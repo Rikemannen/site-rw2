@@ -21,15 +21,21 @@
         </div>
         <div class="absolute right-4 top-16 min-w-[160px] hidden" id="profile-menu" style="z-index:1000;">
             <ul class="bg-white text-gray-800 rounded-lg shadow-lg mt-2 border border-gray-200">
-                {% if user.is_authenticated %}
-                <li class="px-4 py-2 hover:bg-gray-200" style="color: {{ user.color if user.equipped_emblem else '#000000' }};"><a href="/profile" class="hover:underline">{{ user.display_name ~ ' (@' ~ user.name ~ ')' if user.display_name and user.display_name != user.name
-                    else user.name }}</a></li>
+                {% if current_user.is_authenticated %}
+                <li class="px-4 py-2 hover:bg-gray-200" style="color: {{ current_user.color if current_user.equipped_emblem else '#000000' }};"><a href="/profile" class="hover:underline">{{ current_user.display_name ~ ' (@' ~ current_user.name ~ ')' if current_user.display_name and current_user.display_name != current_user.name
+                    else current_user.name }}</a></li>
                 {% if show_chat_window is not defined or show_chat_window %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline" onclick="toggleChat()">Visa/Göm
                         Chatt</a></li>
                 {% endif %}
-                {% if user.admin %}
+                {% if current_user.admin %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin" class="hover:underline">Admin</a></li>
+                {% if request.path.startswith('/exercise/') %}
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/exercise/{{ exercise.id }}" class="hover:underline">Redigera Övning</a></li>
+                {% endif %}
+                {% if request.path.startswith('/user/') %}
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/user/{{ user.id }}" class="hover:underline">Redigera Användare</a></li>
+                {% endif %}
                 {% endif %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings" class="hover:underline">Inställningar</a></li>
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/logout" class="hover:underline">Logga ut</a></li>

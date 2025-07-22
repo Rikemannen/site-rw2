@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Sök{% endblock %}
+
+{% block content %}
+{% set is_admin = current_user.admin %}
+<div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+    <div class="bg-slate-200 p-2 rounded-md shadow-md">
+        {% for emblem in emblems %}
+        <div class="p-2 mt-2 mb-2 rounded-md shadow-md" style="background-color: {{ emblem.color }}33">
+            <p><a href="/emblem/{{ emblem.id }}" class="text-blue-600 hover:underline"
+                    style="color: {{ emblem.color }}">{{ emblem.name }}
+                </a>
+                {% if is_admin %}
+                <a href="/admin/emblem/{{ emblem.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
+                {% endif %}
+            </p>
+            <p>Färg: <span>{{ emblem.color }}</span></p>
+            <p>Ägare: <span>{{ emblem.owners | length }}</span></p>
+            <p>ID: {{ emblem.id }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

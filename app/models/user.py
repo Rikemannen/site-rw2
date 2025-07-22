@@ -28,6 +28,7 @@ class User(db.Model, UserMixin):
     liked_exercises = relationship('Exercise', secondary='exercise_likes', back_populates='liked_by')
     exercises = relationship('Exercise', back_populates='owner')
     name_last_change = Column(DateTime(timezone=True), nullable=True)
+    joined = Column(Integer, nullable=False, default=0)  # Unix timestamp
 
     # Additional columns to consider:
     #profile_picture = Column(String(), nullable=True) # Url

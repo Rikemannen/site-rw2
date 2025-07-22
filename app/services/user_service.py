@@ -1,4 +1,5 @@
 import sqlalchemy.exc
+from datetime import datetime, timezone
 from app.extensions import db
 from app.models.user import User
 
@@ -16,12 +17,17 @@ def user_exists(username):
 
 def create_user(username, display_name, password_hash):
     """Create a new user with the given username, display name, and password hash."""
-    user = User(name=username, display_name=display_name, password_hash=password_hash)
+    user = User(
+        name=username,
+        display_name=display_name,
+        password_hash=password_hash,
+        joined=int(datetime.now(timezone.utc).timestamp())
+    )
     db.session.add(user)
     try:
         db.session.commit()
         return user
-    except sqlalchemy.exc.IntegrityError as e:
+    except sqlalchemy.exc.IntegrityError:
         db.session.rollback()
         return None
 

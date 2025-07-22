@@ -3,6 +3,7 @@
 {% block title %}Sök{% endblock %}
 
 {% block content %}
+{% set is_admin = current_user.admin %}
 {% if search_type == 'all' %}
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {% else %}
@@ -14,11 +15,12 @@
             {% for user in user_results %}
             <div class="p-2 mt-2 mb-2 rounded-md shadow-md"
                 style="background-color: {{ user.equipped_emblem.color }}33">
-                <p><a href="/user/{{ user.id }}" class="text-blue-600 hover:underline">{{
-                        user.display_name ~ ' (@' ~ user.name ~ ')' if
-                        user.display_name and user.display_name != user.name
-                        else user.name }}
-                    </a></p>
+                <p><a href="/user/{{ user.id }}" class="text-blue-600 hover:underline" style="color: {{ user.equipped_emblem.color }}">{{ user | format_user }}
+                    </a>
+                        {% if is_admin %}
+                        <a href="/admin/user/{{ user.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
+                        {% endif %}
+                </p>
                 <p>ID: {{ user.id }}</p>
             </div>
             {% endfor %}
@@ -36,13 +38,13 @@
             <div class="p-2 mt-2 mb-2 rounded-md shadow-md bg-slate-300">
                 <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
                         }}</a>
+                        {% if is_admin %}
+                        <a href="/admin/exercise/{{ exercise.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
+                        {% endif %}
                 </p>
                 <p>Skapare: <a href="/user/{{ user.id }}" class="hover:underline"
-                        style="color: {{ exercise.owner.equipped_emblem.color }}">{{
-                        exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
-                        exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
-                        else exercise.owner.name }}
-                    </a></p>
+                        style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner | format_user }}</a>
+                </p>
                 <div class="flex flex-row gap-4">
                     <p>ID: {{ exercise.id }}</p>
                     <p>Gillar: {{ exercise.likes() }}</p>

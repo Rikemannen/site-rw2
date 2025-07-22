@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, abort, redirect, url_for, flash
 import ast
 from flask_login import current_user as user
+from app.models.user import User
+from app.models.exercise import Exercise
 from app.utils.security import admin_required
 from app.services.user_service import get_user_by_id
 from app.services.exercise_service import get_exercise_by_id
@@ -34,9 +36,22 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @admin_required
 def admin():
     """Render the base admin page."""
-    return render_template('admin/admin.html')
+    user_count = User.query.count()
+    exercise_count = Exercise.query.count()
+    latest_user = User.query.order_by(User.joined.desc()).first()
+    total_attempts = db.session.query(db.func.sum(Exercise.attempts)).scalar() or 0
+    total_completions = db.session.query(db.func.sum(Exercise.finished)).scalar() or 0
+    return render_template('admin/admin.html', user_count=user_count, exercise_count=exercise_count,
+                           latest_user=latest_user, attempt_count=total_attempts,
+                           completed_count=total_completions)
 
 # --- User related routes within /admin. ---
+
+@bp.route('/user')
+@admin_required
+def users():
+    """Render the user search page."""
+    return redirect(url_for('main.search', q='*', type='users'))
 
 @bp.route('/user/<user_id>')
 @admin_required
@@ -175,6 +190,12 @@ def elevate(user_id):
     return redirect(url_for('admin.admin'))
 
 # --- Exercise related routes within /admin. ---
+
+@bp.route('/exercise')
+@admin_required
+def exercises():
+    """Render the exercise search page."""
+    return redirect(url_for('main.search', q='*', type='exercises'))
 
 @bp.route('/exercise/<id>')
 @admin_required

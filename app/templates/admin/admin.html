@@ -1,7 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Hem{% endblock %}
+{% block title %}Admin hem{% endblock %}
 
 {% block content %}
-<h1>Hi!</h1>
+<div class="flex gap-4">
+    <div class="flex-grow">
+        <div class="bg-slate-200 p-2 rounded-md shadow-md">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold m-2">
+                    Admin
+                </h1>
+            </div>
+            <div class="bg-slate-300 p-2 rounded-md m-2 shadow-md">
+                <h2 class="text-xl font-bold">Statistik</h2>
+                <p>Antal användare: {{ user_count }}</p>
+                <p>Antal övningar: {{ exercise_count }}</p>
+                <p>Antal försök: {{ attempt_count }}</p>
+                <p>Antal avslutade: {{ completed_count }}</p>
+                <p>Försök till avslutade förhållande: {{ ('%.2f' % (completed_count / attempt_count * 100)) if
+                    completed_count > 0 else '0.00' }}%</p>
+                <p>Försök | avslutade per användare: {{ ('%.2f' % (attempt_count / user_count)) if user_count > 0 else '0.00' }} | {{ ('%.2f' % (completed_count / user_count)) if user_count > 0 else '0.00' }}</p>
+                <br>
+                <div>
+                    <h2 class="text-xl font-bold">Nyaste användare</h2>
+                    <p>
+                        <a href="/user/{{ latest_user.id }}" class="text-blue-600 hover:underline" style="color: {{ latest_user.equipped_emblem.color }}">{{ latest_user | format_user }}</a>
+                    </p>
+                </div>
+            </div>
+            <div class="bg-slate-200 rounded-md p-2 shadow-md m-2">
+                <h2 class="text-xl font-bold">Snabbval</h2>
+                <ul class="list-disc pl-5">
+                    <li><a href="/admin/user" class="text-blue-600 hover:underline">Användare</a></li>
+                    <li><a href="/admin/exercise" class="text-blue-600 hover:underline">Övningar</a></li>
+                    <li><a href="/admin/emblem" class="text-blue-600 hover:underline">Skapa emblem</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
