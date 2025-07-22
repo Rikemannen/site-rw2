@@ -2,6 +2,7 @@
 
 import os
 import json
+import shutil
 
 def create_exercise_files(exercise_id, html_data, json_data):
     """
@@ -59,6 +60,6 @@ def delete_exercise_files(exercise_id):
     json_dir_path = os.path.join("app", "exercises", str(exercise_id))
 
     if os.path.exists(html_dir_path):
-        os.rmdir(html_dir_path)
+        shutil.rmtree(html_dir_path)
     if os.path.exists(json_dir_path):
-        os.rmdir(json_dir_path)
+        shutil.rmtree(json_dir_path)
