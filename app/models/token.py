@@ -19,4 +19,4 @@ class Token(db.Model):
         return int(time.time()) < self.expires and self.valid
 
     def __repr__(self):
-        return f"<Token(for='{self.user_id}', expires='{self.expires}', valid='{self.is_valid}', token='{self.secret[:10]}')>"
+        return f"<Token(id={self.id}, user_id='{self.user_id}', expires='{self.expires}', valid='{self.is_valid}', token='{self.secret[:10]}')>"

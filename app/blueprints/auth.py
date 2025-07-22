@@ -1,6 +1,6 @@
 """Handles user authentication routes and views."""
 
-from flask import Blueprint, flash, redirect, request, render_template, url_for, abort
+from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json
 import flask
 import datetime
 from flask_login import login_user, current_user, login_required, logout_user
@@ -10,6 +10,7 @@ from app.utils.security import verify_password, hash_password
 from app.forms.auth_forms import LoginForm, SignupForm, RecoveryForm
 from app.forms.settings_forms import ProfileSettingsForm, UsernameChangeForm, PasswordChangeForm, DeleteUserForm
 from app.extensions import db
+from app.services.logging_service import log
 
 bp = Blueprint('auth', __name__)
 
@@ -181,6 +182,8 @@ def recovery(secret):
         user.password_hash = hash_password(recoveryForm.new_password.data)
         db.session.commit()
         invalidate_token(token)
+        log(None, 'user', token.user_id, 'recovery.token_used', new_data=json.dumps({'token_id': token.id, 'token': token.secret[:10] + '...'}))
+        log(None, 'token', token.id, 'invalidated', new_data=json.dumps({'user_id': token.user_id, 'token': token.secret[:10] + '...'}))
         flash('Kontots lösenord har ändrats!')
         return redirect(url_for('auth.login'))
 
