@@ -7,7 +7,7 @@ def search_users(query):
     if not query:
         return []
 
-    results = db.session.query(User).filter(User.name.ilike(f'%{query}%')).all()
+    results = User.query.filter(User.name.ilike(f'%{query}%')).all()
     # Returns a list of user objects that match the query username,
     # has to later be linked to profile(s) via id
     return results
@@ -19,7 +19,7 @@ def search_users_by_id_partial(user_id):
 
     # Convert user_id to string for partial matching
     user_id_str = str(user_id)
-    results = db.session.query(User).filter(User.id.cast(db.String).like(f'{user_id_str}%')).all()
+    results = User.query.filter(User.id.cast(db.String).like(f'{user_id_str}%')).all()
     # Returns users whose IDs start with the given digits
     return results
 
@@ -28,7 +28,7 @@ def search_users_by_display_name(display_name):
     if not display_name:
         return []
 
-    results = db.session.query(User).filter(User.display_name.ilike(f'%{display_name}%')).all()
+    results = User.query.filter(User.display_name.ilike(f'%{display_name}%')).all()
     return results
 
 def search_exercises(query):
@@ -36,7 +36,7 @@ def search_exercises(query):
     if not query:
         return []
 
-    results = db.session.query(Exercise).filter(Exercise.approved).filter(Exercise.name.ilike(f'%{query}%')).all()
+    results = Exercise.query.filter(Exercise.approved).filter(Exercise.name.ilike(f'%{query}%')).all()
     # Returns a list of exercise objects that match the query name
     return results
 
@@ -47,6 +47,6 @@ def search_exercises_by_id_partial(exercise_id):
 
     # Convert exercise_id to string for partial matching
     exercise_id_str = str(exercise_id)
-    results = db.session.query(Exercise).filter(Exercise.approved).filter(Exercise.id.cast(db.String).like(f'{exercise_id_str}%')).all()
+    results = Exercise.query.filter(Exercise.approved).filter(Exercise.id.cast(db.String).like(f'{exercise_id_str}%')).all()
     # Returns exercises whose IDs start with the given digits
     return results

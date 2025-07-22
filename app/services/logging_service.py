@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 def get_log_by_id(log_id):
     """Retrieve a log entry by its ID."""
-    log = db.session.query(Log).filter(Log.id == log_id).first()
+    log = Log.query.filter(Log.id == log_id).first()
     if not log:
         return None
     return log
