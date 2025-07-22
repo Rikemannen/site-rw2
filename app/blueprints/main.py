@@ -2,6 +2,8 @@
 
 from flask import Blueprint, abort, render_template, request, redirect
 from flask_login import current_user, login_required
+from app.models.emblems import Emblem
+from app.services.emblem_service import get_emblem_by_id
 from app.services.exercise_service import get_popular_exercises, get_recent_exercises, get_all_exercises
 from app.services.user_service import get_user_by_id, get_all_users
 from app.services.search_service import (
@@ -73,3 +75,17 @@ def search():
         user_results=user_results,
         exercise_results=exercise_results
     )
+
+@bp.route('/emblems')
+def emblems():
+    """Render the page to show all emblems."""
+    emblems = Emblem.query.all()
+    return render_template('emblems.html', emblems=emblems)
+
+@bp.route('/emblem/<int:emblem_id>')
+def emblem_detail(emblem_id):
+    """Render the detail page for a specific emblem."""
+    emblem = get_emblem_by_id(emblem_id)
+    if not emblem:
+        abort(404)
+    return render_template('emblem/detail.html', emblem=emblem)

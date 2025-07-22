@@ -9,8 +9,7 @@
             <div class="flex items-center">
                 {% set emblem_color = user.equipped_emblem.color if user.equipped_emblem else 'inherit' %}
                 <h1 class="text-2xl font-bold m-2" style="color: {{ emblem_color }};">
-                    {{ user.display_name ~ ' (@' ~ user.name ~ ')' if user.display_name and user.display_name !=
-                    user.name else user.name }}
+                    {{ user | format_user }}
                 </h1>
                 {% if user.equipped_emblem %}
                 <div class="bg-slate-200 rounded-md inline-block m-1"
@@ -59,10 +58,7 @@
                     <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
                             }}</a>
                     <p>Skapare: <a href="/user/{{ user.id }}" class="hover:underline"
-                            style="color: {{ exercise.owner.equipped_emblem.color }}">{{
-                            user.display_name ~ ' (@' ~ user.name ~ ')' if
-                            user.display_name and user.display_name != user.name
-                            else user.name }}
+                            style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner | format_user }}
                         </a></p>
                     </p>
                     <div class="flex flex-row gap-4">

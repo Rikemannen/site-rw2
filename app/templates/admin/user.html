@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Kontoinställningar{% endblock %}
+
+{% block content %}
+<div class="bg-slate-200 rounded-md shadow-md p-4">
+    <h2 class="text-2xl font-bold mb-4">
+        Användarinställningar för <a href="{{ url_for('main.user_profile', user_id=editing.id)}}"
+            class="text-blue-600 hover:underline">{{ editing.name }}</a>
+    </h2>
+    <form method="POST" action="{{ url_for('admin.profile_editing', user_id=editing.id) }}">
+        <h2 class="text-xl mb-4">Profil</h2>
+        {{ profileForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ profileForm.display_name.label(class="block text-sm font-md text-gray-700")}}
+            {{ profileForm.display_name(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in profileForm.display_name.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ profileForm.emblem.label(class="block text-sm font-md text-gray-700")}}
+            {{ profileForm.emblem(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in profileForm.emblem.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ profileForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.emblems', user_id=editing.id) }}">
+        <h2 class="text-xl mb-4">Ägda Emblem</h2>
+        {{ emblemForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ emblemForm.emblems.label(class="block text-sm font-md text-gray-700")}}
+            {% for subfield in emblemForm.emblems %}
+            <div>
+                {{ subfield() }} {{ subfield.label.text }}
+            </div>
+            {% endfor %}
+            {% for error in emblemForm.emblems.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ emblemForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.username_editing', user_id=editing.id)}}">
+        <h2 class="text-xl mt-4 mb-4">Användarnamn</h2>
+        {{ nameForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ nameForm.username.label(class="block text-sm font-md text-gray-700")}}
+            {{ nameForm.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in nameForm.username.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ nameForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.recovery', user_id=editing.id)}}">
+        <h2 class="text-xl mt-4 mb-4">Återställning</h2>
+        {{ passForm.hidden_tag() }}
+        {{ passForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+        <p>Återställningslänk, visas inte igen:</p>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <input type="text" class="block text-sm font-md text-gray-700 p-2 w-full"
+            value="{{ messages[0] if messages else 'Skapa en länk ovan' }}">
+        {% endif %}
+        {% endwith %}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.deletion', user_id=editing.id)}}">
+        <h2 class="text-xl mt-4 mb-4">Borttagning</h2>
+        {{ deleteForm.hidden_tag() }}
+        {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.verify', user_id=editing.id)}}">
+        <h2 class="text-xl mt-4 mb-4">Verifiera</h2>
+        {{ verifyForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ verifyForm.verified.label(class="block text-sm font-md text-gray-700")}}
+            {{ verifyForm.verified(class="mt-1 block p-2 border border-gray-300 rounded-md") }}
+            {% for error in verifyForm.verified.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ verifyForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.elevate', user_id=editing.id )}}">
+        <h2 class="text-xl mt-4 mb-4">Ge admin-åtkomst</h2>
+        {% if current_user.id == editing.id %}
+        <h3 class="text-md -mt-2 mb-2 text-red-500">Varning: Du bör ej ändra denna inställning på ditt egna konto!</h3>
+        {% endif %}
+        {{ elevateForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ elevateForm.admin.label(class="block text-sm font-md text-gray-700")}}
+            {{ elevateForm.admin(class="mt-1 block p-2 border border-gray-300 rounded-md") }}
+            {% for error in elevateForm.admin.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ elevateForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
+    </form>
+</div>
+{% endblock %}

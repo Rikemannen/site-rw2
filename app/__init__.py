@@ -5,7 +5,7 @@ from os import environ
 from flask import Flask, render_template, redirect, url_for, request
 from app.blueprints import main, auth, exercises, chat, admin
 from app.extensions import login_manager
-from app.services.user_service import get_user_by_id
+from app.services.user_service import get_user_by_id, get_user_by_username
 from app.extensions import socketio, db
 from flask_login import current_user
 from app.blueprints.chat import get_messages
@@ -51,6 +51,13 @@ def create_app():
         elif variant == "date":
             return dt.strftime('%Y-%m-%d')
         return dt.strftime('%Y-%m-%d %H:%M:%S') # Fallback
+    
+    @app.template_filter('format_user')
+    def format_user(user):
+        """Format user object for display."""
+        if user:
+            return f"{user.display_name} (@{user.name})" if user.display_name else user.name
+        return None
 
     @app.errorhandler(404)
     def not_found(error):
@@ -69,7 +76,7 @@ def create_app():
     
     @app.context_processor
     def inject_user():
-        return {'user': current_user}
+        return {'current_user': current_user}
     
     @app.context_processor
     def inject_messages():

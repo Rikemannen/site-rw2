@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Övningsinställningar{% endblock %}
+
+{% block content %}
+<div class="bg-slate-200 rounded-md shadow-md p-4">
+    <h2 class="text-2xl font-bold mb-4">
+        Inställningar för <a href="{{ url_for('exercise.view', exercise_id=editing.id)}}"
+            class="text-blue-600 hover:underline">{{ editing.name }}</a>
+    </h2>
+    <form method="POST" action="{{ url_for('admin.edit_info', id=editing.id) }}">
+        <h2 class="text-xl mb-4">Enkel data</h2>
+        {{ basicForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ basicForm.name.label(class="block text-sm font-md text-gray-700")}}
+            {{ basicForm.name(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in basicForm.name.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ basicForm.description.label(class="block text-sm font-md text-gray-700")}}
+            {{ basicForm.description(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in basicForm.description.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ basicForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.edit_static', id=editing.id) }}">
+        <h2 class="text-xl mb-4">Statisk data</h2>
+        {{ staticForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ staticForm.owner.label(class="block text-sm font-md text-gray-700")}}
+            {{ staticForm.owner(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in staticForm.owner.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ staticForm.created.label(class="block text-sm font-md text-gray-700")}}
+            {{ staticForm.created(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in staticForm.created.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ staticForm.approved.label(class="block text-sm font-md text-gray-700")}}
+            {{ staticForm.approved(class="mt-1 block p-2 border border-gray-300 rounded-md") }}
+            {% for error in staticForm.approved.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ staticForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.edit_stats', id=editing.id) }}">
+        <h2 class="text-xl mb-4">Statistik</h2>
+        {{ statisticForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ statisticForm.attempts.label(class="block text-sm font-md text-gray-700")}}
+            {{ statisticForm.attempts(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in statisticForm.attempts.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ statisticForm.completions.label(class="block text-sm font-md text-gray-700")}}
+            {{ statisticForm.completions(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in statisticForm.completions.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ statisticForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.edit_json', id=editing.id) }}">
+        <h2 class="text-xl mb-4">Svar</h2>
+        {{ answerForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ answerForm.json.label(class="block text-sm font-md text-gray-700")}}
+            {{ answerForm.json(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in answerForm.json.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ answerForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.edit_html', id=editing.id) }}">
+        <h2 class="text-xl mb-4">Utseende</h2>
+        {{ htmlForm.hidden_tag() }}
+        <div class="mb-4">
+            {{ htmlForm.html.label(class="block text-sm font-md text-gray-700")}}
+            {{ htmlForm.html(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+            {% for error in htmlForm.html.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ htmlForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <hr class="my-6 border-t border-gray-300">
+    <form method="POST" action="{{ url_for('admin.delete_exercise', id=editing.id) }}">
+        <h2 class="text-xl mb-4">Radera</h2>
+        {{ deleteForm.hidden_tag() }}
+        {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
+    </form>
+</div>
+{% endblock %}

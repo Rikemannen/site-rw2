@@ -16,7 +16,7 @@
                 <a class="hover:underline" href="{{ url_for('exercise.likes', exercise_id=exercise.id) }}">
                     {{ exercise.likes() }} gillar</a>
                 <form
-                    action="{{ url_for('exercise.like', exercise_id=exercise.id) if user.is_authenticated else url_for('auth.login', next=request.url) }}"
+                    action="{{ url_for('exercise.like', exercise_id=exercise.id) if current_user.is_authenticated else url_for('auth.login', next=request.url) }}"
                     method="post" style="display:inline;">
                     <button type="submit" class="bg-transparent border-none hover:underline cursor-pointer ml-2">
                         {% if has_liked %}
