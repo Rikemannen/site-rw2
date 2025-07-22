@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort, redirect, url_for, flash
+from flask import Blueprint, json, render_template, request, abort, redirect, url_for, flash
 import ast
 from flask_login import current_user as user
 from app.models.user import User
@@ -9,6 +9,8 @@ from app.services.exercise_service import get_exercise_by_id
 from app.services.token_service import generate_token, get_url
 from app.services.file_service import create_exercise_files, delete_exercise_files, get_exercise_html, get_exercise_answers
 from app.services.emblem_service import get_emblem_by_id, create_emblem as createEmblem
+from app.services.logging_service import log
+from app.models.logs import Log
 from app.models.emblems import Emblem
 from app.extensions import db
 from app.forms.admin_forms import (
@@ -44,6 +46,14 @@ def admin():
     return render_template('admin/admin.html', user_count=user_count, exercise_count=exercise_count,
                            latest_user=latest_user, attempt_count=total_attempts,
                            completed_count=total_completions)
+
+@bp.route('/logs')
+@admin_required
+def logs():
+    """Render the logs page."""
+    count = request.args.get('c', default=100, type=int)
+    logs = db.session.query(Log).order_by(Log.id.desc()).limit(count).all()
+    return render_template('admin/logs.html', logs=logs)
 
 # --- User related routes within /admin. ---
 
@@ -131,6 +141,7 @@ def username_editing(user_id):
     editing = get_user_by_id(user_id)
 
     if usernameForm.validate_on_submit():
+        log(user, 'user', editing.id, 'name.change', old_data=editing.name, new_data=usernameForm.username.data)
         editing.name = usernameForm.username.data
         db.session.commit()
         return redirect(url_for('admin.edit_user', user_id=editing.id))
@@ -146,6 +157,8 @@ def recovery(user_id):
     if resetForm.validate_on_submit():
         token = generate_token(editing)
         url = get_url(token, request.host)
+        log(user, 'user', editing.id, 'recovery.token_generated', new_data=json.dumps({'id': token.id, 'token': token.secret[:10] + '...'}))
+        log(user, 'token', token.id, 'created', new_data=json.dumps({'token': token.secret[:10] + '...', 'expires': token.expires}))
         flash(url)
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
@@ -160,6 +173,7 @@ def deletion(user_id):
     if deleteForm.validate_on_submit():
         db.session.delete(editing)
         db.session.commit()
+        log(user, 'user', editing.id, 'delete')
         return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))
 
@@ -173,6 +187,7 @@ def verify(user_id):
     if verifyForm.validate_on_submit():
         editing.verified = verifyForm.verified.data
         db.session.commit()
+        log(user, 'user', editing.id, 'verified.verify' if verifyForm.verified.data else 'verified.unverify')
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -186,6 +201,7 @@ def elevate(user_id):
     if elevateForm.validate_on_submit():
         editing.admin = elevateForm.admin.data
         db.session.commit()
+        log(user, 'user', editing.id, 'admin.elevate' if elevateForm.admin.data else 'admin.demote')
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -253,6 +269,16 @@ def edit_static(id):
     editing = get_exercise_by_id(id)
 
     if dataForm.validate_on_submit():
+        if dataForm.approved.data != editing.approved:
+            log(user, 'exercise', editing.id, 'approve' if dataForm.approved.data else 'unapprove')
+        if dataForm.owner.data != editing.owner_id or dataForm.created.data != editing.created:
+            log(user, 'exercise', editing.id, 'static.update', old_data=json.dumps({
+                'owner_id': editing.owner_id,
+                'created': editing.created
+            }), new_data=json.dumps({
+                'owner_id': dataForm.owner.data,
+                'created': dataForm.created.data
+            }))
         editing.owner_id = dataForm.owner.data
         editing.created = dataForm.created.data
         editing.approved = dataForm.approved.data
@@ -281,6 +307,7 @@ def edit_json(id):
 
     if answerForm.validate_on_submit():
         json_data = ast.literal_eval(answerForm.json.data)
+        log(user, 'exercise', editing.id, 'json.update', old_data=json.dumps(get_exercise_answers(editing.id)), new_data=json.dumps(json_data))
         create_exercise_files(editing.id, get_exercise_html(editing), json_data)
         return redirect(url_for('admin.edit_exercise', id=editing.id))
     return redirect(url_for('admin.admin'))
@@ -293,6 +320,7 @@ def edit_html(id):
 
     if htmlForm.validate_on_submit():
         html_data = htmlForm.html.data
+        log(user, 'exercise', editing.id, 'html.update', old_data=get_exercise_html(editing), new_data=html_data)
         create_exercise_files(editing.id, html_data, get_exercise_answers(editing.id))
         return redirect(url_for('admin.edit_exercise', id=editing.id))
     return redirect(url_for('admin.admin'))
@@ -307,6 +335,7 @@ def delete_exercise(id):
         delete_exercise_files(editing.id)
         db.session.delete(editing)
         db.session.commit()
+        log(user, 'exercise', editing.id, 'delete')
         return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))
 

@@ -1,5 +1,6 @@
 import secrets
 import time
+from flask import json
 import sqlalchemy.exc
 from app.models.token import Token
 from app.extensions import db
