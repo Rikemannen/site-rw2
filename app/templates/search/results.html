@@ -42,7 +42,7 @@
                         <a href="/admin/exercise/{{ exercise.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
                         {% endif %}
                 </p>
-                <p>Skapare: <a href="/user/{{ user.id }}" class="hover:underline"
+                <p>Skapare: <a href="/user/{{ exercise.owner.id }}" class="hover:underline"
                         style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner | format_user }}</a>
                 </p>
                 <div class="flex flex-row gap-4">
