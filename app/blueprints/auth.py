@@ -23,12 +23,10 @@ def login():
     if form.validate_on_submit():
         user = get_user_by_username(form.username.data)
         if not user or not verify_password(user.password_hash, form.password.data):
-            flash('Invalid username or password.')
+            flash('Ogiltigt användarnamn eller lösenord.')
             return redirect(flask.url_for('auth.login'))
 
         login_user(user)
-
-        flash('Login successful!')
 
         next_url = request.form.get('next')
 
@@ -57,10 +55,9 @@ def register():
 
         if user:
             login_user(user)
-            flash('Registration successful! Welcome!')
             return redirect(flask.url_for('main.index'))
         else:
-            flash('Registration failed. Please try again.')
+            flash('Registreringen misslyckades, försök igen!')
             return redirect(flask.url_for('auth.register'))
     return render_template('auth/register.html', form=form)
 
@@ -69,7 +66,6 @@ def register():
 def logout():
     """Handle user logout."""
     logout_user()
-    flash('You have been logged out.')
     return redirect(flask.url_for('main.index'))
 
 @bp.route('/settings/profile', methods=['GET', 'POST'])
@@ -94,7 +90,7 @@ def profile_settings():
             current_user.equipped_emblem_id = form.emblem.data
 
         db.session.commit()
-        flash('Settings updated successfully.', 'success')
+        flash('Inställningarna har uppdaterats!.', 'success')
         return redirect(url_for('auth.profile_settings'))
 
     return render_template('auth/profile_settings.html', form=form)
@@ -141,7 +137,7 @@ def password_change():
 
     if passForm.validate_on_submit():
         if not passForm.new_password.data == passForm.confirm_password.data:
-            flash('Passwords do not match!')
+            flash('Lösenorden matchar inte!')
             return redirect(url_for('auth.account_settings'))
         if verify_password(current_user.password_hash, passForm.current_password.data):
             current_user.password_hash = hash_password(passForm.new_password.data)
@@ -162,7 +158,6 @@ def account_deletion():
 
         db.session.delete(current_user)
         db.session.commit()
-        flash('Kontot har tagits bort :(')
         return redirect(url_for('main.index'))
 
 @bp.route('/settings')
