@@ -61,6 +61,7 @@ def register():
             return redirect(flask.url_for('main.index'))
         else:
             flash('Registration failed. Please try again.')
+            return redirect(flask.url_for('auth.register'))
     return render_template('auth/register.html', form=form)
 
 @bp.route('/logout')

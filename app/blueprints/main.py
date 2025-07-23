@@ -29,7 +29,7 @@ def user_profile(user_id):
     user = get_user_by_id(user_id)
     if not user:
         abort(404)
-    return render_template('user/profile.html', user=user)
+    return render_template('user/profile.html', user=user, show_edit_links_user=True)
 
 @bp.route('/profile')
 @login_required

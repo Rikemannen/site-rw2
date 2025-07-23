@@ -1,4 +1,5 @@
 from sqlalchemy import func
+from datetime import datetime, timezone
 from app.extensions import db
 from app.models.exercise import Exercise, exercise_likes
 from app.services.file_service import create_exercise_files, delete_exercise_files
@@ -11,12 +12,12 @@ def get_exercise_by_name(name):
     """Retrieve exercise data based on its name."""
     return Exercise.query.filter_by(name=name).first()
 
-def create_exercise(name, owner, html_data, json_data, description=None):
+def create_exercise(name, owner, html_data, json_data, description=None, approved=False):
     """Create a new exercise with the given name and optional description."""
-    exercise = Exercise(name=name, owner=owner, description=description)
+    exercise = Exercise(name=name, owner=owner, description=description, approved=approved, created=int(datetime.now(timezone.utc).timestamp()))
     db.session.add(exercise)
     db.session.commit()
-    create_exercise_files(exercise.id, html_data, json_data)
+    create_exercise_files(exercise, html_data, json_data)
     return exercise
 
 def delete_exercise(exercise_id):
