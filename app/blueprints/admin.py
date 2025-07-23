@@ -226,7 +226,7 @@ def edit_exercise(id):
     if not editing:
         abort(404)
 
-    json = get_exercise_answers(editing.id)
+    json = get_exercise_answers(editing)
     html = get_exercise_html(editing)
 
 
@@ -307,8 +307,8 @@ def edit_json(id):
 
     if answerForm.validate_on_submit():
         json_data = ast.literal_eval(answerForm.json.data)
-        log(user, 'exercise', editing.id, 'json.update', old_data=json.dumps(get_exercise_answers(editing.id)), new_data=json.dumps(json_data))
-        create_exercise_files(editing.id, get_exercise_html(editing), json_data)
+        log(user, 'exercise', editing.id, 'json.update', old_data=json.dumps(get_exercise_answers(editing)), new_data=json.dumps(json_data))
+        create_exercise_files(editing, get_exercise_html(editing), json_data)
         return redirect(url_for('admin.edit_exercise', id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -321,7 +321,7 @@ def edit_html(id):
     if htmlForm.validate_on_submit():
         html_data = htmlForm.html.data
         log(user, 'exercise', editing.id, 'html.update', old_data=get_exercise_html(editing), new_data=html_data)
-        create_exercise_files(editing.id, html_data, get_exercise_answers(editing.id))
+        create_exercise_files(editing, html_data, get_exercise_answers(editing))
         return redirect(url_for('admin.edit_exercise', id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -332,7 +332,7 @@ def delete_exercise(id):
     editing = get_exercise_by_id(id)
 
     if deleteForm.validate_on_submit():
-        delete_exercise_files(editing.id)
+        delete_exercise_files(editing)
         db.session.delete(editing)
         db.session.commit()
         log(user, 'exercise', editing.id, 'delete')

@@ -1,0 +1,11 @@
+<!-- Utseendet på sidan kan ändras som du vill för det mesta -->
+<div class="bg-slate-200 rounded-md shadow-md p-2">
+    <form id="exercise-form" class="space-y-2"> <!-- class="" får röras, inget annat på denna rad-->
+        <div class="flex items-center"> <!-- Kopiera from denna rad -->
+            <label for="q1" class="w-32">Hej!</label> <!-- Ord på svenska -->
+            <input type="text" id="q1" name="q1" class="border p-1 m-2 flex-1"> <!-- Ord på annat språk, användaren skriver. Id:t på denna kan ändras, men det måste matcha vad som anges i svarsfilen, öka med 1 per fråga -->
+        </div> <!-- Kopiera till denna rad och klistra in under -->
+        <button type="button" id="submit-btn" class="bg-blue-500 text-white px-2 py-1 mt-2">Kolla svar</button> <!-- Knapp för att kontrollera svaren -->
+    </form>
+</div>
+<script src="/static/exercise_submit.js"></script> <!-- Script för att hantera svaren, denna rad får ej ändras -->

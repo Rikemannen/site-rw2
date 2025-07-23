@@ -30,10 +30,10 @@
                 {% endif %}
                 {% if current_user.admin %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin" class="hover:underline">Admin</a></li>
-                {% if request.path.startswith('/exercise/') %}
+                {% if show_edit_links %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/exercise/{{ exercise.id }}" class="hover:underline">Redigera Övning</a></li>
                 {% endif %}
-                {% if request.path.startswith('/user/') %}
+                {% if show_edit_links_user %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/user/{{ user.id }}" class="hover:underline">Redigera Användare</a></li>
                 {% endif %}
                 {% endif %}
