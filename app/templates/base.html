@@ -4,12 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Okänd{% endblock %}</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="/static/output.css">
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-slate-600">
     <header id="main-header"
-        class="sticky bg-slate-400 text-white p-4 mb-0 rounded-none shadow-none w-full top-0 left-0 transition-all duration-300 z-50">
+        class="sticky bg-slate-400 dark:bg-slate-700 text-white p-4 mb-0 rounded-none shadow-none w-full top-0 left-0 transition-all duration-300 z-50">
         <div class="flex items-center justify-between">
             <a href="/" class="hover:underline">
                 <h1 class="text-2xl font-bold content-center">Hem</h1>
@@ -22,22 +29,29 @@
         <div class="absolute right-4 top-16 min-w-[160px] hidden" id="profile-menu" style="z-index:1000;">
             <ul class="bg-white text-gray-800 rounded-lg shadow-lg mt-2 border border-gray-200">
                 {% if current_user.is_authenticated %}
-                <li class="px-4 py-2 hover:bg-gray-200" style="color: {{ current_user.color if current_user.equipped_emblem else '#000000' }};"><a href="/profile" class="hover:underline">{{ current_user.display_name ~ ' (@' ~ current_user.name ~ ')' if current_user.display_name and current_user.display_name != current_user.name
-                    else current_user.name }}</a></li>
+                <li class="px-4 py-2 hover:bg-gray-200"
+                    style="color: {{ current_user.color if current_user.equipped_emblem else '#000000' }};"><a
+                        href="/profile" class="hover:underline">{{ current_user.display_name ~ ' (@' ~ current_user.name
+                        ~ ')' if current_user.display_name and current_user.display_name != current_user.name
+                        else current_user.name }}</a></li>
                 {% if show_chat_window is not defined or show_chat_window %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline" onclick="toggleChat()">Visa/Göm
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline"
+                        onclick="toggleChat()">Visa/Göm
                         Chatt</a></li>
                 {% endif %}
                 {% if current_user.admin %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin" class="hover:underline">Admin</a></li>
                 {% if show_edit_links %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/exercise/{{ exercise.id }}" class="hover:underline">Redigera Övning</a></li>
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/exercise/{{ exercise.id }}"
+                        class="hover:underline">Redigera Övning</a></li>
                 {% endif %}
                 {% if show_edit_links_user %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/user/{{ user.id }}" class="hover:underline">Redigera Användare</a></li>
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/user/{{ user.id }}"
+                        class="hover:underline">Redigera Användare</a></li>
                 {% endif %}
                 {% endif %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings" class="hover:underline">Inställningar</a></li>
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings" class="hover:underline">Inställningar</a>
+                </li>
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/logout" class="hover:underline">Logga ut</a></li>
                 {% else %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/login" class="hover:underline">Logga in</a></li>
@@ -64,7 +78,7 @@
         </div>
         {% endif %}
         <div class="container mx-auto p-4">
-        {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
         </div>
     </main>
 </body>

@@ -18,7 +18,7 @@ def handle_send_message(data):
     message = data.get('message')
     if len(message) > 100:
         return
-    color = "#FFFFFF"
+    color = "#949494"
     if current_user.equipped_emblem:
         color = current_user.equipped_emblem.color
     clean_message = bleach.clean(message)
@@ -41,7 +41,7 @@ def get_messages():
     result = []
     for msg in messages:
         user = get_user_by_id(msg["id"])
-        color = ""
+        color = "#949494"
         if user and user.equipped_emblem:
             color = user.equipped_emblem.color
         
