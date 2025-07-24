@@ -52,7 +52,8 @@ def get_messages():
                 "name": user.name,
                 "id": user.id,
                 "color": color,
-                "time": msg["time"]
+                "time": msg["time"],
+                "user": user
             })
 
     return result
