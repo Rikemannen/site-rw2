@@ -55,4 +55,4 @@ class User(db.Model, UserMixin):
         """Returns the color of the user's equipped emblem"""
         if self.equipped_emblem and self.equipped_emblem.color:
             return self.equipped_emblem.color
-        return "#155DFC"
+        return None

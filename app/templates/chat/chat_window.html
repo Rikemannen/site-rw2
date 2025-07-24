@@ -7,7 +7,7 @@
             <p><a href="/user/${id}" class="hover:underline">{{ msg.display_name ~ ' (@' ~ msg.name ~ ')' if
                     msg.display_name and msg.display_name != msg.name
                     else msg.name }}</a>: {{ msg.message }}</p>
-            <p class="text-gray-600 text-sm">{{ msg.time | datetimeformat('time') }}</p>
+            <p class="text-gray-600 text-sm" style="color: {{ msg.color }};">{{ msg.time | datetimeformat('time') }}</p>
         </div>
         {% endfor %}
     </div>
@@ -56,7 +56,7 @@
             ? `${displayName} (@${username})`
             : username;
 
-        msg.innerHTML = `<div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between" style="color: ${color}; background-color: ${color}33;"><p><a href="/user/${id}" class="hover:underline">${nameText}</a>: ${message}</p><p class="text-gray-600 text-sm">${time}</p></div>`;
+        msg.innerHTML = `<div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between" style="color: ${color}; background-color: ${color}33;"><p><a href="/user/${id}" class="hover:underline">${nameText}</a>: ${message}</p><p class="text-gray-600 text-sm" style="color: ${color};">${time}</p></div>`;
         chatBox.appendChild(msg);
         chatBox.scrollTop = chatBox.scrollHeight;
     });
