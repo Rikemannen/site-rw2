@@ -8,6 +8,9 @@
         Användarinställningar för <a href="{{ url_for('main.user_profile', user_id=editing.id)}}"
             class="text-blue-600 hover:underline">{{ editing.name }}</a>
     </h2>
+    {% if current_user.id == editing.id %}
+    <h3 class="text-md -mt-2 mb-2 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h3>
+    {% endif %}
     <form method="POST" action="{{ url_for('admin.profile_editing', user_id=editing.id) }}">
         <h2 class="text-xl mb-4">Profil</h2>
         {{ profileForm.hidden_tag() }}
@@ -73,6 +76,9 @@
     <hr class="my-6 border-t border-gray-300">
     <form method="POST" action="{{ url_for('admin.deletion', user_id=editing.id)}}">
         <h2 class="text-xl mt-4 mb-4">Borttagning</h2>
+        {% if current_user.id == editing.id %}
+        <h3 class="text-md -mt-2 mb-2 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h3>
+        {% endif %}
         {{ deleteForm.hidden_tag() }}
         {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
     </form>
@@ -93,7 +99,7 @@
     <form method="POST" action="{{ url_for('admin.elevate', user_id=editing.id )}}">
         <h2 class="text-xl mt-4 mb-4">Ge admin-åtkomst</h2>
         {% if current_user.id == editing.id %}
-        <h3 class="text-md -mt-2 mb-2 text-red-500">Varning: Du bör ej ändra denna inställning på ditt egna konto!</h3>
+        <h3 class="text-md -mt-2 mb-2 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h3>
         {% endif %}
         {{ elevateForm.hidden_tag() }}
         <div class="mb-4">
