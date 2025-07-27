@@ -4,12 +4,12 @@ from datetime import datetime
 from os import environ
 from datetime import timedelta
 from flask import Flask, render_template, redirect, url_for, request
+from flask_login import current_user
+from app.blueprints.chat import get_messages
 from app.blueprints import main, auth, exercises, chat, admin
 from app.extensions import login_manager
 from app.services.user_service import get_user_by_id
 from app.extensions import socketio, db
-from flask_login import current_user
-from app.blueprints.chat import get_messages
 
 def create_app():
     """Create and configure the Flask application."""
