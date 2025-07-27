@@ -3,6 +3,7 @@
 from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json, session
 import time
 import re
+from urllib.parse import urlparse, urljoin
 from flask_login import login_user, current_user, login_required, logout_user
 from app.services.user_service import get_user_by_username, create_user, get_user_by_id
 from app.services.token_service import get_token_by_secret, invalidate_token
@@ -14,6 +15,11 @@ from app.services.logging_service import log
 
 bp = Blueprint('auth', __name__)
 pattern = r'^[a-zA-Z0-9]{1,20}$'
+
+def is_safe_url(target):
+    host_url = urlparse(request.host_url)
+    redirect_url = urlparse(urljoin(request.host_url, target))
+    return redirect_url.scheme in ('http', 'https') and host_url.netloc == redirect_url.netloc
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -31,6 +37,8 @@ def login():
         session.permanent = True
 
         next_url = request.form.get('next')
+        if not next_url or not is_safe_url(next_url):
+            next_url = url_for('main.index')
 
         if next_url:
             return redirect(next_url)
