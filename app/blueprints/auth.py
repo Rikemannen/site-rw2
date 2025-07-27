@@ -1,7 +1,6 @@
 """Handles user authentication routes and views."""
 
 from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json, session
-import flask
 import datetime
 import re
 from flask_login import login_user, current_user, login_required, logout_user
@@ -20,13 +19,13 @@ pattern = r'^[a-zA-Z0-9]{1,20}$'
 def login():
     """Handle user login."""
     if current_user.is_authenticated:
-        return redirect(flask.url_for('main.index'))
+        return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = get_user_by_username(form.username.data)
         if not user or not verify_password(user.password_hash, form.password.data):
             flash('Ogiltigt användarnamn eller lösenord.')
-            return redirect(flask.url_for('auth.login'))
+            return redirect(url_for('auth.login'))
 
         login_user(user)
         session.permanent = True
@@ -48,9 +47,9 @@ def register():
 
         if user_exists := get_user_by_username(form.username.data):
             flash('Användarnamnet taget, använd ett annat!')
-            return redirect(flask.url_for('auth.register'))
+            return redirect(url_for('auth.register'))
         
-        if re.match(pattern, nameForm.username.data) is not None:
+        if re.match(pattern, form.username.data) is not None:
             pass
         else:
             flash('Användarnamnet får bara inehålla bokstäver och siffror, och vara max 20 tecken!')
@@ -64,10 +63,10 @@ def register():
 
         if user:
             login_user(user)
-            return redirect(flask.url_for('main.index'))
+            return redirect(url_for('main.index'))
         else:
             flash('Registreringen misslyckades, försök igen!')
-            return redirect(flask.url_for('auth.register'))
+            return redirect(url_for('auth.register'))
     return render_template('auth/register.html', form=form)
 
 @bp.route('/logout')
@@ -75,7 +74,7 @@ def register():
 def logout():
     """Handle user logout."""
     logout_user()
-    return redirect(flask.url_for('main.index'))
+    return redirect(url_for('main.index'))
 
 @bp.route('/settings/profile', methods=['GET', 'POST'])
 @login_required
