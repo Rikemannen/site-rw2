@@ -1,6 +1,6 @@
 """User model for the application."""
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from app.extensions import db
@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
     verified = Column(Boolean, default=False)
     liked_exercises = relationship('Exercise', secondary='exercise_likes', back_populates='liked_by')
     exercises = relationship('Exercise', back_populates='owner')
-    name_last_change = Column(DateTime(timezone=True), nullable=True)
+    name_last_change = Column(Integer, nullable=True)
     joined = Column(Integer, nullable=False, default=0)  # Unix timestamp
 
     # Additional columns to consider:

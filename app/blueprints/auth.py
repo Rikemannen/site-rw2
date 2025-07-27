@@ -1,7 +1,7 @@
 """Handles user authentication routes and views."""
 
 from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json, session
-import datetime
+import time
 import re
 from flask_login import login_user, current_user, login_required, logout_user
 from app.services.user_service import get_user_by_username, create_user, get_user_by_id
@@ -127,10 +127,10 @@ def username_change():
     nameForm = UsernameChangeForm()
 
     if nameForm.validate_on_submit():
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = time.time()
         if (
             current_user.name_last_change is None
-            or current_user.name_last_change + datetime.timedelta(days=14) <= now
+            or current_user.name_last_change + 14 * 86400 <= now
         ):
             if re.match(pattern, nameForm.username.data) is not None:
                 current_user.name = nameForm.username.data

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from flask_socketio import emit
 from flask_login import current_user
 import bleach
-import datetime
+import time
 from app.extensions import socketio
 from app.services.user_service import get_user_by_id
 
@@ -22,7 +22,7 @@ def handle_send_message(data):
     if current_user.equipped_emblem:
         color = current_user.equipped_emblem.color
     clean_message = bleach.clean(message)
-    now = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    now = time.time()
     emit('receive_message',
         {'message': clean_message, 'display_name': current_user.display_name,
          'username': current_user.name, 'id': current_user.id, 'color': color, 'time': now},

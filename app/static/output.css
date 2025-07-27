@@ -648,6 +648,9 @@
   .dark .text-blue-600 {
     color: var(--color-slate-800);
   }
+  .dark .text-gray-500 {
+    color: var(--color-slate-800);
+  }
   .dark .text-gray-600 {
     color: var(--color-slate-800);
   }

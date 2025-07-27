@@ -1,5 +1,5 @@
 import sqlalchemy.exc
-from datetime import datetime, timezone
+import time
 from app.extensions import db
 from app.models.user import User
 
@@ -21,7 +21,7 @@ def create_user(username, display_name, password_hash):
         name=username,
         display_name=display_name,
         password_hash=password_hash,
-        joined=int(datetime.now(timezone.utc).timestamp())
+        joined=time.time()
     )
     db.session.add(user)
     try:
