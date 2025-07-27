@@ -1,8 +1,7 @@
 """Application factory for the Flask application."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from os import environ
-from datetime import timedelta
 from flask import Flask, render_template, redirect, url_for, request
 from flask_login import current_user
 from app.blueprints.chat import get_messages
