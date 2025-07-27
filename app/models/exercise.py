@@ -3,7 +3,6 @@
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.extensions import db
-from app.models.user import User
 
 exercise_likes = db.Table(
     'exercise_likes',

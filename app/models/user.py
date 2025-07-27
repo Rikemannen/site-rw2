@@ -4,7 +4,6 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from app.extensions import db
-from app.models.emblems import Emblem
 
 user_emblems = Table(
     'user_emblems',

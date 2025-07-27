@@ -6,7 +6,7 @@ from datetime import timedelta
 from flask import Flask, render_template, redirect, url_for, request
 from app.blueprints import main, auth, exercises, chat, admin
 from app.extensions import login_manager
-from app.services.user_service import get_user_by_id, get_user_by_username
+from app.services.user_service import get_user_by_id
 from app.extensions import socketio, db
 from flask_login import current_user
 from app.blueprints.chat import get_messages
