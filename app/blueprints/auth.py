@@ -3,6 +3,7 @@
 from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json, session
 import flask
 import datetime
+import re
 from flask_login import login_user, current_user, login_required, logout_user
 from app.services.user_service import get_user_by_username, create_user, get_user_by_id
 from app.services.token_service import get_token_by_secret, invalidate_token
@@ -13,6 +14,7 @@ from app.extensions import db
 from app.services.logging_service import log
 
 bp = Blueprint('auth', __name__)
+pattern = r'^[a-zA-Z0-9]{1,20}$'
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -48,6 +50,12 @@ def register():
             flash('Användarnamnet taget, använd ett annat!')
             return redirect(flask.url_for('auth.register'))
         
+        if re.match(pattern, nameForm.username.data) is not None:
+            pass
+        else:
+            flash('Användarnamnet får bara inehålla bokstäver och siffror, och vara max 20 tecken!')
+            return redirect(url_for('auth.register'))
+
         user = create_user(
             username=form.username.data,
             display_name=form.display_name.data or None,
@@ -121,12 +129,19 @@ def username_change():
 
     if nameForm.validate_on_submit():
         now = datetime.datetime.now(datetime.timezone.utc)
-        if current_user.name_last_change is None or current_user.name_last_change + datetime.timedelta(days=14) <= now:
-            current_user.name = nameForm.username.data
-            current_user.name_last_change = now
-            db.session.commit()
-            flash('Användarnamnet har ändrats!')
-            return redirect(url_for('auth.account_settings'))
+        if (
+            current_user.name_last_change is None
+            or current_user.name_last_change + datetime.timedelta(days=14) <= now
+        ):
+            if re.match(pattern, nameForm.username.data) is not None:
+                current_user.name = nameForm.username.data
+                current_user.name_last_change = now
+                db.session.commit()
+                flash('Användarnamnet har ändrats!')
+                return redirect(url_for('auth.account_settings'))
+            else:
+                flash('Användarnamnet får bara inehålla bokstäver och siffror, och vara max 20 tecken!')
+                return redirect(url_for('auth.account_settings'))
         else:
             flash('Du måste vänta 14 dagar innan du ändrar ditt namn igen.')
             return redirect(url_for('auth.account_settings'))
