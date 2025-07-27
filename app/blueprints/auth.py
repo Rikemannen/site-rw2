@@ -1,6 +1,6 @@
 """Handles user authentication routes and views."""
 
-from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json
+from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json, session
 import flask
 import datetime
 from flask_login import login_user, current_user, login_required, logout_user
@@ -27,6 +27,7 @@ def login():
             return redirect(flask.url_for('auth.login'))
 
         login_user(user)
+        session.permanent = True
 
         next_url = request.form.get('next')
 
