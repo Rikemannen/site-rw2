@@ -6,10 +6,24 @@
     <title>{% block title %}Okänd{% endblock %}</title>
     <link rel="stylesheet" href="/static/output.css">
     <script>
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const darkModeCookie = getCookie('dark_mode');
+        if (darkModeCookie === 'true') {
             document.documentElement.classList.add('dark');
-        } else {
+        } else if (darkModeCookie === 'false') {
             document.documentElement.classList.remove('dark');
+        } else {
+            // fallback to system preference if cookie not set
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         }
     </script>
 </head>
@@ -52,6 +66,7 @@
                 {% endif %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings" class="hover:underline">Inställningar</a>
                 </li>
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline" onclick="toggleDarkMode('toggle')">Byt tema</a> | <a href="javascript:void(0)" class="hover:underline" onclick="toggleDarkMode('system')">Följ system</a></li>
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/logout" class="hover:underline">Logga ut</a></li>
                 {% else %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/login" class="hover:underline">Logga in</a></li>
@@ -68,6 +83,63 @@
             function toggleChat() {
                 const chatWindow = document.querySelector('#chat-window');
                 chatWindow.classList.toggle('hidden');
+            }
+
+            function setCookie(name, value, days = 365) {
+                const expires = days ? `; expires=${new Date(Date.now() + days * 864e5).toUTCString()}` : '';
+                document.cookie = `${name}=${value || ''}${expires}; path=/; SameSite=Lax`;
+            }
+
+            function deleteCookie(name) {
+                document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
+            }
+
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            }
+
+            function getSystemDarkMode() {
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+
+            /**
+             * Toggles dark mode or sets system preference
+             * @param {string} input - "toggle" or "system"
+             */
+            function toggleDarkMode(input) {
+                const cookie = getCookie('dark_mode');
+                const systemPrefersDark = getSystemDarkMode();
+
+                if (input === 'system') {
+                    deleteCookie('dark_mode');
+                    if (systemPrefersDark) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                } else if (input === 'toggle') {
+                    if (cookie === null) {
+                        // no cookie: toggle opposite of system
+                        if (systemPrefersDark) {
+                            setCookie('dark_mode', 'false');
+                            document.documentElement.classList.remove('dark');
+                        } else {
+                            setCookie('dark_mode', 'true');
+                            document.documentElement.classList.add('dark');
+                        }
+                    } else if (cookie === 'true') {
+                        // cookie is dark, toggle to light
+                        setCookie('dark_mode', 'false');
+                        document.documentElement.classList.remove('dark');
+                    } else {
+                        // cookie is light, toggle to dark
+                        setCookie('dark_mode', 'true');
+                        document.documentElement.classList.add('dark');
+                    }
+                }
             }
         </script>
     </header>

@@ -613,12 +613,12 @@
     }
   }
   .dark\:bg-slate-600 {
-    @media (prefers-color-scheme: dark) {
+    &:where(.dark, .dark *) {
       background-color: var(--color-slate-600);
     }
   }
   .dark\:bg-slate-700 {
-    @media (prefers-color-scheme: dark) {
+    &:where(.dark, .dark *) {
       background-color: var(--color-slate-700);
     }
   }
