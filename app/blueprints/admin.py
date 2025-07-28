@@ -107,6 +107,10 @@ def profile_editing(user_id):
     """Handle profileForm submission."""
     profileForm = ProfileSettingsForm()
     editing = get_user_by_id(user_id)
+
+    if not editing:
+        abort(404)
+
     profileForm.emblem.choices = [(0, 'None')] + [(e.id, e.name) for e in editing.emblems]
     if profileForm.validate_on_submit():
         editing.display_name = profileForm.display_name.data
@@ -122,8 +126,10 @@ def emblems(user_id):
     emblemForm = EmblemAssignmentForm()
     editing = get_user_by_id(user_id)
 
+    if not editing:
+        abort(404)
+
     emblemForm.emblems.choices = [(e.id, e.name) for e in Emblem.query.all()]
-    print("received data:",emblemForm.emblems.data)
     if emblemForm.validate_on_submit():
         editing.emblems.clear()
         selected_ids = [int(e_id) for e_id in emblemForm.emblems.data]
@@ -140,6 +146,9 @@ def username_editing(user_id):
     usernameForm = UsernameChangeForm()
     editing = get_user_by_id(user_id)
 
+    if not editing:
+        abort(404)
+
     if usernameForm.validate_on_submit():
         log(user, 'user', editing.id, 'name.change', old_data=editing.name, new_data=usernameForm.username.data)
         editing.name = usernameForm.username.data
@@ -153,6 +162,9 @@ def recovery(user_id):
     """Handle resetForm submission."""
     resetForm = PasswordResetForm()
     editing = get_user_by_id(user_id)
+
+    if not editing:
+        abort(404)
 
     if resetForm.validate_on_submit():
         token = generate_token(editing)
@@ -170,6 +182,9 @@ def deletion(user_id):
     deleteForm = DeleteUserForm()
     editing = get_user_by_id(user_id)
 
+    if not editing:
+        abort(404)
+
     if deleteForm.validate_on_submit():
         db.session.delete(editing)
         db.session.commit()
@@ -184,6 +199,9 @@ def verify(user_id):
     verifyForm = VerifyUserForm()
     editing = get_user_by_id(user_id)
 
+    if not editing:
+        abort(404)
+
     if verifyForm.validate_on_submit():
         editing.verified = verifyForm.verified.data
         db.session.commit()
@@ -197,6 +215,9 @@ def elevate(user_id):
     """Handle elevateForm submissions."""
     elevateForm = ElevateUserForm()
     editing = get_user_by_id(user_id)
+
+    if not editing:
+        abort(404)
 
     if elevateForm.validate_on_submit():
         editing.admin = elevateForm.admin.data
@@ -223,6 +244,7 @@ def edit_exercise(id):
     answerForm = ExerciseAnswerForm()
     deleteForm = DeleteExerciseForm()
     editing = get_exercise_by_id(id)
+
     if not editing:
         abort(404)
 
@@ -255,6 +277,9 @@ def edit_info(id):
     infoForm = ExerciseInfoForm()
     editing = get_exercise_by_id(id)
 
+    if not editing:
+        abort(404)
+
     if infoForm.validate_on_submit():
         editing.name = infoForm.name.data
         editing.description = infoForm.description.data
@@ -267,6 +292,9 @@ def edit_info(id):
 def edit_static(id):
     dataForm = ExerciseDataForm()
     editing = get_exercise_by_id(id)
+
+    if not editing:
+        abort(404)
 
     if dataForm.validate_on_submit():
         if dataForm.approved.data != editing.approved:
@@ -292,6 +320,9 @@ def edit_stats(id):
     statisticForm = ExerciseStatisticForm()
     editing = get_exercise_by_id(id)
 
+    if not editing:
+        abort(404)
+
     if statisticForm.validate_on_submit():
         editing.attempts = statisticForm.attempts.data
         editing.finished = statisticForm.completions.data
@@ -304,6 +335,9 @@ def edit_stats(id):
 def edit_json(id):
     answerForm = ExerciseAnswerForm()
     editing = get_exercise_by_id(id)
+
+    if not editing:
+        abort(404)
 
     if answerForm.validate_on_submit():
         json_data = ast.literal_eval(answerForm.json.data)
@@ -318,6 +352,9 @@ def edit_html(id):
     htmlForm = ExerciseHTMLForm()
     editing = get_exercise_by_id(id)
 
+    if not editing:
+        abort(404)
+
     if htmlForm.validate_on_submit():
         html_data = htmlForm.html.data
         log(user, 'exercise', editing.id, 'html.update', old_data=get_exercise_html(editing), new_data=html_data)
@@ -330,6 +367,9 @@ def edit_html(id):
 def delete_exercise(id):
     deleteForm = DeleteExerciseForm()
     editing = get_exercise_by_id(id)
+
+    if not editing:
+        abort(404)
 
     if deleteForm.validate_on_submit():
         delete_exercise_files(editing)
@@ -375,6 +415,9 @@ def edit_emblem_appearance(id):
     appearanceForm = EmblemAppearanceForm()
     editing = get_emblem_by_id(id)
 
+    if not editing:
+        abort(404)
+
     if appearanceForm.validate_on_submit():
         editing.name = appearanceForm.name.data
         editing.color = appearanceForm.color.data
@@ -387,6 +430,9 @@ def edit_emblem_appearance(id):
 def delete_emblem(id):
     deleteForm = DeleteEmblemForm()
     editing = get_emblem_by_id(id)
+
+    if not editing:
+        abort(404)
 
     if deleteForm.validate_on_submit():
         db.session.delete(editing)
