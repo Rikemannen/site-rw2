@@ -1,13 +1,13 @@
 <div class="bg-slate-200 rounded-md shadow-md p-4">
     <h1 class="text-2xl font-bold mb-4"><a href="/chat" class="hover:underline">Chatt</a></h1>
     <div id="chat-box" class="bg-white h-64 overflow-y-scroll p-2 mb-4 rounded-md border border-gray-300">
-        {% for msg in messages %}
+        <!-- {% for msg in messages %}
         <div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between"
             style="color: {{ msg.color }}; background-color: {{ msg.color }}33;">
-            <p><a href="/user/{{ msg.id }}" class="hover:underline">{{ msg.user | format_user }}</a>: {{ msg.message }}</p>
+            <p><a href="/user/{{ msg.id }}" class="hover:underline">{{ msg.id | format_user_id }}</a>: {{ msg.message }}</p>
             <p class="text-gray-600 text-sm" style="color: {{ msg.color }};">{{ msg.time | datetimeformat('time') }}</p>
         </div>
-        {% endfor %}
+        {% endfor %} -->
     </div>
     <form id="chat-form" class="flex">
         <input id="message-input" type="text" placeholder="Skriv ett meddelande..."
@@ -17,16 +17,34 @@
 </div>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-    window.onload = function () {
-        const chatBox = document.getElementById('chat-box');
+    const chatBox = document.getElementById('chat-box');
+
+    function formatTime(unixTime) {
+        const date = new Date(unixTime * 1000);
+        return date.toLocaleTimeString(undefined, { hour12: false });
+    }
+
+    function renderMessage(data) {
+        const msg = document.createElement('div');
+        const nameText = (data.display_name && data.display_name !== data.name)
+            ? `${data.display_name} (@${data.name})`
+            : data.name;
+
+        msg.innerHTML = `<div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between" style="color: ${data.color}; background-color: ${data.color}33;"><p><a href="/user/${data.id}" class="hover:underline">${nameText}</a>: ${data.message}</p><p class="text-gray-600 text-sm" style="color: ${data.color};">${formatTime(data.time)}</p></div>`;
+        chatBox.appendChild(msg);
+    }
+
+    // Load existing messages
+    window.onload = async function () {
+        const res = await fetch('/chat/messages');
+        const messages = await res.json();
+        messages.forEach(renderMessage);
         chatBox.scrollTop = chatBox.scrollHeight;
     };
 
     const socket = io();
-
     const form = document.getElementById('chat-form');
     const input = document.getElementById('message-input');
-    const chatBox = document.getElementById('chat-box');
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -36,26 +54,8 @@
         }
     });
 
-    function formatTime(unixTime) {
-        const date = new Date(unixTime * 1000);
-        return date.toLocaleTimeString(undefined, { hour12: false });
-    }
-
     socket.on('receive_message', function (data) {
-        const msg = document.createElement('div');
-        const displayName = data.display_name;
-        const username = data.username;
-        const id = data.id;
-        const message = data.message;
-        const color = data.color;
-        const time = formatTime(data.time);
-
-        const nameText = (displayName && displayName !== username)
-            ? `${displayName} (@${username})`
-            : username;
-
-        msg.innerHTML = `<div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between" style="color: ${color}; background-color: ${color}33;"><p><a href="/user/${id}" class="hover:underline">${nameText}</a>: ${message}</p><p class="text-gray-600 text-sm" style="color: ${color};">${time}</p></div>`;
-        chatBox.appendChild(msg);
+        renderMessage(data);
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 </script>

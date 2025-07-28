@@ -3,12 +3,13 @@ from flask_socketio import emit
 from flask_login import current_user
 import bleach
 import time
+from collections import deque
 from app.extensions import socketio
 from app.services.user_service import get_user_by_id
 
 bp = Blueprint('chat', __name__, url_prefix='/')
 
-messages = []
+messages = deque(maxlen=75)
 
 @socketio.on('send_message')
 def handle_send_message(data):
@@ -25,7 +26,7 @@ def handle_send_message(data):
     now = time.time()
     emit('receive_message',
         {'message': clean_message, 'display_name': current_user.display_name,
-         'username': current_user.name, 'id': current_user.id, 'color': color, 'time': now},
+         'name': current_user.name, 'id': current_user.id, 'color': color, 'time': now},
          broadcast=True)
 
     messages.append({"message": clean_message, "id": current_user.id, "time": now})
@@ -52,8 +53,7 @@ def get_messages():
                 "name": user.name,
                 "id": user.id,
                 "color": color,
-                "time": msg["time"],
-                "user": user
+                "time": msg["time"]
             })
 
     return result

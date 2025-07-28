@@ -62,6 +62,14 @@ def create_app():
             return f"{user.display_name} (@{user.name})" if user.display_name else user.name
         return None
 
+    @app.template_filter('format_user_id')
+    def format_user_id(id):
+        """Format user object for display."""
+        user = get_user_by_id(id)
+        if user:
+            return f"{user.display_name} (@{user.name})" if user.display_name else user.name
+        return None
+
     @app.errorhandler(404)
     def not_found(error):
         """Render the 404 Not Found page."""
