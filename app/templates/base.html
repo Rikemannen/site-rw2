@@ -75,9 +75,18 @@
             </ul>
         </div>
         <script>
-            document.getElementById('profile-button').addEventListener('click', function () {
+            const toggleBtn = document.getElementById('profile-button'); // the button that opens the menu
+
+            toggleBtn.addEventListener('click', function () {
                 const menu = document.getElementById('profile-menu');
                 menu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+              const menu = document.getElementById('profile-menu');
+              if (!menu.contains(e.target) && !toggleBtn.contains(e.target)) {
+                menu.classList.add('hidden');
+              }
             });
 
             function toggleChat() {
@@ -145,7 +154,7 @@
     </header>
     <main class="p-4">
         {% if show_chat_window is not defined or show_chat_window %}
-        <div class="fixed bottom-4 right-4 w-[400px] h-[740px] hidden" id="chat-window">
+        <div class="fixed right-4 w-[400px] h-[740px] hidden" id="chat-window">
             {% include "chat/chat_window.html" %}
         </div>
         {% endif %}
