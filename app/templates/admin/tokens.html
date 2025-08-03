@@ -7,14 +7,21 @@
     <div class="bg-slate-100 p-2 rounded-md shadow-md">
         {% for token in tokens %}
         <div id="T{{ token.id }}" class="p-2 mt-2 mb-2 rounded-md shadow-md bg-slate-200">
-            <p><a href="/user/{{ token.user_id }}" class="text-blue-600 hover:underline">{{ token.owner | format_user }}
+            <p><a href="/user/{{ token.user_id }}" class="hover:underline">För: {{ token.owner | format_user }}
+                </a>
+            </p>
+            <p><a href="/user/{{ token.creator_id }}" class="hover:underline">Skapad av: {{ token.creator | format_user }}
                 </a>
             </p>
             <p>Går ut: {{ token.expires | datetimeformat }}</p>
+            <p>Hemlighet: {{ token.secret[:10] }}...</p>
             {% if token.is_valid %}
             <p class="text-green-500">Giltig</p>
             {% else %}
             <p class="text-red-700">Ej Giltig</p>
+            {% if token.used_timestamp %}
+            <p>Användes: {{ token.used_timestamp | datetimeformat }}</p>
+            {% endif %}
             {% endif %}
             <p>ID: {{ token.id }}</p>
         </div>

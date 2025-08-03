@@ -10,7 +10,9 @@ class Token(db.Model):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    owner = relationship('User', back_populates='tokens')
+    owner = relationship('User', back_populates='tokens', foreign_keys=[user_id])
+    creator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    creator = relationship('User', back_populates='created_tokens', foreign_keys=[creator_id])
     secret = Column(String(64), nullable=False, unique=True)
     expires = Column(Integer, nullable=False)
     valid = Column(Boolean, nullable=False, default=True)
