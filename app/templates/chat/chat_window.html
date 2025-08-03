@@ -1,13 +1,6 @@
 <div class="bg-slate-200 rounded-md shadow-md p-4">
     <h1 class="text-2xl font-bold mb-4"><a href="/chat" class="hover:underline">Chatt</a></h1>
     <div id="chat-box" class="bg-white h-64 overflow-y-scroll p-2 mb-4 rounded-md border border-gray-300">
-        <!-- {% for msg in messages %}
-        <div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between"
-            style="color: {{ msg.color }}; background-color: {{ msg.color }}33;">
-            <p><a href="/user/{{ msg.id }}" class="hover:underline">{{ msg.id | format_user_id }}</a>: {{ msg.message }}</p>
-            <p class="text-gray-600 text-sm" style="color: {{ msg.color }};">{{ msg.time | datetimeformat('time') }}</p>
-        </div>
-        {% endfor %} -->
     </div>
     <form id="chat-form" class="flex">
         <input id="message-input" type="text" placeholder="Skriv ett meddelande..."
