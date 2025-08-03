@@ -12,7 +12,7 @@
             </p>
             <p>Går ut: {{ token.expires | datetimeformat }}</p>
             {% if token.is_valid %}
-            <p class="text-green-400">Giltig</p>
+            <p class="text-green-500">Giltig</p>
             {% else %}
             <p class="text-red-700">Ej Giltig</p>
             {% endif %}
