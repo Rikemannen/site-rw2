@@ -22,6 +22,7 @@ def get_token_by_secret(secret):
 def invalidate_token(token):
     """Invalidate a token."""
     token.valid = False
+    token.used_timestamp = time.time()
     db.session.commit()
     return token
 

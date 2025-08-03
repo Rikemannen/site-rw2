@@ -2,6 +2,7 @@
 
 import time
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
 from app.extensions import db
 
 class Token(db.Model):
@@ -9,9 +10,11 @@ class Token(db.Model):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    owner = relationship('User', back_populates='tokens')
     secret = Column(String(64), nullable=False, unique=True)
     expires = Column(Integer, nullable=False)
     valid = Column(Boolean, nullable=False, default=True)
+    used_timestamp = Column(Integer)
 
     @property
     def is_valid(self):

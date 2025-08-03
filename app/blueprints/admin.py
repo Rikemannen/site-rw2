@@ -12,6 +12,7 @@ from app.services.emblem_service import get_emblem_by_id, create_emblem as creat
 from app.services.logging_service import log
 from app.models.logs import Log
 from app.models.emblems import Emblem
+from app.models.token import Token
 from app.extensions import db
 from app.forms.admin_forms import (
     ProfileSettingsForm,
@@ -54,6 +55,14 @@ def logs():
     count = request.args.get('c', default=100, type=int)
     logs = db.session.query(Log).order_by(Log.id.desc()).limit(count).all()
     return render_template('admin/logs.html', logs=logs)
+
+@bp.route('tokens')
+@admin_required
+def tokens():
+    """Show all tokens."""
+    tokens = Token.query.order_by(Token.id.desc()).all()
+    tokens.sort(key=lambda t: not t.is_valid)
+    return render_template('admin/tokens.html', tokens=tokens)
 
 # --- User related routes within /admin. ---
 
