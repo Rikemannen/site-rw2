@@ -64,9 +64,12 @@
                         class="hover:underline">Redigera Användare</a></li>
                 {% endif %}
                 {% endif %}
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="/search" class="hover:underline">Sök</a></li>
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings" class="hover:underline">Inställningar</a>
                 </li>
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline" onclick="toggleDarkMode('toggle')">Byt tema</a> | <a href="javascript:void(0)" class="hover:underline" onclick="toggleDarkMode('system')">Följ system</a></li>
+                <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline"
+                        onclick="toggleDarkMode('toggle')">Byt tema</a> | <a href="javascript:void(0)"
+                        class="hover:underline" onclick="toggleDarkMode('system')">Följ system</a></li>
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/logout" class="hover:underline">Logga ut</a></li>
                 {% else %}
                 <li class="px-4 py-2 hover:bg-gray-200"><a href="/login" class="hover:underline">Logga in</a></li>
@@ -83,10 +86,10 @@
             });
 
             document.addEventListener('click', (e) => {
-              const menu = document.getElementById('profile-menu');
-              if (!menu.contains(e.target) && !toggleBtn.contains(e.target)) {
-                menu.classList.add('hidden');
-              }
+                const menu = document.getElementById('profile-menu');
+                if (!menu.contains(e.target) && !toggleBtn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
             });
 
             function toggleChat() {
