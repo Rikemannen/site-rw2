@@ -40,7 +40,7 @@ def profile():
 @bp.route('/search')
 def search():
     """Render the search results page."""
-    query = request.args.get('q', '').strip()
+    query = request.args.get('q', '*').strip()
     search_type = request.args.get('type', 'all')
 
     user_results = []

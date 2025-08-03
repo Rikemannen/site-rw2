@@ -4,6 +4,36 @@
 
 {% block content %}
 {% set is_admin = current_user.admin %}
+<div class="bg-slate-200 p-2 rounded-md mb-2 shadow-md">
+    <form action="/search" method="GET" onsubmit="return updateQuery(this);">
+        <h2 class="block text-xl font-md">Sök:</h2>
+        <input placeholder="Sökning..." class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-md">
+        <p class="mt-2">Inkludera:</p>
+        <ul style="list-style-type:none;">
+            <li><input type="checkbox" id="users">
+                Användare</li>
+            <li><input type="checkbox" id="exercises">
+                Övningar</li>
+        </ul>
+        <button type="submit" class="bg-blue-500 p-2 rounded-md shadow-md mb-2 mt-2">Sök</button>
+    </form>
+</div>
+<script>
+    function updateQuery(form) {
+        let q = form.querySelector('input[placeholder="Sökning..."]').value.trim();
+        const users = document.getElementById('users').checked;
+        const exercises = document.getElementById('exercises').checked;
+
+        if (q === '') q = '*';
+        let type = 'all';
+        if (users && !exercises) type = 'users';
+        else if (!users && exercises) type = 'exercises';
+
+        const params = new URLSearchParams({ q, type });
+        window.location.href = `/search?${params.toString()}`;
+        return false;
+    }
+</script>
 {% if search_type == 'all' %}
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {% else %}
@@ -11,15 +41,17 @@
         {% endif %}
         {% if search_type in ('all', 'users') %}
         <div class="bg-slate-200 p-2 rounded-md shadow-md">
+            <h2 class="text-xl">Användare:</h2>
             {% if user_results %}
             {% for user in user_results %}
             <div class="p-2 mt-2 mb-2 rounded-md shadow-md"
                 style="background-color: {{ user.equipped_emblem.color }}33">
-                <p><a href="/user/{{ user.id }}" class="text-blue-600 hover:underline" style="color: {{ user.equipped_emblem.color }}">{{ user | format_user }}
+                <p><a href="/user/{{ user.id }}" class="text-blue-600 hover:underline"
+                        style="color: {{ user.equipped_emblem.color }}">{{ user | format_user }}
                     </a>
-                        {% if is_admin %}
-                        <a href="/admin/user/{{ user.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
-                        {% endif %}
+                    {% if is_admin %}
+                    <a href="/admin/user/{{ user.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
+                    {% endif %}
                 </p>
                 <p>ID: {{ user.id }}</p>
             </div>
@@ -33,14 +65,16 @@
         {% endif %}
         {% if search_type in ('all', 'exercises') %}
         <div class="bg-slate-200 p-2 rounded-md shadow-md">
+            <h2 class="text-xl">Övningar:</h2>
             {% if exercise_results %}
             {% for exercise in exercise_results %}
             <div class="p-2 mt-2 mb-2 rounded-md shadow-md bg-slate-300">
                 <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
                         }}</a>
-                        {% if is_admin %}
-                        <a href="/admin/exercise/{{ exercise.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
-                        {% endif %}
+                    {% if is_admin %}
+                    <a href="/admin/exercise/{{ exercise.id }}" class="text-orange-600 hover:underline">Öppna som
+                        admin</a>
+                    {% endif %}
                 </p>
                 <p>Skapare: <a href="/user/{{ exercise.owner.id }}" class="hover:underline"
                         style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner | format_user }}</a>
