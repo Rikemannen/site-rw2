@@ -203,7 +203,6 @@ def recovery(secret):
         invalidate_token(token)
         log(None, 'user', token.user_id, 'recovery.token_used', new_data=json.dumps({'token_id': token.id, 'token': token.secret[:10] + '...'}))
         log(None, 'token', token.id, 'invalidated', new_data=json.dumps({'user_id': token.user_id, 'token': token.secret[:10] + '...'}))
-        flash('Kontots lösenord har ändrats!')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/recovery.html', form=recoveryForm, recover=user)
