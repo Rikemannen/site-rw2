@@ -6,7 +6,7 @@ import re
 from urllib.parse import urlparse, urljoin
 from flask_login import current_user, login_required
 from app.services.user_service import get_user_by_username, create_user, get_user_by_id
-from app.services.token_service import get_token_by_secret
+from app.services.token_service import get_token_by_secret, invalidate_token
 from app.services.session_token_service import login_user, logout_user
 from app.utils.security import verify_password, hash_password
 from app.forms.auth_forms import LoginForm, SignupForm, RecoveryForm
