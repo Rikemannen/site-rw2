@@ -56,7 +56,7 @@ def logs():
     logs = db.session.query(Log).order_by(Log.id.desc()).limit(count).all()
     return render_template('admin/logs.html', logs=logs)
 
-@bp.route('tokens')
+@bp.route('/tokens')
 @admin_required
 def tokens():
     """Show all tokens."""
