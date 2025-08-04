@@ -76,6 +76,9 @@
         </div>
         {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
     </form>
+    <form method="POST" action="/settings/account/signout">
+        <button class="bg-red-500 text-white px-4 py-2 rounded mt-2">Logga ut överallt</button>
+    </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     <ul class="flash-messages">

@@ -32,6 +32,7 @@ def invalidate_session_token(token_str):
 def invalidate_all_sessions(user):
     """Invalidate all sessions for a user."""
     for session in user.sessions:
+        print(session)
         session.valid = False
     db.session.commit()
 

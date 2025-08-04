@@ -7,7 +7,7 @@ from urllib.parse import urlparse, urljoin
 from flask_login import current_user, login_required
 from app.services.user_service import get_user_by_username, create_user, get_user_by_id
 from app.services.token_service import get_token_by_secret, invalidate_token
-from app.services.session_token_service import login_user, logout_user
+from app.services.session_token_service import login_user, logout_user, invalidate_all_sessions
 from app.utils.security import verify_password, hash_password
 from app.forms.auth_forms import LoginForm, SignupForm, RecoveryForm
 from app.forms.settings_forms import ProfileSettingsForm, UsernameChangeForm, PasswordChangeForm, DeleteUserForm
@@ -204,3 +204,9 @@ def recovery(secret):
         return redirect(url_for('auth.login'))
 
     return render_template('auth/recovery.html', form=recoveryForm, recover=user)
+
+@bp.route('/settings/account/signout', methods=['POST'])
+@login_required
+def logout_everywhere():
+    invalidate_all_sessions(current_user)
+    return redirect(url_for('main.index'))
