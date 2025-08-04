@@ -8,6 +8,7 @@ from app.blueprints.chat import get_messages
 from app.blueprints import main, auth, exercises, chat, admin
 from app.extensions import login_manager
 from app.services.user_service import get_user_by_id
+from app.services.session_token_service import get_user_from_token
 from app.extensions import socketio, db
 
 def create_app():
@@ -37,10 +38,12 @@ def create_app():
 
     login_manager.init_app(app)
 
-    @login_manager.user_loader
-    def load_user(user_id):
-        """Load a user by their ID."""
-        return get_user_by_id(user_id)
+    @login_manager.request_loader
+    def load_user_from_request(request):
+        token = request.cookies.get('session_token')
+        if not token:
+            return None
+        return get_user_from_token(token)
 
     @app.template_filter('datetimeformat')
     def datetimeformat(value, variant="full"):

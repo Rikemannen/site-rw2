@@ -30,6 +30,7 @@ class User(db.Model, UserMixin):
     joined = Column(Integer, nullable=False, default=0)  # Unix timestamp
     tokens = relationship('Token', back_populates='owner', foreign_keys='Token.user_id')
     created_tokens = relationship('Token', back_populates='creator', foreign_keys='Token.creator_id')
+    sessions = db.relationship('SessionToken', back_populates='user', foreign_keys='SessionToken.user_id')
 
     # Additional columns to consider:
     #profile_picture = Column(String(), nullable=True) # Url

@@ -1,12 +1,13 @@
 """Handles user authentication routes and views."""
 
-from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json, session
+from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json
 import time
 import re
 from urllib.parse import urlparse, urljoin
-from flask_login import login_user, current_user, login_required, logout_user
+from flask_login import current_user, login_required
 from app.services.user_service import get_user_by_username, create_user, get_user_by_id
-from app.services.token_service import get_token_by_secret, invalidate_token
+from app.services.token_service import get_token_by_secret
+from app.services.session_token_service import login_user, logout_user
 from app.utils.security import verify_password, hash_password
 from app.forms.auth_forms import LoginForm, SignupForm, RecoveryForm
 from app.forms.settings_forms import ProfileSettingsForm, UsernameChangeForm, PasswordChangeForm, DeleteUserForm
@@ -23,9 +24,9 @@ def is_safe_url(target):
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """Handle user login."""
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
+
     form = LoginForm()
     if form.validate_on_submit():
         user = get_user_by_username(form.username.data)
@@ -33,16 +34,13 @@ def login():
             flash('Ogiltigt användarnamn eller lösenord.')
             return redirect(url_for('auth.login'))
 
-        login_user(user)
-        session.permanent = True
-
         next_url = request.form.get('next')
         if not next_url or not is_safe_url(next_url):
             next_url = url_for('main.index')
 
-        if next_url:
-            return redirect(next_url)
-        return redirect(url_for('main.index'))
+        resp = login_user(user)
+        resp.headers['Location'] = next_url
+        return resp
 
     return render_template('auth/login.html', form=form)
 
@@ -81,8 +79,8 @@ def register():
 @login_required
 def logout():
     """Handle user logout."""
-    logout_user()
-    return redirect(url_for('main.index'))
+    resp = logout_user()
+    return resp
 
 @bp.route('/settings/profile', methods=['GET', 'POST'])
 @login_required
