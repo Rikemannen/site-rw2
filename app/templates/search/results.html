@@ -4,7 +4,7 @@
 
 {% block content %}
 {% set is_admin = current_user.admin %}
-<div class="bg-slate-200 p-2 rounded-md mb-2 shadow-md">
+<div class="bg-slate-100 p-2 rounded-md mb-2 shadow-md">
     <form action="/search" method="GET" onsubmit="return updateQuery(this);">
         <h2 class="block text-xl font-md">Sök:</h2>
         <input placeholder="Sökning..." class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-md">
@@ -40,7 +40,7 @@
     <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
         {% endif %}
         {% if search_type in ('all', 'users') %}
-        <div class="bg-slate-200 p-2 rounded-md shadow-md">
+        <div class="bg-slate-100 p-2 rounded-md shadow-md">
             <h2 class="text-xl">Användare:</h2>
             {% if user_results %}
             {% for user in user_results %}
@@ -64,7 +64,7 @@
         </div>
         {% endif %}
         {% if search_type in ('all', 'exercises') %}
-        <div class="bg-slate-200 p-2 rounded-md shadow-md">
+        <div class="bg-slate-100 p-2 rounded-md shadow-md">
             <h2 class="text-xl">Övningar:</h2>
             {% if exercise_results %}
             {% for exercise in exercise_results %}

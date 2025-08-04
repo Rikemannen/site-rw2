@@ -3,7 +3,7 @@
 {% block title %}Kontoinställningar{% endblock %}
 
 {% block content %}
-<div class="bg-slate-200 rounded-md shadow-md p-4">
+<div class="bg-slate-100 rounded-md shadow-md p-4">
     <h2 class="text-2xl font-bold mb-4">
         Användarinställningar för <a href="{{ url_for('main.user_profile', user_id=editing.id)}}"
             class="text-blue-600 hover:underline">{{ editing.name }}</a>
@@ -30,7 +30,7 @@
         </div>
         {{ profileForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.emblems', user_id=editing.id) }}">
         <h2 class="text-xl mb-4">Ägda Emblem</h2>
         {{ emblemForm.hidden_tag() }}
@@ -47,7 +47,7 @@
         </div>
         {{ emblemForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.username_editing', user_id=editing.id)}}">
         <h2 class="text-xl mt-4 mb-4">Användarnamn</h2>
         {{ nameForm.hidden_tag() }}
@@ -60,7 +60,7 @@
         </div>
         {{ nameForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.recovery', user_id=editing.id)}}">
         <h2 class="text-xl mt-4 mb-4">Återställning</h2>
         {{ passForm.hidden_tag() }}
@@ -73,7 +73,7 @@
         {% endif %}
         {% endwith %}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.deletion', user_id=editing.id)}}">
         <h2 class="text-xl mt-4 mb-4">Borttagning</h2>
         {% if current_user.id == editing.id %}
@@ -82,7 +82,7 @@
         {{ deleteForm.hidden_tag() }}
         {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.verify', user_id=editing.id)}}">
         <h2 class="text-xl mt-4 mb-4">Verifiera</h2>
         {{ verifyForm.hidden_tag() }}
@@ -95,7 +95,7 @@
         </div>
         {{ verifyForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.elevate', user_id=editing.id )}}">
         <h2 class="text-xl mt-4 mb-4">Ge admin-åtkomst</h2>
         {% if current_user.id == editing.id %}

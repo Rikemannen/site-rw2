@@ -68,8 +68,8 @@ def register():
         )
 
         if user:
-            login_user(user)
-            return redirect(url_for('main.index'))
+            resp = login_user(user)
+            return resp
         else:
             flash('Registreringen misslyckades, försök igen!')
             return redirect(url_for('auth.register'))

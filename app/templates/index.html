@@ -4,11 +4,11 @@
 
 {% block content %}
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="bg-slate-200 rounded-lg shadow-md p-4">
+    <div class="bg-slate-100 rounded-lg shadow-md p-4">
         <h2 class="text-xl font-semibold mb-4 text-gray-800">Nya Övningar</h2>
         <ul id="latest-exercises" class="space-y-2">
             {% for exercise in recent_exercises %}
-            <li class="bg-slate-300 rounded-sm p-2">
+            <li class="bg-slate-200 rounded-sm p-2">
                 <div class="flex justify-between items-center">
                     <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
                         exercise.name[:30] }}</a>
@@ -24,11 +24,11 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="bg-slate-200 rounded-lg shadow-md p-4">
+    <div class="bg-slate-100 rounded-lg shadow-md p-4">
         <h2 class="text-xl font-semibold mb-4 text-gray-800">Populära Övningar</h2>
         <ul id="popular-exercises" class="space-y-2">
             {% for exercise, likes_count in popular_exercises %}
-            <li class="bg-slate-300 rounded-sm p-2">
+            <li class="bg-slate-200 rounded-sm p-2">
                 <div class="flex justify-between items-center">
                     <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
                         exercise.name[:30] }}</a>

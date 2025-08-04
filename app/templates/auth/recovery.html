@@ -3,7 +3,7 @@
 {% block title %}Återställning{% endblock %}
 
 {% block content %}
-<div class="bg-slate-200 rounded-md shadow-md p-4">
+<div class="bg-slate-100 rounded-md shadow-md p-4">
     <h2 class="text-2xl font-bold mb-4">Återställning för {{ recover.name }}</h2>
     <form method="POST" action="{{ request.base_url }}">
         {{ form.hidden_tag() }}

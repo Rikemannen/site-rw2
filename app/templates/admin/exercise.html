@@ -27,7 +27,7 @@
         </div>
         {{ basicForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.edit_static', id=editing.id) }}">
         <h2 class="text-xl mb-4">Statisk data</h2>
         {{ staticForm.hidden_tag() }}
@@ -54,7 +54,7 @@
         </div>
         {{ staticForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.edit_stats', id=editing.id) }}">
         <h2 class="text-xl mb-4">Statistik</h2>
         {{ statisticForm.hidden_tag() }}
@@ -74,7 +74,7 @@
         </div>
         {{ statisticForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.edit_json', id=editing.id) }}">
         <h2 class="text-xl mb-4">Svar</h2>
         {{ answerForm.hidden_tag() }}
@@ -87,7 +87,7 @@
         </div>
         {{ answerForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.edit_html', id=editing.id) }}">
         <h2 class="text-xl mb-4">Utseende</h2>
         {{ htmlForm.hidden_tag() }}
@@ -100,7 +100,7 @@
         </div>
         {{ htmlForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('admin.delete_exercise', id=editing.id) }}">
         <h2 class="text-xl mb-4">Radera</h2>
         {{ deleteForm.hidden_tag() }}

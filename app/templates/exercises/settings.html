@@ -3,7 +3,7 @@
 {% block title %}Övningsinställningar{% endblock %}
 
 {% block content %}
-<div class="bg-slate-200 rounded-md shadow-md p-4">
+<div class="bg-slate-100 rounded-md shadow-md p-4">
     <h2 class="text-2xl font-bold mb-4">
         Inställningar för <a href="{{ url_for('exercise.view', exercise_id=editing.id)}}"
             class="text-blue-600 hover:underline">{{ editing.name }}</a>
@@ -41,7 +41,7 @@
         </div>
         {{ editForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
     </form>
-    <hr class="my-6 border-t border-gray-300">
+    <hr class="break">
     <form method="POST" action="{{ url_for('exercise.settings', exercise_id=editing.id) }}">
         <h2 class="text-xl mb-4">Radera</h2>
         {{ deleteForm.hidden_tag() }}

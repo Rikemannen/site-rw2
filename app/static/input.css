@@ -6,8 +6,16 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer utilities {
+    .break {
+        @apply my-6 border-t border-gray-300;
+    }
+
+    .dark .break {
+        @apply my-6 border-t border-gray-500;
+    }
+
     .dark .bg-white {
-        @apply bg-slate-700;
+        @apply bg-slate-500;
     }
 
     .dark .bg-slate-200 {
@@ -38,6 +46,10 @@
         @apply border-slate-400;
     }
 
+    .dark .border-gray-300 {
+        @apply border-slate-600;
+    }
+
     .dark .text-blue-600 {
         @apply text-slate-800;
     }
@@ -63,6 +75,6 @@
     }
 
     .dark .bg-red-500 {
-        @apply bg-rose-800
+        @apply bg-rose-700
     }
 }
