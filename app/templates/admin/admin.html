@@ -20,6 +20,7 @@
                 <p>Försök till avslutade förhållande: {{ ('%.2f' % (completed_count / attempt_count * 100)) if
                     completed_count > 0 else '0.00' }}%</p>
                 <p>Försök | avslutade per användare: {{ ('%.2f' % (attempt_count / user_count)) if user_count > 0 else '0.00' }} | {{ ('%.2f' % (completed_count / user_count)) if user_count > 0 else '0.00' }}</p>
+                <p>Sessioner | Giltiga sessioner: {{ sessions }} | {{ valid_sessions }}</p>
                 <br>
                 <div>
                     <h2 class="text-xl font-bold">Nyaste användare</h2>

@@ -13,6 +13,7 @@ from app.services.logging_service import log
 from app.models.logs import Log
 from app.models.emblems import Emblem
 from app.models.token import Token
+from app.models.session_tokens import SessionToken
 from app.extensions import db
 from app.forms.admin_forms import (
     ProfileSettingsForm,
@@ -44,9 +45,11 @@ def admin():
     latest_user = User.query.order_by(User.joined.desc()).first()
     total_attempts = db.session.query(db.func.sum(Exercise.attempts)).scalar() or 0
     total_completions = db.session.query(db.func.sum(Exercise.finished)).scalar() or 0
+    sessions = SessionToken.query.count()
+    valid_sessions = SessionToken.query.filter_by(valid=True).count()
     return render_template('admin/admin.html', user_count=user_count, exercise_count=exercise_count,
                            latest_user=latest_user, attempt_count=total_attempts,
-                           completed_count=total_completions)
+                           completed_count=total_completions, sessions=sessions, valid_sessions=valid_sessions)
 
 @bp.route('/logs')
 @admin_required
