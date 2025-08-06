@@ -89,6 +89,7 @@
     </form>
     <hr class="break">
     <form method="POST" action="/settings/account/signout" class="mt-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button class="button-red">Logga ut överallt</button>
     </form>
     {% with messages = get_flashed_messages() %}

@@ -9,8 +9,8 @@
             class="text-blue-600 hover:underline">{{ editing.name }}</a>
     </h2>
     <form method="POST" action="{{ url_for('exercise.settings', exercise_id=editing.id) }}" enctype="multipart/form-data" class="space-y-4">
-        <h2 class="text-xl">Enkel data</h2>
         {{ editForm.hidden_tag() }}
+        <h2 class="text-xl">Enkel data</h2>
         <div>
             {{ editForm.name.label(class="block text-sm font-md text-slate-600")}}
             {{ editForm.name(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}

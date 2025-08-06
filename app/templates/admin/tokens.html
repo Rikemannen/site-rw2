@@ -24,6 +24,7 @@
             {% if token.is_valid %}
             <p class="text-green-500">Giltig</p>
             <form action="tokens/{{ token.id }}/invalidate" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit"
                     class="text-red-700 hover:underline bg-transparent border-none p-0 m-0 cursor-pointer">
                     Annullera

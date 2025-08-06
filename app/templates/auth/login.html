@@ -6,8 +6,8 @@
 <div class="bg-white rounded-2xl shadow-xl p-6">
     <h1 class="text-3xl font-bold mb-4">Logga in</h1>
     <form method="POST" action="/login" class="space-y-4">
-        <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
         {{ form.hidden_tag() }}
+        <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
         <div>
             {{ form.username.label(class="block text-sm font-medium text-slate-600 inline")}}<span class="text-red-500">
                 *</span>
