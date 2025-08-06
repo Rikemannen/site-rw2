@@ -3,15 +3,23 @@ from flask_socketio import emit
 from flask_login import current_user
 import bleach
 import time
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from collections import deque
 from app.extensions import socketio
 from app.services.user_service import get_user_by_id
 
 bp = Blueprint('chat', __name__, url_prefix='/')
 
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["120 per hour"]
+)
+
 messages = deque(maxlen=75)
 
 @socketio.on('send_message')
+@limiter.limit("3 per second")
 def handle_send_message(data):
     """Handle incoming chat messages."""
     if not current_user.is_authenticated:

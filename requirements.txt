@@ -3,6 +3,7 @@ flask-sqlalchemy
 flask-login
 flask-wtf
 flask-socketio
+flask-limiter
 argon2-cffi
 pytest
 bleach
