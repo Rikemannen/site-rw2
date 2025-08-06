@@ -3,22 +3,24 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Okänd{% endblock %}</title>
     <link rel="stylesheet" href="/static/output.css">
     <script>
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
+            if (parts.length === 2) return parts.pop().split(';');
         }
 
         const darkModeCookie = getCookie('dark_mode');
-        if (darkModeCookie === 'true') {
+        // Check for dark mode cookie and apply class
+        if (darkModeCookie && darkModeCookie[0] === 'true') {
             document.documentElement.classList.add('dark');
-        } else if (darkModeCookie === 'false') {
+        } else if (darkModeCookie && darkModeCookie[0] === 'false') {
             document.documentElement.classList.remove('dark');
         } else {
-            // fallback to system preference if cookie not set
+            // Fallback to system preference
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.documentElement.classList.add('dark');
             } else {
@@ -28,58 +30,73 @@
     </script>
 </head>
 
-<body class="dark:bg-slate-500">
+<body class="bg-gray-100 text-slate-900 font-sans transition-colors duration-300 dark:bg-slate-900 dark:text-slate-200">
     <header id="main-header"
-        class="sticky bg-slate-400 dark:bg-slate-700 text-white p-4 mb-0 rounded-none shadow-none w-full top-0 left-0 transition-all duration-300 z-50">
-        <div class="flex items-center justify-between">
-            <a href="/" class="hover:underline">
-                <h1 class="text-2xl font-bold content-center">Hem</h1>
+        class="sticky bg-white text-slate-900 p-4 mb-4 rounded-b-2xl shadow-xl w-full top-0 left-0 transition-all duration-300 z-50 dark:bg-slate-800 dark:text-white">
+        <div class="container mx-auto flex items-center justify-between">
+            <a href="/" class="hover:text-blue-600 transition-colors duration-200 dark:hover:text-blue-400"{% if current_user.admin %} onclick="if (event.shiftKey) { event.preventDefault(); window.location.href = '/admin'; }"{% endif %}>
+                <h1 class="text-3xl font-bold">Hem</h1>
             </a>
-            <button id="profile-button" class="top-0 right-0">
-                <img class="cursor-pointer" src="https://cdn-icons-png.flaticon.com/512/15494/15494722.png"
-                    width="30px">
+            <button id="profile-button" class="relative z-10 p-2 rounded-full hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-700 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user text-slate-900 dark:text-slate-200">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
             </button>
         </div>
-        <div class="absolute right-4 top-16 min-w-[160px] hidden" id="profile-menu" style="z-index:1000;">
-            <ul class="bg-white text-gray-800 rounded-lg shadow-lg mt-2 border border-gray-200">
+        <div class="absolute right-4 mt-2 min-w-[200px] hidden" id="profile-menu" style="z-index:1000;">
+            <ul class="bg-white text-slate-900 rounded-xl shadow-lg border border-gray-200 divide-y divide-gray-200 overflow-hidden dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:divide-slate-600">
                 {% if current_user.is_authenticated %}
-                <li class="px-4 py-2 hover:bg-gray-200"
-                    style="color: {{ current_user.color if current_user.equipped_emblem else '#000000' }};"><a
-                        href="/profile" class="hover:underline">{{ current_user.display_name ~ ' (@' ~ current_user.name
-                        ~ ')' if current_user.display_name and current_user.display_name != current_user.name
-                        else current_user.name }}</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600">
+                    <a href="/profile" class="block font-semibold"
+                        style="color: {{ current_user.color if current_user.equipped_emblem else inherit }};">
+                        {{ current_user.display_name ~ ' (@' ~ current_user.name ~ ')' if current_user.display_name and current_user.display_name != current_user.name else current_user.name }}
+                    </a>
+                </li>
                 {% if show_chat_window is not defined or show_chat_window %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline"
-                        onclick="toggleChat()">Visa/Göm
-                        Chatt</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="javascript:void(0)" class="block"
+                        onclick="toggleChat()">Visa/Göm Chatt</a></li>
                 {% endif %}
                 {% if current_user.admin %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin" class="hover:underline">Admin</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/admin" class="block">Admin</a></li>
                 {% if show_edit_links %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/exercise/{{ exercise.id }}"
-                        class="hover:underline">Redigera Övning</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/admin/exercise/{{ exercise.id }}" class="block">Redigera Övning</a></li>
                 {% endif %}
                 {% if show_edit_links_user %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/admin/user/{{ user.id }}"
-                        class="hover:underline">Redigera Användare</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/admin/user/{{ user.id }}" class="block">Redigera Användare</a></li>
                 {% endif %}
                 {% endif %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/search" class="hover:underline">Sök</a></li>
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/settings" class="hover:underline">Inställningar</a>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/search" class="block">Sök</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/settings" class="block">Inställningar</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600 flex justify-between">
+                    <span>
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('toggle')" class="hover:text-blue-600 dark:hover:text-blue-400">Byt tema</a>
+                        |
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('system')" class="hover:text-blue-600 dark:hover:text-blue-400">Följ system</a>
+                    </span>
                 </li>
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="javascript:void(0)" class="hover:underline"
-                        onclick="toggleDarkMode('toggle')">Byt tema</a> | <a href="javascript:void(0)"
-                        class="hover:underline" onclick="toggleDarkMode('system')">Följ system</a></li>
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/logout" class="hover:underline">Logga ut</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/logout" class="block text-red-500 dark:text-red-400">Logga ut</a></li>
                 {% else %}
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/login" class="hover:underline">Logga in</a></li>
-                <li class="px-4 py-2 hover:bg-gray-200"><a href="/register" class="hover:underline">Skapa Konto</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/login" class="block">Logga in</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/register" class="block">Skapa Konto</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/search" class="block">Sök</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600 flex justify-between">
+                    <span>
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('toggle')" class="hover:text-blue-600 dark:hover:text-blue-400">Byt tema</a>
+                        |
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('system')" class="hover:text-blue-600 dark:hover:text-blue-400">Följ system</a>
+                    </span>
+                </li>
                 {% endif %}
             </ul>
         </div>
+        {% if show_chat_window is not false %}
+        <div id="chat-window-card" class="fixed right-4 top-1/10 w-[400px] h-[400px] hidden">
+            {% include 'chat/chat_window.html' %}
+        </div>
+        {% endif %}
         <script>
-            const toggleBtn = document.getElementById('profile-button'); // the button that opens the menu
-
+            const toggleBtn = document.getElementById('profile-button');
             toggleBtn.addEventListener('click', function () {
                 const menu = document.getElementById('profile-menu');
                 menu.classList.toggle('hidden');
@@ -93,8 +110,10 @@
             });
 
             function toggleChat() {
-                const chatWindow = document.querySelector('#chat-window');
-                chatWindow.classList.toggle('hidden');
+                const chatWindow = document.getElementById('chat-window-card');
+                if (chatWindow) {
+                    chatWindow.classList.toggle('hidden');
+                }
             }
 
             function setCookie(name, value, days = 365) {
@@ -117,10 +136,6 @@
                 return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             }
 
-            /**
-             * Toggles dark mode or sets system preference
-             * @param {string} input - "toggle" or "system"
-             */
             function toggleDarkMode(input) {
                 const cookie = getCookie('dark_mode');
                 const systemPrefersDark = getSystemDarkMode();
@@ -134,7 +149,6 @@
                     }
                 } else if (input === 'toggle') {
                     if (cookie === null) {
-                        // no cookie: toggle opposite of system
                         if (systemPrefersDark) {
                             setCookie('dark_mode', 'false');
                             document.documentElement.classList.remove('dark');
@@ -143,11 +157,9 @@
                             document.documentElement.classList.add('dark');
                         }
                     } else if (cookie === 'true') {
-                        // cookie is dark, toggle to light
                         setCookie('dark_mode', 'false');
                         document.documentElement.classList.remove('dark');
                     } else {
-                        // cookie is light, toggle to dark
                         setCookie('dark_mode', 'true');
                         document.documentElement.classList.add('dark');
                     }
@@ -155,13 +167,8 @@
             }
         </script>
     </header>
-    <main class="p-4">
-        {% if show_chat_window is not defined or show_chat_window %}
-        <div class="fixed right-4 w-[400px] h-[740px] hidden" id="chat-window">
-            {% include "chat/chat_window.html" %}
-        </div>
-        {% endif %}
-        <div class="container mx-auto p-4">
+    <main class="p-4 md:p-8">
+        <div class="container mx-auto">
             {% block content %}{% endblock %}
         </div>
     </main>

@@ -3,27 +3,27 @@
 {% block title %}Skapa konto{% endblock %}
 
 {% block content %}
-<div class="bg-slate-100 rounded-md shadow-md p-4">
-    <h2 class="text-2xl font-bold mb-4">Skapa konto</h2>
-    <form method="POST" action="/register">
+<div class="bg-white rounded-2xl shadow-xl p-6">
+    <h1 class="text-3xl font-bold mb-4">Skapa konto</h1>
+    <form method="POST" action="/register" class="space-y-4">
         {{ form.hidden_tag() }}
-        <div class="mb-4">
-            {{ form.display_name.label(class="block text-sm font-md text-gray-700")}}
+        <div>
+            {{ form.display_name.label(class="block text-sm font-md text-slate-600")}}
             {{ form.display_name(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
             {% for error in form.display_name.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ form.username.label(class="block text-sm font-md text-gray-700 inline")}}<span class="text-red-500">
+        <div>
+            {{ form.username.label(class="block text-sm font-md text-slate-600 inline")}}<span class="text-red-500">
                 *</span>
             {{ form.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
             {% for error in form.username.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ form.password.label(class="block text-sm font-medium text-gray-700 inline")}}<span class="text-red-500">
+        <div>
+            {{ form.password.label(class="block text-sm font-medium text-slate-600 inline")}}<span class="text-red-500">
                 *</span>
             {{ form.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
             {% for error in form.password.errors %}
@@ -31,7 +31,7 @@
             {% endfor %}
         </div>
         {{ form.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
-        <p class="text-gray-700 mt-2">Har du redan ett konto? Logga in <a href="/login"
+        <p class="text-slate-600 mt-2">Har du redan ett konto? Logga in <a href="/login"
                 class="text-blue-600 hover:underline">här</a>!</p>
     </form>
     {% with messages = get_flashed_messages() %}

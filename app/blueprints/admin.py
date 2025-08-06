@@ -6,7 +6,7 @@ from app.models.exercise import Exercise
 from app.utils.security import admin_required
 from app.services.user_service import get_user_by_id
 from app.services.exercise_service import get_exercise_by_id
-from app.services.token_service import generate_token, get_url
+from app.services.token_service import generate_token, get_url, invalidate_token, get_token_by_id
 from app.services.file_service import create_exercise_files, delete_exercise_files, get_exercise_html, get_exercise_answers
 from app.services.emblem_service import get_emblem_by_id, create_emblem as createEmblem
 from app.services.logging_service import log
@@ -94,7 +94,6 @@ def edit_user(user_id):
     profileForm.emblem.choices = [(0, 'None')] + [(e.id, e.name) for e in editing.emblems]
     emblemForm.emblems.choices = [(e.id, e.name) for e in Emblem.query.all()]
     emblemForm.emblems.data = [e.id for e in editing.emblems]
-    print("data:",emblemForm.emblems.data,"owned:",editing.emblems)
 
     if request.method == 'GET':
         profileForm.display_name.data = editing.display_name
@@ -179,7 +178,7 @@ def recovery(user_id):
         abort(404)
 
     if resetForm.validate_on_submit():
-        token = generate_token(editing)
+        token = generate_token(editing, user)
         url = get_url(token, request.host)
         log(user, 'user', editing.id, 'recovery.token_generated', new_data=json.dumps({'id': token.id, 'token': token.secret[:10] + '...'}))
         log(user, 'token', token.id, 'created', new_data=json.dumps({'token': token.secret[:10] + '...', 'expires': token.expires}))
@@ -451,3 +450,12 @@ def delete_emblem(id):
         db.session.commit()
         return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))
+
+@bp.route('/tokens/<id>/invalidate', methods=['POST'])
+@admin_required
+def invalidate_tokens(id):
+    """Path for invalidating tokens."""
+    token = get_token_by_id(id)
+    invalidate_token(token)
+    log(user, 'token', token.id, 'invalidate')
+    return redirect(url_for('admin.tokens'))

@@ -3,21 +3,21 @@
 {% block title %}Logga in{% endblock %}
 
 {% block content %}
-<div class="bg-slate-100 rounded-md shadow-md p-4">
-    <h2 class="text-2xl font-bold mb-4">Logga in</h2>
-    <form method="POST" action="/login">
+<div class="bg-white rounded-2xl shadow-xl p-6">
+    <h1 class="text-3xl font-bold mb-4">Logga in</h1>
+    <form method="POST" action="/login" class="space-y-4">
         <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
         {{ form.hidden_tag() }}
-        <div class="mb-4">
-            {{ form.username.label(class="block text-sm font-medium text-gray-700 inline")}}<span class="text-red-500">
+        <div>
+            {{ form.username.label(class="block text-sm font-medium text-slate-600 inline")}}<span class="text-red-500">
                 *</span>
             {{ form.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
             {% for error in form.username.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ form.password.label(class="block text-sm font-medium text-gray-700 inline")}}<span class="text-red-500">
+        <div>
+            {{ form.password.label(class="block text-sm font-medium text-slate-600 inline")}}<span class="text-red-500">
                 *</span>
             {{ form.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
             {% for error in form.password.errors %}
@@ -25,7 +25,7 @@
             {% endfor %}
         </div>
         {{ form.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
-        <p class="text-gray-700 mt-2">Har du inget konto? Skapa ett <a href="/register"
+        <p class="text-slate-600">Har du inget konto? Skapa ett <a href="/register"
                 class="text-blue-600 hover:underline">här</a>!</p>
     </form>
     {% with messages = get_flashed_messages() %}

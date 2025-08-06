@@ -2,6 +2,7 @@
 
 from sqlalchemy import Column, Integer, String, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
+import time
 from flask_login import UserMixin
 from app.extensions import db
 
@@ -27,7 +28,7 @@ class User(db.Model, UserMixin):
     liked_exercises = relationship('Exercise', secondary='exercise_likes', back_populates='liked_by')
     exercises = relationship('Exercise', back_populates='owner')
     name_last_change = Column(Integer, nullable=True)
-    joined = Column(Integer, nullable=False, default=0)  # Unix timestamp
+    joined = Column(Integer, nullable=False, default=time.time())  # Unix timestamp
     tokens = relationship('Token', back_populates='owner', foreign_keys='Token.user_id')
     created_tokens = relationship('Token', back_populates='creator', foreign_keys='Token.creator_id')
     sessions = db.relationship('SessionToken', back_populates='user', foreign_keys='SessionToken.user_id')

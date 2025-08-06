@@ -3,81 +3,93 @@
 {% block title %}Kontoinställningar{% endblock %}
 
 {% block content %}
-<div class="bg-slate-100 rounded-md shadow-md p-4">
-    <h2 class="text-2xl font-bold mb-4">
-        <span class="text-blue-600 hover:underline"><a href="/settings/profile">Profilinställningar</a></span> |
-        <span class="text-green-600">Kontoinställningar</span>
-    </h2>
-    <form method="POST" action="/settings/account/username">
+<div class="space-y-4 bg-white p-6 rounded-2xl shadow-xl">
+    <h2 class="text-3xl font-bold mb-4">Inställningar</h2>
+    <div class="flex gap-4">
+        <a href="/settings/profile"
+            class="px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+            Profilinställningar
+        </a>
+        <span class="px-4 py-2 rounded-xl bg-gray-100 font-bold">
+            Kontoinställningar
+        </span>
+    </div>
+    <form method="POST" action="/settings/account/username" class="space-y-4">
+        <h2 class="text-xl font-bold mt-4">Användarnamn:</h2>
         {{ nameForm.hidden_tag() }}
-        <div class="mb-4">
-            {{ nameForm.username.label(class="block text-sm font-md text-gray-700")}}
-            {{ nameForm.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ nameForm.username.label(class="block text-sm font-md text-slate-600")}}
+            {{ nameForm.username(class="mt-1 input") }}
             {% for error in nameForm.username.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ nameForm.password.label(class="block text-sm font-md text-gray-700")}}
-            {{ nameForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ nameForm.password.label(class="block text-sm font-md text-slate-600")}}
+            {{ nameForm.password(class="mt-1 input") }}
             {% for error in nameForm.password.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        {{ nameForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+        {{ nameForm.submit(class="button-blue") }}
     </form>
-    <form method="POST" action="/settings/account/password">
+    <hr class="break">
+    <form method="POST" action="/settings/account/password" class="space-y-4">
+        <h2 class="text-xl font-bold mt-4">Lösenord:</h2>
         {{ passForm.hidden_tag() }}
-        <div class="mb-4">
-            {{ passForm.current_password.label(class="block text-sm font-md text-gray-700")}}
-            {{ passForm.current_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ passForm.current_password.label(class="block text-sm font-md text-slate-600")}}
+            {{ passForm.current_password(class="mt-1 input") }}
             {% for error in passForm.current_password.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ passForm.new_password.label(class="block text-sm font-md text-gray-700")}}
-            {{ passForm.new_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ passForm.new_password.label(class="block text-sm font-md text-slate-600")}}
+            {{ passForm.new_password(class="mt-1 input") }}
             {% for error in passForm.new_password.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ passForm.confirm_password.label(class="block text-sm font-md text-gray-700")}}
-            {{ passForm.confirm_password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ passForm.confirm_password.label(class="block text-sm font-md text-slate-600")}}
+            {{ passForm.confirm_password(class="mt-1 input") }}
             {% for error in passForm.confirm_password.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        {{ passForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+        {{ passForm.submit(class="button-blue") }}
     </form>
-    <form method="POST" action="/settings/account/delete">
+    <hr class="break">
+    <form method="POST" action="/settings/account/delete" class="space-y-4">
+        <h2 class="text-xl font-bold mt-4">Radera Konto</h2>
         {{ deleteForm.hidden_tag() }}
-        <div class="mb-4">
-            {{ deleteForm.username.label(class="block text-sm font-md text-gray-700")}}
-            {{ deleteForm.username(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ deleteForm.username.label(class="block text-sm font-md text-slate-600")}}
+            {{ deleteForm.username(class="mt-1 input") }}
             {% for error in deleteForm.username.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ deleteForm.password.label(class="block text-sm font-md text-gray-700")}}
-            {{ deleteForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ deleteForm.password.label(class="block text-sm font-md text-slate-600")}}
+            {{ deleteForm.password(class="mt-1 input") }}
             {% for error in deleteForm.password.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ deleteForm.confirm.label(class="block text-sm font-md text-gray-700")}}
-            {{ deleteForm.confirm(class="mt-1 block p-2 border border-gray-300 rounded-md") }}
+        <div class="flex items-center">
+            {{ deleteForm.confirm(class="checkbox mr-2") }}
+            {{ deleteForm.confirm.label(class="block text-sm font-md text-slate-600")}}
             {% for error in deleteForm.confirm.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        {{ deleteForm.submit(class="bg-red-500 text-white px-4 py-2 rounded") }}
+        {{ deleteForm.submit(class="button-red") }}
     </form>
-    <form method="POST" action="/settings/account/signout">
-        <button class="bg-red-500 text-white px-4 py-2 rounded mt-2">Logga ut överallt</button>
+    <hr class="break">
+    <form method="POST" action="/settings/account/signout" class="mt-4">
+        <button class="button-red">Logga ut överallt</button>
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

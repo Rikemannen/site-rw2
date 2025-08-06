@@ -4,97 +4,129 @@
 
 {% block content %}
 {% set is_admin = current_user.admin %}
-<div class="bg-slate-100 p-2 rounded-md mb-2 shadow-md">
-    <form action="/search" method="GET" onsubmit="return updateQuery(this);">
-        <h2 class="block text-xl font-md">Sök:</h2>
-        <input placeholder="Sökning..." class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-md">
-        <p class="mt-2">Inkludera:</p>
-        <ul style="list-style-type:none;">
-            <li><input type="checkbox" id="users">
-                Användare</li>
-            <li><input type="checkbox" id="exercises">
-                Övningar</li>
-        </ul>
-        <button type="submit" class="bg-blue-500 p-2 rounded-md shadow-md mb-2 mt-2">Sök</button>
-    </form>
-</div>
-<script>
-    function updateQuery(form) {
-        let q = form.querySelector('input[placeholder="Sökning..."]').value.trim();
-        const users = document.getElementById('users').checked;
-        const exercises = document.getElementById('exercises').checked;
+<div class="space-y-8">
+    <!-- Search form card -->
+    <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <form action="/search" method="GET" onsubmit="return updateQuery(this);">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">Sök</h2>
 
-        if (q === '') q = '*';
-        let type = 'all';
-        if (users && !exercises) type = 'users';
-        else if (!users && exercises) type = 'exercises';
+            <label for="search-input" class="sr-only">Sökning...</label>
+            <input id="search-input" type="text" placeholder="Sökning..."
+                class="w-full p-3 rounded-xl bg-gray-100 text-slate-900 border-2 border-gray-300 focus:outline-none focus:border-blue-500 placeholder:text-gray-400 transition-colors duration-200">
 
-        const params = new URLSearchParams({ q, type });
-        window.location.href = `/search?${params.toString()}`;
-        return false;
-    }
-</script>
-{% if search_type == 'all' %}
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {% else %}
-    <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-        {% endif %}
-        {% if search_type in ('all', 'users') %}
-        <div class="bg-slate-100 p-2 rounded-md shadow-md">
-            <h2 class="text-xl">Användare:</h2>
-            {% if user_results %}
-            {% for user in user_results %}
-            <div class="p-2 mt-2 mb-2 rounded-md shadow-md"
-                style="background-color: {{ user.equipped_emblem.color }}33">
-                <p><a href="/user/{{ user.id }}" class="text-blue-600 hover:underline"
-                        style="color: {{ user.equipped_emblem.color }}">{{ user | format_user }}
-                    </a>
-                    {% if is_admin %}
-                    <a href="/admin/user/{{ user.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
+            <p class="mt-4 text-slate-800">Inkludera:</p>
+            <ul class="mt-2 space-y-2">
+                <li class="flex items-center gap-2 text-slate-800">
+                    <input type="checkbox" id="users"
+                        class="h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="users">Användare</label>
+                </li>
+                <li class="flex items-center gap-2 text-slate-800">
+                    <input type="checkbox" id="exercises"
+                        class="h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="exercises">Övningar</label>
+                </li>
+            </ul>
+
+            <button type="submit"
+                class="w-full sm:w-auto mt-4 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200">
+                Sök
+            </button>
+        </form>
+    </div>
+
+    <!-- Script to handle search query -->
+    <script>
+        function updateQuery(form) {
+            let q = form.querySelector('#search-input').value.trim();
+            const users = document.getElementById('users').checked;
+            const exercises = document.getElementById('exercises').checked;
+
+            if (q === '') q = '*';
+            let type = 'all';
+            if (users && !exercises) type = 'users';
+            else if (!users && exercises) type = 'exercises';
+
+            const params = new URLSearchParams({ q, type });
+            window.location.href = `/search?${params.toString()}`;
+            return false;
+        }
+    </script>
+
+    <!-- Results section -->
+    {% if search_type == 'all' %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-8">
+            {% endif %}
+
+            {% if search_type in ('all', 'users') %}
+            <div class="bg-white p-6 rounded-2xl shadow-xl">
+                <h2 class="text-2xl font-bold mb-4 text-slate-900">Användare</h2>
+                <ul class="space-y-4">
+                    {% if user_results %}
+                    {% for user in user_results %}
+                    <li class="p-4 rounded-xl shadow-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <p class="font-semibold text-slate-900">
+                                <a href="/user/{{ user.id }}" class="text-blue-600 hover:underline"
+                                    style="color: {{ user.equipped_emblem.color }}">{{ user | format_user }}
+                                </a>
+                            </p>
+                            <p class="text-sm text-slate-600 mt-1 sm:mt-0">ID: {{ user.id }}</p>
+                        </div>
+                        {% if is_admin %}
+                        <p class="mt-2"><a href="/admin/user/{{ user.id }}"
+                                class="text-orange-600 hover:underline">Öppna som admin</a></p>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="p-4 rounded-xl shadow-md bg-rose-500/20 text-rose-800">
+                        <p>Inga Resultat!</p>
+                    </li>
                     {% endif %}
-                </p>
-                <p>ID: {{ user.id }}</p>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="p-2 mt-2 mb-2 rounded-md shadow-md bg-red-300">
-                <p class="text-red-700">Inga Resultat!</p>
+                </ul>
             </div>
             {% endif %}
-        </div>
-        {% endif %}
-        {% if search_type in ('all', 'exercises') %}
-        <div class="bg-slate-100 p-2 rounded-md shadow-md">
-            <h2 class="text-xl">Övningar:</h2>
-            {% if exercise_results %}
-            {% for exercise in exercise_results %}
-            <div class="p-2 mt-2 mb-2 rounded-md shadow-md bg-slate-300">
-                <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
-                        }}</a>
-                    {% if is_admin %}
-                    <a href="/admin/exercise/{{ exercise.id }}" class="text-orange-600 hover:underline">Öppna som
-                        admin</a>
+
+            {% if search_type in ('all', 'exercises') %}
+            <div class="bg-white p-6 rounded-2xl shadow-xl">
+                <h2 class="text-2xl font-bold mb-4 text-slate-900">Övningar</h2>
+                <ul class="space-y-4">
+                    {% if exercise_results %}
+                    {% for exercise in exercise_results %}
+                    <li class="p-4 rounded-xl shadow-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
+                        <p class="font-semibold">
+                            <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
+                                }}</a>
+                            {% if is_admin %}
+                            <a href="/admin/exercise/{{ exercise.id }}"
+                                class="text-orange-600 hover:underline">(Admin)</a>
+                            {% endif %}
+                        </p>
+                        <p class="text-sm mt-1 text-slate-600">
+                            Skapare: <a href="/user/{{ exercise.owner.id }}" class="hover:underline"
+                                style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner |
+                                format_user }}</a>
+                        </p>
+                        <div class="flex flex-wrap items-center gap-4 text-sm mt-2 text-slate-600">
+                            <p>ID: {{ exercise.id }}</p>
+                            <p>Gillar: {{ exercise.likes }}</p>
+                            <p>Skapad: {{ exercise.created | datetimeformat }}</p>
+                            <p>Försök: {{ exercise.attempts }}</p>
+                            <p>Avklarad: {{ exercise.finished }}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="p-4 rounded-xl shadow-md bg-rose-500/20 text-rose-800">
+                        <p>Inga Resultat!</p>
+                    </li>
                     {% endif %}
-                </p>
-                <p>Skapare: <a href="/user/{{ exercise.owner.id }}" class="hover:underline"
-                        style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner | format_user }}</a>
-                </p>
-                <div class="flex flex-row gap-4">
-                    <p>ID: {{ exercise.id }}</p>
-                    <p>Gillar: {{ exercise.likes() }}</p>
-                    <p>Skapad: {{ exercise.created | datetimeformat }}</p>
-                    <p>Försök: {{ exercise.attempts }}</p>
-                    <p>Avklarad: {{ exercise.finished }}</p>
-                </div>
+                </ul>
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="p-2 mt-2 mb-2 rounded-md shadow-md bg-red-300">
-                <p class="text-red-700">Inga Resultat!</p>
-            </div>
-            {% endif %}
             {% endif %}
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}

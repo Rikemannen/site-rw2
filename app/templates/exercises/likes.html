@@ -3,20 +3,25 @@
 {% block title %}Folk som gillar {{ exercise.name }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-4">
-    <div class="bg-slate-100 p-2 rounded-md shadow-md">
-        <h1 class="text-2xl font-bold mb-4">Folk som gillar '<a href="/exercise/{{ exercise.id }}"
-                class="text-blue-600 hover:underline">{{ exercise.name }}</a>'
+<div class="space-y-8">
+    <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <h1 class="text-3xl font-bold mb-4 text-slate-900">
+            Folk som gillar '<a href="/exercise/{{ exercise.id }}"
+                class="text-blue-600 hover:underline transition-colors duration-200">{{ exercise.name }}</a>'
         </h1>
-        <ul class="list-disc pl-5 bg-slate-200 p-2 rounded-md">
-            <p class="text-md mb-2">{{ exercise.likes() }} personer totalt</p>
-            {% for user in exercise.liked_by %}
-            <li class="ml-4">
-                <a href="/user/{{ user.id }}" class="text-blue-600 hover:underline" style="color: {{ user.color if user.equipped_emblem else '#000000' }};">{{ user.display_name ~ ' (@' ~
-                    user.name ~ ')' if user.display_name and user.display_name != user.name else user.name }}</a>
-            </li>
-            {% endfor %}
-        </ul>
+        <div class="bg-gray-100 p-4 rounded-xl shadow-inner">
+            <p class="text-md mb-2 text-slate-700">{{ exercise.likes }} person{{ "er" if exercise.likes != 1 else "" }} totalt</p>
+            <ul class="space-y-2">
+                {% for user in exercise.liked_by %}
+                <li class="p-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors duration-200">
+                    <a href="/user/{{ user.id }}" class="hover:underline font-semibold"
+                        style="color: {{ user.color if user.equipped_emblem else '#1e293b' }};">
+                        {{ user.display_name ~ ' (@' ~ user.name ~ ')' if user.display_name and user.display_name != user.name else user.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </div>
 {% endblock %}

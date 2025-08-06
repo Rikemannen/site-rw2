@@ -31,5 +31,5 @@ class DeleteUserForm(FlaskForm):
     """Form for deleting account."""
     username = StringField('Användarnamn', validators=[DataRequired(), Length(min=3, max=20)])
     password = PasswordField('Lösenord', validators=[DataRequired(), Length(min=8, max=100)])
-    confirm = BooleanField('Jag förstår att detta inte går att göra om.', validators=[DataRequired()])
+    confirm = BooleanField('Jag förstår att detta inte går att ångra.', validators=[DataRequired()])
     submit = SubmitField('Ta bort konto')

@@ -1,6 +1,7 @@
 """Log model for the application. Everything an admin does isn't logged, only the most critical actions."""
 
 from sqlalchemy import Column, Integer, String, Text
+import time
 from app.extensions import db
 from app.services.user_service import get_user_by_id
 from app.services.token_service import get_token_by_id
@@ -14,7 +15,7 @@ class Log(db.Model):
     user = db.relationship('User', backref='logs')
     entity = Column(String(100), nullable=False)
     affected_id = Column(Integer, nullable=False)
-    timestamp = Column(Integer, nullable=False)
+    timestamp = Column(Integer, nullable=False, default=time.time())
     action = Column(String(50), nullable=False)
     new_data = Column(Text, nullable=True)
     old_data = Column(Text, nullable=True)  # Old data can be empty even if new data has a value

@@ -58,7 +58,7 @@ def register():
         if re.match(pattern, form.username.data) is not None:
             pass
         else:
-            flash('Användarnamnet får bara inehålla bokstäver och siffror, och vara max 20 tecken!')
+            flash('Användarnamnet får bara inehålla bokstäver och siffror, och vara 3-20 tecken!')
             return redirect(url_for('auth.register'))
 
         user = create_user(
@@ -104,7 +104,7 @@ def profile_settings():
             current_user.equipped_emblem_id = form.emblem.data
 
         db.session.commit()
-        flash('Inställningarna har uppdaterats!.', 'success')
+        flash('Inställningarna har uppdaterats!', 'success')
         return redirect(url_for('auth.profile_settings'))
 
     return render_template('auth/profile_settings.html', form=form)
@@ -200,7 +200,6 @@ def recovery(secret):
         db.session.commit()
         invalidate_token(token)
         log(None, 'user', token.user_id, 'recovery.token_used', new_data=json.dumps({'token_id': token.id, 'token': token.secret[:10] + '...'}))
-        log(None, 'token', token.id, 'invalidated', new_data=json.dumps({'user_id': token.user_id, 'token': token.secret[:10] + '...'}))
         return redirect(url_for('auth.login'))
 
     return render_template('auth/recovery.html', form=recoveryForm, recover=user)

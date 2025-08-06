@@ -20,8 +20,7 @@ def create_user(username, display_name, password_hash):
     user = User(
         name=username,
         display_name=display_name,
-        password_hash=password_hash,
-        joined=time.time()
+        password_hash=password_hash
     )
     db.session.add(user)
     try:

@@ -3,46 +3,68 @@
 {% block title %}{{ exercise.name }}{% endblock %}
 
 {% block content %}
-<div class="bg-slate-100 rounded-md shadow-md p-2">
-    <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold mb-4">{{ exercise.name }}</h1>
-    {% if current_user.is_authenticated and current_user.owns_exercise(exercise) %}
-    <a href="{{ url_for('exercise.settings', exercise_id=exercise.id) }}" class="text-blue-600 underline mb-4">Inställningar</a>
-    {% endif %}
-    </div>
-    <p class="mb-2 bg-slate-200 p-2 rounded-md">{{ exercise.description }}</p>
-    <div class="flex flex-wrap gap-4 text-gray-600 mb-2 items-center justify-between">
-        <div class="flex flex-wrap gap-4">
-            <span>Skapad: {{ exercise.created | datetimeformat('datetime') }}</span>
-            <span>{{ exercise.attempts }} försök</span>
-            <span>Avklarad {{ exercise.finished }} gånger</span>
-            {% set has_liked = current_user.is_authenticated and current_user.has_liked_exercise(exercise) %}
-            <span>
-                <a class="hover:underline" href="{{ url_for('exercise.likes', exercise_id=exercise.id) }}">
-                    {{ exercise.likes() }} gillar</a>
-                <form
-                    action="{{ url_for('exercise.like', exercise_id=exercise.id) if current_user.is_authenticated else url_for('auth.login', next=request.url) }}"
-                    method="post" style="display:inline;">
-                    <button type="submit" class="bg-transparent border-none hover:underline cursor-pointer ml-2">
-                        {% if has_liked %}
-                        <p class="text-green-600">Gillar</p>
-                        {% else %}
-                        <p>Gilla</p>
-                        {% endif %}
-                    </button>
-                </form>
-            </span>
-        </div>
-        <p class="text-gray-600 mb-0">Skapad av:
-            <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline"
-                style="color: {{ exercise.owner.color }};">
-                {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if exercise.owner.display_name
-                and
-                exercise.owner.display_name != exercise.owner.name else exercise.owner.name }}
+<div class="space-y-8">
+    <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <div class="flex items-center justify-between flex-wrap gap-4 mb-4">
+            <h1 class="text-3xl font-bold text-slate-900">{{ exercise.name }}</h1>
+            {% if current_user.is_authenticated and current_user.owns_exercise(exercise) %}
+            <a href="{{ url_for('exercise.settings', exercise_id=exercise.id) }}"
+                class="px-4 py-2 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200">
+                Inställningar
             </a>
-        </p>
+            {% endif %}
+        </div>
+
+        <div class="bg-gray-100 p-4 rounded-xl shadow-inner mb-4 text-slate-700">
+            <h2 class="text-xl font-bold">Beskrivning:</h2>
+            <p>{{ exercise.description }}</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between text-sm flex-wrap gap-4 text-slate-600">
+            <div class="flex flex-wrap items-center gap-4">
+                <span class="bg-gray-200 py-1 px-3 rounded-full">Skapad: {{ exercise.created | datetimeformat('datetime') }}</span>
+                <span class="bg-gray-200 py-1 px-3 rounded-full">{{ exercise.attempts }} försök</span>
+                <span class="bg-gray-200 py-1 px-3 rounded-full">Avklarad {{ exercise.finished }} gånger</span>
+            </div>
+
+            <p class="text-sm">Skapad av:
+                <a href="/user/{{ exercise.owner.id }}" class="hover:underline"
+                    style="color: {{ exercise.owner.color }};">
+                    {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if exercise.owner.display_name
+                    and exercise.owner.display_name != exercise.owner.name else exercise.owner.name }}
+                </a>
+            </p>
+        </div>
     </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <div class="flex items-center gap-4">
+            {% set has_liked = current_user.is_authenticated and current_user.has_liked_exercise(exercise) %}
+            <a class="text-slate-800 hover:underline font-medium" href="{{ url_for('exercise.likes', exercise_id=exercise.id) }}">
+                {{ exercise.likes }} gillar
+            </a>
+            <form
+                action="{{ url_for('exercise.like', exercise_id=exercise.id) if current_user.is_authenticated else url_for('auth.login', next=request.url) }}"
+                method="post" style="display:inline;">
+                <button type="submit"
+                    class="px-4 py-2 rounded-xl font-bold transition-all duration-200 shadow-md cursor-pointer
+                        {% if has_liked %}
+                            bg-rose-500 text-white hover:bg-rose-600
+                        {% else %}
+                            bg-gray-200 text-slate-800 hover:bg-gray-300
+                        {% endif %}">
+                    {% if has_liked %}
+                    Gillar
+                    {% else %}
+                    Gilla
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <hr class="break">
+
+    {% include "exercises/" ~ exercise.id ~ "/exercise.html" %}
 </div>
-<hr class="break">
-{% include "exercises/" ~ exercise.id ~ "/exercise.html" %}
 {% endblock %}
