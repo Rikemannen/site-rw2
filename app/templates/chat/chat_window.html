@@ -1,13 +1,55 @@
-<div class="bg-slate-100 rounded-md shadow-md p-4">
-    <h1 class="text-2xl font-bold mb-4"><a href="/chat" class="hover:underline">Chatt</a></h1>
-    <div id="chat-box" class="bg-white h-64 overflow-y-scroll p-2 mb-4 rounded-md border border-gray-300">
+<div class="bg-white rounded-2xl h-full flex flex-col p-4 dark:bg-slate-800">
+    <h1 class="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100"><a href="/chat" class="hover:underline hover:text-blue-600 dark:hover:text-blue-400">Chatt</a></h1>
+    <div id="chat-box" class="bg-gray-100 flex-grow overflow-y-scroll h-64 p-4 mb-4 rounded-lg border border-gray-300 custom-scrollbar dark:bg-slate-700 dark:border-slate-600">
     </div>
-    <form id="chat-form" class="flex">
+    {% if current_user.is_authenticated %}
+    <form id="chat-form" class="flex items-center gap-2">
         <input id="message-input" type="text" placeholder="Skriv ett meddelande..."
-            class="flex-grow p-2 border border-gray-400 rounded-l-md">
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-md">Skicka</button>
+            class="flex-grow p-3 rounded-lg bg-gray-200 text-slate-900 border-2 border-gray-400 focus:outline-none focus:border-blue-500 placeholder:text-gray-500 transition-colors duration-200 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 dark:placeholder:text-slate-400">
+        <button type="submit" class="px-5 py-3 bg-blue-600 text-white font-bold rounded-md shadow-md hover:bg-blue-700 transition-all duration-200 cursor-pointer">
+            Skicka
+        </button>
     </form>
+    {% else %}
+    <div class="flex-grow p-3 rounded-lg bg-gray-200 text-slate-900 border-2 border-gray-400 focus:outline-none focus:border-blue-500 placeholder:text-gray-500 transition-colors duration-200 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 dark:placeholder:text-slate-400">
+        <p class="text-slate-600 dark:text-slate-400"><a href="/login" class="text-blue-600 hover:underline dark:text-blue-400">Logga in</a> för att delta i chatten.</p>
+    </div>
+    {% endif %}
 </div>
+
+<style>
+    /* Custom scrollbar for a sleeker look in dark mode */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #e5e7eb; /* gray-100 */
+        border-radius: 10px;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-track {
+        background: #475569; /* slate-700 */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #9ca3af; /* gray-400 */
+        border-radius: 10px;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #64748b; /* slate-500 */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #6b7280; /* gray-500 */
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; /* slate-400 */
+    }
+</style>
+
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
     const chatBox = document.getElementById('chat-box');
@@ -23,11 +65,15 @@
             ? `${data.display_name} (@${data.name})`
             : data.name;
 
-        msg.innerHTML = `<div class="flex flex-wrap gap-4 mb-1 mt-1 p-1 rounded-sm shadow-sm items-center justify-between" style="color: ${data.color}; background-color: ${data.color}33;"><p><a href="/user/${data.id}" class="hover:underline">${nameText}</a>: ${data.message}</p><p class="text-gray-600 text-sm" style="color: ${data.color};">${formatTime(data.time)}</p></div>`;
+        // Enhanced styling for chat messages
+        msg.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between p-3 my-2 rounded-lg" style="background-color: ${data.color}15;">
+                <p class="flex-grow"><a href="/user/${data.id}" class="hover:underline font-semibold" style="color: ${data.color};">${nameText}</a>: <span class="text-slate-900 dark:text-slate-200">${data.message}</span></p>
+                <p class="text-sm mt-1 sm:mt-0 text-slate-600 dark:text-slate-400" style="color: ${data.color};">${formatTime(data.time)}</p>
+            </div>`;
         chatBox.appendChild(msg);
     }
 
-    // Load existing messages
     window.onload = async function () {
         const res = await fetch('/chat/messages');
         const messages = await res.json();

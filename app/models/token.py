@@ -14,7 +14,8 @@ class Token(db.Model):
     creator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     creator = relationship('User', back_populates='created_tokens', foreign_keys=[creator_id])
     secret = Column(String(64), nullable=False, unique=True)
-    expires = Column(Integer, nullable=False)
+    created = Column(Integer, nullable=False, default=time.time())
+    expires = Column(Integer, nullable=False, default=(time.time() + 7 * 24 * 3600))
     valid = Column(Boolean, nullable=False, default=True)
     used_timestamp = Column(Integer)
 

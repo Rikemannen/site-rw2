@@ -4,32 +4,40 @@
 
 {% block content %}
 <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-    <div class="bg-slate-100 p-2 rounded-md shadow-md">
+    <div class="bg-white p-6 rounded-2xl shadow-xl space-y-4">
+        <div class="flex items-center justify-between">
+            <h1 class="text-3xl font-bold">Adminloggar:</h1>
+            <p class="text-gray-500">Tips: Du kan trycka på loggens id för att permalänka!</p>
+        </div>
         {% for log in logs %}
-        <div id="L{{ log.id }}" class="p-2 mt-2 mb-2 rounded-md shadow-md bg-slate-200">
+        <div id="L{{ log.id }}" class="p-4 rounded-xl shadow-xl bg-gray-100">
             <p><a href="/user/{{ log.user.id }}" class="text-blue-600 hover:underline">{{ log.user | format_user }}
                 </a>
             </p>
             <p class="text-sm text-gray-500">{{ log.timestamp | datetimeformat }}</p>
-            {% if log.entity == 'token' %}
-            <p>Affected item: {{ log.entity }} | {{ log.affected_id }}</p>
+            {% if log.entity in ('user', exercise) %}
+            <p>Affected item: <a href="/{{ log.entity }}/{{ log.affected_id }}" class="text-blue-600 hover:underline">{{
+                    log.entity }} | {{ log.affected_id }}</a></p>
+            {% elif log.entity == 'token' %}
+            <p>Affected item: <a href="/admin/tokens#T{{ log.affected_id }}" class="text-blue-600 hover:underline">{{
+                    log.entity }} | {{ log.affected_id }}</a></p>
             {% else %}
-            <p>Affected item: <a href="/{{ log.entity }}/{{ log.affected_id }}" class="text-blue-600 hover:underline">{{ log.entity }} | {{ log.affected_id }}</a></p>
+            <p>Affected item: {{ log.entity }} | {{ log.affected_id }}</p>
             {% endif %}
             <p>Action: {{ log.action }}</p>
             {% if log.old_data %}
-            <div class="bg-slate-300 p-2 rounded-md mt-2">
+            <div class="bg-gray-200 p-2 rounded-xl mt-2">
                 <p class="text-sm text-gray-500">Old Data:</p>
-                <textarea type="text" class="w-full p-2 bg-white rounded-md" readonly>{{ log.old_data }}</textarea>
+                <textarea type="text" class="w-full p-2 bg-gray-100 rounded-md" readonly>{{ log.old_data }}</textarea>
             </div>
             {% endif %}
             {% if log.new_data %}
-            <div class="bg-slate-300 p-2 rounded-md mt-2">
+            <div class="bg-gray-200 p-2 rounded-xl mt-2">
                 <p class="text-sm text-gray-500">New Data:</p>
-                <textarea type="text" class="w-full p-2 bg-white rounded-md" readonly>{{ log.new_data }}</textarea>
+                <textarea type="text" class="w-full p-2 bg-gray-100 rounded-md" readonly>{{ log.new_data }}</textarea>
             </div>
             {% endif %}
-            <p>ID: {{ log.id }}</p>
+            <a class="hover:underline" href="#L{{ log.id }}">ID: {{ log.id }}</a>
         </div>
         {% endfor %}
     </div>

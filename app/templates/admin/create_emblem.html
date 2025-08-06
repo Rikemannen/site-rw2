@@ -3,25 +3,25 @@
 {% block title %}Skapa emblem{% endblock %}
 
 {% block content %}
-<div class="bg-slate-200 rounded-md shadow-md p-4">
-    <h2 class="text-2xl font-bold mb-4">Skapa nytt emblem</h2>
-    <form method="POST" action="{{ url_for('admin.create_emblem') }}">
+<div class="bg-white rounded-2xl shadow-xl p-6">
+    <h2 class="text-3xl font-bold mb-4">Skapa nytt emblem</h2>
+    <form method="POST" action="{{ url_for('admin.create_emblem') }}" class="space-y-4">
         {{ createForm.hidden_tag() }}
-        <div class="mb-4">
-            {{ createForm.name.label(class="block text-sm font-md text-gray-700")}}
-            {{ createForm.name(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ createForm.name.label(class="block text-sm font-md text-slate-600")}}
+            {{ createForm.name(class="mt-1 input") }}
             {% for error in createForm.name.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ createForm.color.label(class="block text-sm font-md text-gray-700")}}
-            {{ createForm.color(class="mt-1 block w-full p-2 border border-gray-300 rounded-md") }}
+        <div>
+            {{ createForm.color.label(class="block text-sm font-md text-slate-600")}}
+            {{ createForm.color(class="mt-1 input") }}
             {% for error in createForm.color.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        {{ createForm.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+        {{ createForm.submit(class="button-blue") }}
     </form>
 </div>
 {% endblock %}

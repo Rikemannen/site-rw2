@@ -3,37 +3,34 @@
 {% block title %}Detaljer för {{ emblem.name }}{% endblock %}
 
 {% block content %}
-<div class="flex gap-4">
-    <div class="flex-grow">
-        <div class="bg-slate-200 p-2 rounded-md shadow-md" style="background-color: {{ emblem.color }}33;">
-            <div class="flex items-center">
-                <h1 class="text-2xl font-bold m-2" style="color: {{ emblem.color }};">
-                    {{ emblem.name }}
-                </h1>
-            </div>
-            <div class="bg-slate-300 rounded-md p-2 shadow-md">
-                <h2 class="text-xl font-bold">Info:</h2>
-                <p>Färg: <span>{{ emblem.color }}</span></p>
-                <p>ID: {{ emblem.id }}</p>
-                <p>Ägare: <span>{{ emblem.owners | length }}</span></p>
-            </div>
-            <div class="bg-slate-200 rounded-md p-2 mt-4 shadow-md">
-                <h2 class="text-xl font-bold">Ägare:</h2>
-                {% if emblem.owners %}
-                <ul>
-                    {% for owner in emblem.owners %}
-                    <li>
-                        <a href="/user/{{ owner.id }}" class="text-blue-600 hover:underline" style="color: {{ owner.equipped_emblem.color }}">{{ owner | format_user }}</a>
-                        {% if current_user.admin %}
-                        <a href="/admin/user/{{ owner.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p>Inga ägare hittades.</p>
+<div class="flex-grow gap-4 space-y-4 bg-white p-6 rounded-2xl shadow-xl space-y-4"
+    style="background-color: {{ emblem.color }}33;">
+    <h1 class="text-3xl font-bold" style="color: {{ emblem.color }};">
+        {{ emblem.name }}
+    </h1>
+    <div class="bg-gray-100 text-sm rounded-2xl p-4 shadow-xl space-y-1 text-slate-600 hover:bg-gray-200 transition-colors duration-200">
+        <h2 class="text-xl font-bold text-white">Info:</h2>
+        <p>Färg: <span>{{ emblem.color }}</span></p>
+        <p>ID: {{ emblem.id }}</p>
+        <p>Ägare: <span>{{ emblem.owners | length }}</span></p>
+    </div>
+    <div class="bg-gray-100 text-sm rounded-2xl p-4 shadow-xl hover:bg-gray-200 transition-colors duration-200">
+        <h2 class="text-xl font-bold">Ägare:</h2>
+        {% if emblem.owners %}
+        <ul>
+            {% for owner in emblem.owners %}
+            <li>
+                <a href="/user/{{ owner.id }}" class="text-blue-600 hover:underline"
+                    style="color: {{ owner.equipped_emblem.color }}">{{ owner | format_user }}</a>
+                {% if current_user.admin %}
+                <a href="/admin/user/{{ owner.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
                 {% endif %}
-        </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Inga ägare hittades.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -1,25 +1,28 @@
 {% extends 'base.html' %}
 
-{% block title %}Sök{% endblock %}
+{% block title %}Emblem{% endblock %}
 
 {% block content %}
 {% set is_admin = current_user.admin %}
-<div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-    <div class="bg-slate-200 p-2 rounded-md shadow-md">
+<div class="bg-white grid grid-cols-1 md:grid-cols-1 gap-6 p-6 shadow-xl rounded-2xl">
+    <h1 class="text-3xl font-bold">Emblem</h1>
+    <ul class="space-y-4">
         {% for emblem in emblems %}
-        <div class="p-2 mt-2 mb-2 rounded-md shadow-md" style="background-color: {{ emblem.color }}33">
-            <p><a href="/emblem/{{ emblem.id }}" class="text-blue-600 hover:underline"
-                    style="color: {{ emblem.color }}">{{ emblem.name }}
-                </a>
+        <li class="p-4 rounded-2xl shadow-xl" style="background-color: {{ emblem.color }}33">
+            <div>
+                <a href="/emblem/{{ emblem.id }}" class="text-blue-600 hover:underline font-bold"
+                    style="color: {{ emblem.color }}">{{
+                    emblem.name }}</a>
                 {% if is_admin %}
-                <a href="/admin/emblem/{{ emblem.id }}" class="text-orange-600 hover:underline">Öppna som admin</a>
+                <a href="/admin/emblem/{{ emblem.id }}" class="text-orange-600 hover:underline font-bold">(Admin)</a>
                 {% endif %}
-            </p>
-            <p>Färg: <span>{{ emblem.color }}</span></p>
-            <p>Ägare: <span>{{ emblem.owners | length }}</span></p>
-            <p>ID: {{ emblem.id }}</p>
-        </div>
+            </div>
+            <div class="text-slate-600 text-sm space-y-1 mt-1">
+                <p>Färg: {{ emblem.color }}</p>
+                <p>Ägare: {{ emblem.owners | length }}</p>
+            </div>
+        </li>
         {% endfor %}
-    </div>
+    </ul>
 </div>
 {% endblock %}

@@ -25,6 +25,7 @@ class Exercise(db.Model):
     approved = Column(Boolean, default=False)
     liked_by = relationship('User', secondary='exercise_likes', back_populates='liked_exercises')
 
+    @property
     def likes(self):
         """Return the number of likes for the exercise."""
         return len(self.liked_by)

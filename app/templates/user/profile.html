@@ -3,78 +3,87 @@
 {% block title %}{{ user.display_name if user.display_name else user.name }}s profil{% endblock %}
 
 {% block content %}
-<div class="flex gap-4">
-    <div class="flex-grow">
-        <div class="bg-slate-100 p-2 rounded-md shadow-md">
-            <div class="flex items-center">
-                {% set emblem_color = user.equipped_emblem.color if user.equipped_emblem else 'inherit' %}
-                <h1 class="text-2xl font-bold m-2" style="color: {{ emblem_color }};">
-                    {{ user | format_user }}
-                </h1>
-                {% if user.equipped_emblem %}
-                <div class="bg-slate-200 rounded-md inline-block m-1"
-                    style="color: {{ emblem_color }}; background-color: {{ emblem_color }}33;">
-                    <p class="text-xl pr-2 pl-2 p-1">{{ user.equipped_emblem.name }}</p>
-                </div>
-                {% endif %}
+<div class="space-y-8">
+    <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <div class="flex items-center">
+            {% set emblem_color = user.equipped_emblem.color if user.equipped_emblem else 'inherit' %}
+            <h1 class="text-3xl font-bold" style="color: {{ emblem_color }};">
+                {{ user | format_user }}
+            </h1>
+            {% if user.equipped_emblem %}
+            <div class="bg-slate-200 rounded-md inline-block ml-4"
+                style="color: {{ emblem_color }}; background-color: {{ emblem_color }}33;">
+                <p class="text-xl pr-2 pl-2 p-1">{{ user.equipped_emblem.name }}</p>
             </div>
-            <div class="bg-slate-200 rounded-md p-2">
-                <h2 class="text-xl font-bold">Beskrivning:</h2>
-                <p>{{ user.description if user.description else 'Tomt D;' }}</p>
-            </div>
+            {% endif %}
         </div>
-        {% set has_approved_exercise = user.exercises | selectattr('approved') | list | length > 0 %}
-        {% if has_approved_exercise %}
-        <div class="bg-slate-100 p-2 rounded-md shadow-md mt-4">
-            <h1 class="text-xl font-bold mb-2">Skapade Övningar</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {% for exercise in user.exercises %}
-                {% if exercise.approved %}
-                <div class="p-2 rounded-md shadow-md bg-slate-200">
-                    <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
-                            }}</a></p>
-                    <div class="flex flex-row gap-4">
-                        <a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar: {{
-                            exercise.likes()
-                            }}</a>
-                        <p>Skapad: {{ exercise.created | datetimeformat }}</p>
-                        <p>Försök: {{ exercise.attempts }}</p>
-                        <p>Avklarad: {{ exercise.finished }}</p>
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
+        <div class="bg-gray-100 p-4 rounded-xl shadow-inner mb-4 mt-4 text-slate-700">
+            <h2 class="text-xl font-bold">Beskrivning:</h2>
+            <p>{{ user.description if user.description else 'Tomt D;' }}</p>
         </div>
-        {% endif %}
-        {% set likes_approved_exercise = user.liked_exercises | selectattr('approved') | list | length > 0 %}
-        {% if likes_approved_exercise %}
-        <div class="bg-slate-100 p-2 rounded-md shadow-md mt-4">
-            <h1 class="text-xl font-bold mb-2">Gillade Övningar</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {% for exercise in user.liked_exercises %}
-                {% if exercise.approved %}
-                <div class="p-2 rounded-md shadow-md bg-slate-200">
-                    <p><a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
-                            }}</a>
-                    <p>Skapare: <a href="/user/{{ user.id }}" class="hover:underline"
-                            style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner | format_user }}
-                        </a></p>
-                    </p>
-                    <div class="flex flex-row gap-4">
-                        <a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar: {{
-                            exercise.likes()
-                            }}</a>
-                        <p>Skapad: {{ exercise.created | datetimeformat }}</p>
-                        <p>Försök: {{ exercise.attempts }}</p>
-                        <p>Avklarad: {{ exercise.finished }}</p>
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
+        <div class="flex flex-wrap items-center gap-4">
+            <span class="bg-gray-200 py-1 px-3 rounded-full">Gick med: {{ user.joined | datetimeformat('date')
+                }}</span>
         </div>
     </div>
+    {% set has_approved_exercise = user.exercises | selectattr('approved') | list | length > 0 %}
+    {% if has_approved_exercise %}
+    <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <h1 class="text-2xl font-bold mb-4">Skapade Övningar</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for exercise in user.exercises %}
+            {% if exercise.approved %}
+            <div class="p-4 rounded-xl shadow-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
+                <div>
+                    <p class="font-semibold">
+                        <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
+                            }}</a>
+                    </p>
+                    <div class="flex flex-wrap items-center gap-4 text-sm mt-2 text-slate-600">
+                        <a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar: {{ exercise.likes
+                            }}</a>
+                        <p>Skapad: {{ exercise.created | datetimeformat }}</p>
+                        <p>Försök: {{ exercise.attempts }}</p>
+                        <p>Avklarad: {{ exercise.finished }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% set likes_approved_exercise = user.liked_exercises | selectattr('approved') | list | length > 0 %}
+    {% if likes_approved_exercise %}
+    <div class="bg-white p-6 rounded-2xl shadow-xl">
+        <h1 class="text-2xl font-bold mb-4">Gillade Övningar</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for exercise in user.liked_exercises %}
+            {% if exercise.approved %}
+            <div class="p-4 rounded-xl shadow-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
+                <p class="font-semibold">
+                    <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{ exercise.name
+                        }}</a>
+                </p>
+                <p class="text-sm mt-1 text-slate-600">
+                    Skapare: <a href="/user/{{ exercise.owner.id }}" class="hover:underline"
+                        style="color: {{ exercise.owner.equipped_emblem.color }}">{{ exercise.owner |
+                        format_user }}</a>
+                </p>
+                <div class="flex flex-wrap items-center gap-4 text-sm mt-2 text-slate-600">
+                    <a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">Gillar: {{
+                        exercise.likes
+                        }}</a>
+                    <p>Skapad: {{ exercise.created | datetimeformat }}</p>
+                    <p>Försök: {{ exercise.attempts }}</p>
+                    <p>Avklarad: {{ exercise.finished }}</p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
 </div>
 {% endif %}
 {% endblock %}

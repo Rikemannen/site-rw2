@@ -3,52 +3,91 @@
 {% block title %}Hem{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="bg-slate-100 rounded-lg shadow-md p-4">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Nya Övningar</h2>
-        <ul id="latest-exercises" class="space-y-2">
-            {% for exercise in recent_exercises %}
-            <li class="bg-slate-200 rounded-sm p-2">
-                <div class="flex justify-between items-center">
-                    <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
-                        exercise.name[:30] }}</a>
-                    <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline"
-                        style="color: {{ exercise.owner.color }};">
-                        {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
-                        exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
-                        else exercise.owner.name }}
-                    </a>
-                </div>
-                <p class="text-slate-600 text-sm">Skapades: {{ exercise.created | datetimeformat('datetime') }}</p>
-            </li>
-            {% endfor %}
-        </ul>
+<div class="space-y-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 p-6 bg-white rounded-2xl shadow-xl">
+        <div class="flex-grow w-full sm:w-auto">
+            <label for="search" class="sr-only">Sök övningar</label>
+            <form action="/search" method="GET" onsubmit="return updateQuery(this);">
+                <input type="text" id="search" placeholder="Sök efter övningar..."
+                    class="w-full p-3 rounded-xl bg-gray-100 text-slate-900 border-2 border-gray-300 focus:outline-none focus:border-blue-500 placeholder:text-gray-400 transition-colors duration-200">
+            </form>
+            <script>
+                function updateQuery(form) {
+                    let q = form.elements['search'].value.trim();
+
+                    if (q === '') q = '*';
+                    let type = 'exercises';
+
+                    const params = new URLSearchParams({ q, type });
+                    window.location.href = `/search?${params.toString()}`;
+                    return false;
+                }
+            </script>
+        </div>
+        <a href="/exercise/create">
+            <button
+                class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200 cursor-pointer">
+                Skapa ny övning
+            </button>
+        </a>
     </div>
-    <div class="bg-slate-100 rounded-lg shadow-md p-4">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Populära Övningar</h2>
-        <ul id="popular-exercises" class="space-y-2">
-            {% for exercise, likes_count in popular_exercises %}
-            <li class="bg-slate-200 rounded-sm p-2">
-                <div class="flex justify-between items-center">
-                    <a href="/exercise/{{ exercise.id }}" class="text-blue-600 hover:underline">{{
-                        exercise.name[:30] }}</a>
-                    <a href="/user/{{ exercise.owner.id }}" class="text-blue-600 hover:underline"
-                        style="color: {{ exercise.owner.color }};">
-                        {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
-                        exercise.owner.display_name and exercise.owner.display_name !=
-                        exercise.owner.name else exercise.owner.name }}
-                    </a>
-                </div>
-                <p class="text-slate-600 text-sm"><a href="/exercise/{{ exercise.id }}/likes"
-                        class="hover:underline">Gillar:
-                        {{ likes_count
-                        }}</a></p>
-            </li>
-            {% endfor %}
-        </ul>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold mb-6 text-slate-900">Nya Övningar</h2>
+            <ul id="latest-exercises" class="space-y-4">
+                {% for exercise in recent_exercises %}
+                <li class="bg-gray-100 rounded-xl p-4 hover:bg-gray-200 transition-colors duration-200">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <a href="/exercise/{{ exercise.id }}"
+                            class="text-blue-600 hover:text-blue-700 font-semibold mb-1 sm:mb-0 block">{{
+                            exercise.name[:30] }}</a>
+                        <a href="/user/{{ exercise.owner.id }}"
+                            class="text-sm font-medium hover:underline text-slate-700"
+                            style="color: {{ exercise.owner.color }};">
+                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
+                            exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
+                            else exercise.owner.name }}
+                        </a>
+                    </div>
+                    <p class="text-slate-600 text-sm mt-2">Skapades: {{ exercise.created |
+                        datetimeformat('datetime') }}
+                    </p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold mb-6 text-slate-900">Populära Övningar</h2>
+            <ul id="popular-exercises" class="space-y-4">
+                {% for exercise, likes_count in popular_exercises %}
+                <li class="bg-gray-100 rounded-xl p-4 hover:bg-gray-200 transition-colors duration-200">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <a href="/exercise/{{ exercise.id }}"
+                            class="text-blue-600 hover:text-blue-700 font-semibold mb-1 sm:mb-0 block">{{
+                            exercise.name[:30] }}</a>
+                        <a href="/user/{{ exercise.owner.id }}"
+                            class="text-sm font-medium hover:underline text-slate-700"
+                            style="color: {{ exercise.owner.color }};">
+                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
+                            exercise.owner.display_name and exercise.owner.display_name !=
+                            exercise.owner.name else exercise.owner.name }}
+                        </a>
+                    </div>
+                    <p class="text-slate-600 text-sm mt-2 flex items-center gap-1">
+                        <a href="/exercise/{{ exercise.id }}/likes" class="hover:underline">
+                            <span class="text-red-500">❤</span> {{ likes_count }} gillar
+                        </a>
+                    </p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl p-2" id="chat-window-card">
+            {% include 'chat/chat_window.html' %}
+        </div>
     </div>
-</div>
-<div class="mt-6">
-    {% include 'chat/chat_window.html' %}
 </div>
 {% endblock %}
