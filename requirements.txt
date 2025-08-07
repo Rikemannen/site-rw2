@@ -7,3 +7,4 @@ flask-limiter
 argon2-cffi
 pytest
 bleach
+redis

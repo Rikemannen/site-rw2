@@ -6,6 +6,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 import logging
+from redis import Redis
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from app.blueprints.chat import get_messages
@@ -15,9 +16,12 @@ from app.services.user_service import get_user_by_id
 from app.services.session_token_service import get_user_from_token
 from app.extensions import socketio, db
 
+redis_client = Redis(host="localhost", port=6379, db=0)
+
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["120 per hour"]
+    default_limits=["120 per hour"],
+    storage_uri="redis://localhost:6379"
 )
 
 def create_app():
