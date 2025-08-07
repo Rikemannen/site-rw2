@@ -46,6 +46,7 @@
             <form
                 action="{{ url_for('exercise.like', exercise_id=exercise.id) if current_user.is_authenticated else url_for('auth.login', next=request.url) }}"
                 method="post" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit"
                     class="px-4 py-2 rounded-xl font-bold transition-all duration-200 shadow-md cursor-pointer
                         {% if has_liked %}
