@@ -9,6 +9,7 @@ import logging
 from redis import Redis
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_session import Session
 from app.blueprints.chat import get_messages
 from app.blueprints import main, auth, exercises, chat, admin, messaging
 from app.extensions import login_manager
@@ -40,6 +41,9 @@ def create_app():
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(weeks=1)
     app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = redis_client  # your Redis instance
+    Session(app)
 
     db.init_app(app)
     limiter.init_app(app)
