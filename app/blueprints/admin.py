@@ -449,7 +449,7 @@ def delete_exercise(id):
 
 # --- Emblem related routes within /admin ---
 
-@bp.route('/emblem/<id>')
+@bp.route('/emblem/<emblem_id>')
 @admin_required
 def edit_emblem(emblem_id):
     appearanceForm = EmblemAppearanceForm()
