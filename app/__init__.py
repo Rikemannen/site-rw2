@@ -52,7 +52,7 @@ def create_app():
 
     # IMPORTANT: Initialize socketio with the app here
     from app.extensions import socketio
-    socketio.init_app(app, message_queue='redis://localhost:6379/0', async_mode='eventlet')
+    socketio.init_app(app, message_queue='redis://localhost:6379/0', async_mode='eventlet', logger=True, engineio_logger=True)
 
     # Register blueprints (unchanged)
     app.register_blueprint(main.bp)
