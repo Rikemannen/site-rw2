@@ -36,7 +36,7 @@ def login():
             return redirect(url_for('auth.login'))
 
         if user.banned:
-            flash(f'Detta konto är bannlyst tills {datetime.fromtimestamp(user.banned_until).strftime('%Y-%m-%d %H:%M:%S')}!')
+            flash(f'Detta konto är bannlyst tills {datetime.fromtimestamp(user.banned_until).strftime("%Y-%m-%d %H:%M:%S")}!')
             return redirect(url_for('auth.login'))
 
         current_user.last_login = time.time()
