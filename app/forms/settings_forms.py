@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, PasswordField, SubmitField, BooleanField
+from wtforms import SelectField, StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, EqualTo
 
 class ProfileSettingsForm(FlaskForm):
     """Form for profile settings."""
     display_name = StringField('Visningsnamn', validators=[Length(max=20)])
     emblem = SelectField('Utrustad Emblem', coerce=int, choices=[])
+    description = TextAreaField('Beskrivning', validators=[Length(max=200)])
     submit = SubmitField('Uppdatera Profil')
 
 class UsernameChangeForm(FlaskForm):
@@ -31,5 +32,6 @@ class DeleteUserForm(FlaskForm):
     """Form for deleting account."""
     username = StringField('Användarnamn', validators=[DataRequired(), Length(min=3, max=20)])
     password = PasswordField('Lösenord', validators=[DataRequired(), Length(min=8, max=100)])
-    confirm = BooleanField('Jag förstår att detta inte går att ångra.', validators=[DataRequired()])
+    confirm = BooleanField('Jag förstår att detta gör mitt konto anonymt, och att detta inte går att göra om.', validators=[DataRequired()])
+    full = BooleanField('Jag vill att all min data tas bort, inte bara anonymiseras.')
     submit = SubmitField('Ta bort konto')

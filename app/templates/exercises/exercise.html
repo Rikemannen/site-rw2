@@ -17,10 +17,10 @@
 
         <div class="bg-gray-100 p-4 rounded-xl shadow-inner mb-4 text-slate-700">
             <h2 class="text-xl font-bold">Beskrivning:</h2>
-            <p>{{ exercise.description }}</p>
+            <p class="whitespace-pre-wrap">{{ exercise.description }}</p>
         </div>
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between text-sm flex-wrap gap-4 text-slate-600">
+        <div class="flex flex-col md:flex-row md:items-center justify-between text-sm flex-wrap gap-4">
             <div class="flex flex-wrap items-center gap-4">
                 <span class="bg-gray-200 py-1 px-3 rounded-full">Skapad: {{ exercise.created | datetimeformat('datetime') }}</span>
                 <span class="bg-gray-200 py-1 px-3 rounded-full">{{ exercise.attempts }} försök</span>
@@ -30,8 +30,7 @@
             <p class="text-sm">Skapad av:
                 <a href="/user/{{ exercise.owner.id }}" class="hover:underline"
                     style="color: {{ exercise.owner.color }};">
-                    {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if exercise.owner.display_name
-                    and exercise.owner.display_name != exercise.owner.name else exercise.owner.name }}
+                    {{ exercise.owner | format_user }}
                 </a>
             </p>
         </div>

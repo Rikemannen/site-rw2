@@ -67,18 +67,20 @@
                     {% if user_results %}
                     {% for user in user_results %}
                     <li class="p-4 rounded-xl shadow-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200">
-                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                            <p class="font-semibold text-slate-900">
-                                <a href="/user/{{ user.id }}" class="text-blue-600 hover:underline"
-                                    style="color: {{ user.equipped_emblem.color }}">{{ user | format_user }}
-                                </a>
-                            </p>
-                            <p class="text-sm text-slate-600 mt-1 sm:mt-0">ID: {{ user.id }}</p>
+                        <p class="font-semibold">
+                            <a href="/user/{{ user.id }}" class="text-blue-600 hover:underline"
+                                style="color: {{ user.equipped_emblem.color }}">{{ user | format_user }}
+                            </a>
+                            {% if is_admin %}
+                            <a href="/admin/user/{{ user.id }}"
+                                class="text-orange-600 hover:underline">(Admin)</a>
+                            {% endif %}
+                        </p>
+                        <div class="flex flex-wrap items-center gap-4 text-sm mt-2 text-slate-600">
+                            <p>ID: {{ user.id }}</p>
+                            <p>Gick med: {{ user.joined | datetimeformat }}</p>
+                            <p>Övningar: {{ user.exercises | length }}</p>
                         </div>
-                        {% if is_admin %}
-                        <p class="mt-2"><a href="/admin/user/{{ user.id }}"
-                                class="text-orange-600 hover:underline">Öppna som admin</a></p>
-                        {% endif %}
                     </li>
                     {% endfor %}
                     {% else %}

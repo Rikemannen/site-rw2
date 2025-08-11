@@ -3,14 +3,38 @@
 {% block title %}Kontoinställningar{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-2xl shadow-xl p-6">
-    <h1 class="text-3xl font-bold mb-4">
+<div class="bg-white rounded-2xl shadow-xl p-6 space-y-2">
+    <h1 class="text-3xl font-bold">
         Användarinställningar för <a href="{{ url_for('main.user_profile', user_id=editing.id)}}"
             class="text-blue-600 hover:underline">{{ editing.name }}</a>
     </h1>
     {% if current_user.id == editing.id %}
-    <h2 class="text-xl -mt-2 mb-2 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h2>
+    <h2 class="text-xl text-red-500">Var försiktig! Du redigerar ditt egna konto!</h2>
     {% endif %}
+    {% if editing.banned %}
+    <form method="POST" action="{{ url_for('admin.unban', user_id=editing.id) }}" class="space-y-2">
+        <h2 class="text-xl text-red-500">Användaren är bannlyst tills {{ editing.banned_until |
+            datetimeformat }}!</h2>
+        {{ unbanForm.hidden_tag() }}
+        {{ unbanForm.submit(class="button-red") }}
+    </form>
+    <hr class="break">
+    {% endif %}
+    {% if not editing.listed and not editing.banned %}
+    <h2 class="text-xl text-red-500">Användaren är olistad, du bör ej ändra kontot!</h2>
+    {% endif %}
+    <button id="toggle-btn" class="button-blue">Visa/dölj info</button>
+    <ul id="info" class="bg-gray-100 p-4 rounded-2xl shadow-xl mt-2 hidden">
+        {% for key, value in user_data.items() %}
+        <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+    <script>
+        document.getElementById('toggle-btn').onclick = () => {
+            const info = document.getElementById('info');
+            info.classList.toggle('hidden')
+        };
+    </script>
     <form method="POST" action="{{ url_for('admin.profile_editing', user_id=editing.id) }}" class="space-y-2">
         <h2 class="text-2xl">Profil</h2>
         {{ profileForm.hidden_tag() }}
@@ -25,6 +49,13 @@
             {{ profileForm.emblem.label(class="block text-sm font-md text-slate-600")}}
             {{ profileForm.emblem(class="mt-1 input") }}
             {% for error in profileForm.emblem.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ profileForm.description.label(class="block text-sm font-md text-slate-600")}}
+            {{ profileForm.description(class="mt-1 text-field") }}
+            {% for error in profileForm.description.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
@@ -63,11 +94,14 @@
     <hr class="break">
     <form method="POST" action="{{ url_for('admin.recovery', user_id=editing.id)}}" class="space-y-2">
         <h2 class="text-2xl">Återställning</h2>
+        {% if not editing.listed and not editing.banned %}
+        <h2 class="text-md mb-3 text-red-500">Användaren är olistad, du bör ej ändra kontot!</h2>
+        {% endif %}
         {{ passForm.hidden_tag() }}
         {{ passForm.submit(class="button-blue") }}
         <p class="mt-2">Återställningslänk, visas inte igen:</p>
         {% with messages = get_flashed_messages() %}
-        <input type="text" class="block text-sm font-md text-slate-600 p-2 mt-4 w-full" value="{{ messages[0] }}"
+        <input id="link" type="text" class="block text-sm font-md text-slate-600 p-2 mt-4 w-full" value="{{ messages[0] }}"
             placeholder="Länken visas här" readonly>
         {% endwith %}
     </form>
@@ -93,7 +127,7 @@
         <h3 class="text-md mb-3 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h3>
         {% endif %}
         {{ elevateForm.hidden_tag() }}
-        <div class="mb-4">
+        <div>
             <div class="flex items-center">
                 {{ elevateForm.admin(class="checkbox") }}
                 {{ elevateForm.admin.label(class="ml-1 block text-sm font-md text-slate-600")}}
@@ -108,10 +142,35 @@
     <form method="POST" action="{{ url_for('admin.deletion', user_id=editing.id)}}" class="space-y-2">
         <h2 class="text-2xl">Borttagning</h2>
         {% if current_user.id == editing.id %}
-        <h3 class="text-md -mt-3 mb-3 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h3>
+        <h3 class="text-md mb-3 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h3>
         {% endif %}
         {{ deleteForm.hidden_tag() }}
+        <div>
+            <div class="flex items-center">
+                {{ deleteForm.full(class="checkbox") }}
+                {{ deleteForm.full.label(class="ml-1 block text-sm font-md text-slate-600")}}
+            </div>
+            {% for error in deleteForm.full.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
         {{ deleteForm.submit(class="button-red") }}
+    </form>
+    <hr class="break">
+    <form method="POST" action="{{ url_for('admin.ban', user_id=editing.id)}}" class="space-y-2">
+        <h2 class="text-2xl">Bannlys användare</h2>
+        {% if current_user.id == editing.id %}
+        <h3 class="text-mb mb-3 text-red-500">Var försiktig! Du redigerar ditt egna konto!</h3>
+        {% endif %}
+        <div>
+            {{ banForm.time.label(class="block text-sm font-md text-slate-600")}}
+            {{ banForm.time(class="mt-1 input") }}
+            {% for error in banForm.time.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ banForm.hidden_tag() }}
+        {{ banForm.submit(class=("button-red-disabled" if user.banned else "button-red")) }}
     </form>
 </div>
 {% endblock %}

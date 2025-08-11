@@ -1,6 +1,6 @@
 """Handles main application routes and views."""
 
-from flask import Blueprint, abort, render_template, request, redirect
+from flask import Blueprint, abort, render_template, request, redirect, make_response
 from flask_login import current_user, login_required
 from app.models.emblems import Emblem
 from app.services.emblem_service import get_emblem_by_id
@@ -23,6 +23,13 @@ def index():
                            popular_exercises=get_popular_exercises(),
                            recent_exercises=get_recent_exercises(), show_chat_window=False)
 
+@bp.route('/dismiss-banner')
+def dismiss_banner():
+    """Hide the cookie banner"""
+    resp = make_response('', 204)
+    resp.set_cookie('saw_banner', 'yes', max_age=60*60*24*365)  # 1 year
+    return resp
+
 @bp.route('/user/<user_id>')
 def user_profile(user_id):
     """Render the user profile page."""
@@ -41,6 +48,7 @@ def profile():
 def search():
     """Render the search results page."""
     query = request.args.get('q', '*').strip()
+    count = request.args.get('c', '25')
     search_type = request.args.get('type', 'all')
 
     user_results = []
@@ -63,10 +71,10 @@ def search():
                 exercise_results.extend(user for user in id_results if user.id not in existing_ids)
     elif query == "*":
         if search_type in ('all', 'users'):
-            user_results.extend(get_all_users())
+            user_results.extend(get_all_users(count))
 
         if search_type in ('all', 'exercises'):
-            exercise_results.extend(get_all_exercises())
+            exercise_results.extend(get_all_exercises(count))
 
     return render_template(
         'search/results.html',

@@ -10,7 +10,7 @@
             Profilinställningar
         </span>
         <a href="/settings/account"
-        class="px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+            class="px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
             Kontoinställningar
         </a>
     </div>
@@ -19,7 +19,7 @@
         {{ form.hidden_tag() }}
         <div class="space-y-1">
             {{ form.display_name.label(class="block text-sm font-md text-slate-600")}}
-            {{ form.display_name(class="block w-full p-2 border border-gray-300 rounded-md") }}
+            {{ form.display_name(class="input") }}
             {% for error in form.display_name.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
@@ -32,11 +32,43 @@
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
+        <div>
+            {{ form.description.label(class="block text-sm font-md text-slate-600")}}
+            {{ form.description(class="input") }}
+            <p id="desc-counter" class="text-slate-600 text-s"></p>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const descInput = document.getElementById("{{ form.description.id }}");
+                    const counter = document.getElementById("desc-counter");
+                    if (descInput && counter) {
+                        function updateCounter() {
+                            const maxLength = descInput.getAttribute('maxlength') || 500;
+                            const currentLength = descInput.value.length;
+                            counter.textContent = `${currentLength} / ${maxLength} tecken`;
+                            // Add or remove text-red-500 based on remaining length
+                            if ((maxLength - currentLength) / maxLength < 0.1) {
+                                counter.classList.add('text-red-500');
+                            } else {
+                                counter.classList.remove('text-red-500');
+                            }
+                        }
+                        descInput.addEventListener('input', updateCounter);
+                        updateCounter();
+                    }
+                });
+            </script>
+            {% for error in form.description.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
         {{ form.submit(class="button-blue") }}
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <ul class="flash-messages">
+    <ul id="flash" class="flash-messages">
+        <script>
+            window.location.href = `#flash`;
+        </script>
         {% for msg in messages %}
         <li>{{ msg }}</li>
         {% endfor %}

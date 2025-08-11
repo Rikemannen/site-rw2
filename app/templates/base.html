@@ -34,64 +34,90 @@
     <header id="main-header"
         class="sticky bg-white text-slate-900 p-4 mb-4 rounded-b-2xl shadow-xl w-full top-0 left-0 transition-all duration-300 z-50 dark:bg-slate-800 dark:text-white">
         <div class="container mx-auto flex items-center justify-between">
-            <a href="/" class="hover:text-blue-600 transition-colors duration-200 dark:hover:text-blue-400"{% if current_user.admin %} onclick="if (event.shiftKey) { event.preventDefault(); window.location.href = '/admin'; }"{% endif %}>
+            <a href="/" class="hover:text-blue-600 transition-colors duration-200 dark:hover:text-blue-400" {% if
+                current_user.admin %}
+                onclick="if (event.shiftKey) { event.preventDefault(); window.location.href = '/admin'; }" {% endif %}>
                 <h1 class="text-3xl font-bold">Hem</h1>
             </a>
-            <button id="profile-button" class="relative z-10 p-2 rounded-full hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-700 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user text-slate-900 dark:text-slate-200">
+            <button id="profile-button"
+                class="relative z-10 p-2 rounded-full hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-700 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-user text-slate-900 dark:text-slate-200">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                 </svg>
             </button>
         </div>
         <div class="absolute right-4 mt-2 min-w-[200px] hidden" id="profile-menu" style="z-index:1000;">
-            <ul class="bg-white text-slate-900 rounded-xl shadow-lg border border-gray-200 divide-y divide-gray-200 overflow-hidden dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:divide-slate-600">
+            <ul
+                class="bg-white text-slate-900 rounded-xl shadow-lg border border-gray-200 divide-y divide-gray-200 overflow-hidden dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:divide-slate-600">
                 {% if current_user.is_authenticated %}
                 <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600">
                     <a href="/profile" class="block font-semibold"
                         style="color: {{ current_user.color if current_user.equipped_emblem else inherit }};">
-                        {{ current_user.display_name ~ ' (@' ~ current_user.name ~ ')' if current_user.display_name and current_user.display_name != current_user.name else current_user.name }}
+                        {{ current_user | format_user }}
                     </a>
                 </li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/messages" class="block">Meddelanden</a></li>
                 {% if show_chat_window is not defined or show_chat_window %}
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="javascript:void(0)" class="block"
-                        onclick="toggleChat()">Visa/Göm Chatt</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="javascript:void(0)" class="block" onclick="toggleChat()">Visa/Göm Chatt</a></li>
                 {% endif %}
                 {% if current_user.admin %}
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/admin" class="block">Admin</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/admin" class="block">Admin</a></li>
                 {% if show_edit_links %}
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/admin/exercise/{{ exercise.id }}" class="block">Redigera Övning</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/admin/exercise/{{ exercise.id }}" class="block">Redigera Övning</a></li>
                 {% endif %}
                 {% if show_edit_links_user %}
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/admin/user/{{ user.id }}" class="block">Redigera Användare</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/admin/user/{{ user.id }}" class="block">Redigera Användare</a></li>
                 {% endif %}
                 {% endif %}
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/search" class="block">Sök</a></li>
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/settings" class="block">Inställningar</a></li>
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600 flex justify-between">
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/search" class="block">Sök</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/settings" class="block">Inställningar</a></li>
+                <li
+                    class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600 flex justify-between">
                     <span>
-                        <a href="javascript:void(0)" onclick="toggleDarkMode('toggle')" class="hover:text-blue-600 dark:hover:text-blue-400">Byt tema</a>
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('toggle')"
+                            class="hover:text-blue-600 dark:hover:text-blue-400">Byt tema</a>
                         |
-                        <a href="javascript:void(0)" onclick="toggleDarkMode('system')" class="hover:text-blue-600 dark:hover:text-blue-400">Följ system</a>
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('system')"
+                            class="hover:text-blue-600 dark:hover:text-blue-400">Följ system</a>
                     </span>
                 </li>
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/logout" class="block text-red-500 dark:text-red-400">Logga ut</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/logout" class="block text-red-500 dark:text-red-400">Logga ut</a></li>
                 {% else %}
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/login" class="block">Logga in</a></li>
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/register" class="block">Skapa Konto</a></li>
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a href="/search" class="block">Sök</a></li>
-                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600 flex justify-between">
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/login" class="block">Logga in</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/register" class="block">Skapa Konto</a></li>
+                <li class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600"><a
+                        href="/search" class="block">Sök</a></li>
+                <li
+                    class="px-4 py-3 hover:bg-gray-200 transition-colors duration-200 dark:hover:bg-slate-600 flex justify-between">
                     <span>
-                        <a href="javascript:void(0)" onclick="toggleDarkMode('toggle')" class="hover:text-blue-600 dark:hover:text-blue-400">Byt tema</a>
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('toggle')"
+                            class="hover:text-blue-600 dark:hover:text-blue-400">Byt tema</a>
                         |
-                        <a href="javascript:void(0)" onclick="toggleDarkMode('system')" class="hover:text-blue-600 dark:hover:text-blue-400">Följ system</a>
+                        <a href="javascript:void(0)" onclick="toggleDarkMode('system')"
+                            class="hover:text-blue-600 dark:hover:text-blue-400">Följ system</a>
                     </span>
                 </li>
                 {% endif %}
             </ul>
         </div>
+        <div class="fixed right-5 top-20">
+            {% include 'notification.html' %}
+        </div>
         {% if show_chat_window is not false %}
-        <div id="chat-window-card" class="fixed right-4 top-1/10 w-[400px] h-[400px] hidden">
+        <div id="chat-window-card" class="fixed right-4 w-[400px] h-[400px] hidden">
             {% include 'chat/chat_window.html' %}
         </div>
         {% endif %}
@@ -167,6 +193,21 @@
             }
         </script>
     </header>
+    {% if show_banner %}
+    <div id="cookie-banner"
+        style="position: fixed; bottom: 0; background: #222; color: #fff; padding: 10px; width: 100%;">
+        Sidan använder strikt endast kakor för att hålla reda på inloggningar, tema som används och om du har sett
+        detta!<button id="dismiss-btn" class="hover:underline cursor-pointer ml-1">ok!</button>
+    </div>
+
+    <script>
+        document.getElementById('dismiss-btn').onclick = () => {
+            fetch('/dismiss-banner').then(() => {
+                document.getElementById('cookie-banner').style.display = 'none';
+            });
+        };
+    </script>
+    {% endif %}
     <main class="p-4 md:p-8">
         <div class="container mx-auto">
             {% block content %}{% endblock %}

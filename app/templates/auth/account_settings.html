@@ -85,6 +85,13 @@
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
+        <div class="flex items-center">
+            {{ deleteForm.full(class="checkbox mr-2") }}
+            {{ deleteForm.full.label(class="block text-sm font-md text-slate-600")}}
+            {% for error in deleteForm.full.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
         {{ deleteForm.submit(class="button-red") }}
     </form>
     <hr class="break">
@@ -94,7 +101,10 @@
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <ul class="flash-messages">
+    <ul id="flash" class="flash-messages">
+        <script>
+            window.location.href = `#flash`;
+        </script>
         {% for msg in messages %}
         <li>{{ msg }}</li>
         {% endfor %}

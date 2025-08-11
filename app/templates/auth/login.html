@@ -24,13 +24,16 @@
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        {{ form.submit(class="bg-blue-500 text-white px-4 py-2 rounded") }}
+        {{ form.submit(class="button-blue") }}
         <p class="text-slate-600">Har du inget konto? Skapa ett <a href="/register"
                 class="text-blue-600 hover:underline">här</a>!</p>
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <ul class="flash-messages">
+    <ul id="flash" class="flash-messages">
+        <script>
+            window.location.href = `#flash`;
+        </script>
         {% for msg in messages %}
         <li>{{ msg }}</li>
         {% endfor %}

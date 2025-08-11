@@ -25,7 +25,10 @@
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <ul class="flash-messages">
+    <ul id="flash" class="flash-messages">
+        <script>
+            window.location.href = `#flash`;
+        </script>
         {% for msg in messages %}
         <li>{{ msg }}</li>
         {% endfor %}

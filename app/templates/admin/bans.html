@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Loggar{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+    <div class="bg-white p-6 rounded-2xl shadow-xl space-y-4">
+        {% for user in bans %}
+        <div class="p-4 rounded-xl shadow-xl bg-gray-100">
+            <div class="flex items-center">
+            <p><a href="/user/{{ user.id }}" class="text-blue-600 hover:underline">{{ user | format_user }}
+                </a>
+            <p><a href="/admin/user/{{ user.id }}" class="ml-1 text-orange-600 hover:underline">Redigera</a></p>
+            </p>
+            </div>
+            <p class="text-sm text-gray-500">Bannlyst tills {{ user.banned_until | datetimeformat }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</div>
+{% endblock %}

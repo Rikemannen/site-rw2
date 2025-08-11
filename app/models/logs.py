@@ -12,13 +12,14 @@ class Log(db.Model):
 
     id = Column(Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship('User', backref='logs')
     entity = Column(String(100), nullable=False)
     affected_id = Column(Integer, nullable=False)
     timestamp = Column(Integer, nullable=False, default=time.time())
     action = Column(String(50), nullable=False)
     new_data = Column(Text, nullable=True)
     old_data = Column(Text, nullable=True)  # Old data can be empty even if new data has a value
+
+    user = db.relationship('User', backref='logs')
 
     @property
     def affected_object(self):

@@ -1,40 +1,28 @@
-from flask import Blueprint, json, render_template, request, abort, redirect, url_for, flash
 import ast
-from flask_login import current_user as user
+import re
+import time
+from flask import Blueprint, json, render_template, request, abort, redirect, url_for, flash
+from flask_login import current_user
 from app.models.user import User
 from app.models.exercise import Exercise
 from app.utils.security import admin_required
-from app.services.user_service import get_user_by_id
+from app.services.user_service import get_user_by_id, delete_user, get_all_users
 from app.services.exercise_service import get_exercise_by_id
 from app.services.token_service import generate_token, get_url, invalidate_token, get_token_by_id
 from app.services.file_service import create_exercise_files, delete_exercise_files, get_exercise_html, get_exercise_answers
 from app.services.emblem_service import get_emblem_by_id, create_emblem as createEmblem
 from app.services.logging_service import log
+from app.services.session_token_service import invalidate_all_sessions
+from app.services.message_service import send_message_to_all
 from app.models.logs import Log
 from app.models.emblems import Emblem
 from app.models.token import Token
 from app.models.session_tokens import SessionToken
-from app.extensions import db
-from app.forms.admin_forms import (
-    ProfileSettingsForm,
-    EmblemAssignmentForm,
-    UsernameChangeForm,
-    PasswordResetForm,
-    DeleteUserForm,
-    VerifyUserForm,
-    ElevateUserForm,
-    ExerciseInfoForm,
-    ExerciseDataForm,
-    ExerciseStatisticForm,
-    ExerciseHTMLForm,
-    ExerciseAnswerForm,
-    DeleteExerciseForm,
-    EmblemAppearanceForm,
-    DeleteEmblemForm,
-    EmblemCreationForm
-)
+from app.extensions import db, socketio
+from app.forms.admin_forms import *
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
+HIDDEN_DATA = {'password_hash'}
 
 @bp.route('/')
 @admin_required
@@ -67,13 +55,20 @@ def tokens():
     tokens.sort(key=lambda t: not t.is_valid)
     return render_template('admin/tokens.html', tokens=tokens)
 
+@bp.route('/bans')
+@admin_required
+def bans():
+    """Show all banned users."""
+    banned_users = User.query.filter(User.banned_until > time.time()).all()
+    return render_template('admin/bans.html', bans=banned_users)
+
 # --- User related routes within /admin. ---
 
 @bp.route('/user')
 @admin_required
 def users():
     """Render the user search page."""
-    return redirect(url_for('main.search', q='*', type='users'))
+    return redirect(url_for('main.search', q='*', type='users', c=-1))
 
 @bp.route('/user/<user_id>')
 @admin_required
@@ -86,10 +81,14 @@ def edit_user(user_id):
     deleteForm = DeleteUserForm()
     verifyForm = VerifyUserForm()
     elevateForm = ElevateUserForm()
+    banForm = BanUserForm()
+    unbanForm = UnbanUserForm()
     editing = get_user_by_id(user_id)
 
     if not editing:
         abort(404)
+
+    user_data = {k: v for k, v in vars(editing).items() if not k.startswith('_') and k not in HIDDEN_DATA}
 
     profileForm.emblem.choices = [(0, 'None')] + [(e.id, e.name) for e in editing.emblems]
     emblemForm.emblems.choices = [(e.id, e.name) for e in Emblem.query.all()]
@@ -98,18 +97,21 @@ def edit_user(user_id):
     if request.method == 'GET':
         profileForm.display_name.data = editing.display_name
         profileForm.emblem.data = editing.equipped_emblem_id
+        profileForm.description.data = editing.description
         usernameForm.username.data = editing.name
         verifyForm.verified.data = editing.verified
         elevateForm.admin.data = editing.admin
 
-    return render_template('admin/user.html', user=user, editing=editing,
+    return render_template('admin/user.html', user=current_user, editing=editing, user_data=user_data,
                            profileForm=profileForm,
                            emblemForm=emblemForm,
                            nameForm=usernameForm,
                            passForm=passwordForm,
                            deleteForm=deleteForm,
                            verifyForm=verifyForm,
-                           elevateForm=elevateForm
+                           elevateForm=elevateForm,
+                           unbanForm=unbanForm,
+                           banForm=banForm
                            )
 
 @bp.route('/user/<user_id>/profile', methods=['POST'])
@@ -126,6 +128,10 @@ def profile_editing(user_id):
     if profileForm.validate_on_submit():
         editing.display_name = profileForm.display_name.data
         editing.equipped_emblem_id = profileForm.emblem.data if profileForm.emblem.data != 0 else None
+        desc = profileForm.description.data.replace("\r\n", "\n").strip()
+        desc = re.sub(r'\n{2,}', '\n\n', desc)
+        desc = re.sub(r' {2,}', ' ', desc)
+        editing.description = desc
         db.session.commit()
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
@@ -161,7 +167,7 @@ def username_editing(user_id):
         abort(404)
 
     if usernameForm.validate_on_submit():
-        log(user, 'user', editing.id, 'name.change', old_data=editing.name, new_data=usernameForm.username.data)
+        log(current_user, 'user', editing.id, 'name.change', old_data=editing.name, new_data=usernameForm.username.data)
         editing.name = usernameForm.username.data
         db.session.commit()
         return redirect(url_for('admin.edit_user', user_id=editing.id))
@@ -178,12 +184,12 @@ def recovery(user_id):
         abort(404)
 
     if resetForm.validate_on_submit():
-        token = generate_token(editing, user)
+        token = generate_token(editing, current_user)
         url = get_url(token, request.host)
-        log(user, 'user', editing.id, 'recovery.token_generated', new_data=json.dumps({'id': token.id, 'token': token.secret[:10] + '...'}))
-        log(user, 'token', token.id, 'created', new_data=json.dumps({'token': token.secret[:10] + '...', 'expires': token.expires}))
+        log(current_user, 'user', editing.id, 'recovery.token_generated', new_data=json.dumps({'id': token.id, 'token': token.secret[:10] + '...'}))
+        log(current_user, 'token', token.id, 'created', new_data=json.dumps({'token': token.secret[:10] + '...', 'expires': token.expires}))
         flash(url)
-        return redirect(url_for('admin.edit_user', user_id=editing.id))
+        return redirect(url_for('admin.edit_user', user_id=editing.id, _anchor='link'))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/user/<user_id>/delete', methods=['POST'])
@@ -197,10 +203,11 @@ def deletion(user_id):
         abort(404)
 
     if deleteForm.validate_on_submit():
-        db.session.delete(editing)
-        db.session.commit()
-        log(user, 'user', editing.id, 'delete')
-        return redirect(url_for('admin.admin'))
+        delete_user(editing, full=deleteForm.full.data)
+        log(current_user, 'user', editing.id, 'delete', new_data=json.dumps({'full': deleteForm.full.data}))
+
+    if deleteForm.full.data:
+        return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/user/<user_id>/verify', methods=['POST'])
@@ -216,7 +223,7 @@ def verify(user_id):
     if verifyForm.validate_on_submit():
         editing.verified = verifyForm.verified.data
         db.session.commit()
-        log(user, 'user', editing.id, 'verified.verify' if verifyForm.verified.data else 'verified.unverify')
+        log(current_user, 'user', editing.id, 'verified.verify' if verifyForm.verified.data else 'verified.unverify')
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -233,9 +240,54 @@ def elevate(user_id):
     if elevateForm.validate_on_submit():
         editing.admin = elevateForm.admin.data
         db.session.commit()
-        log(user, 'user', editing.id, 'admin.elevate' if elevateForm.admin.data else 'admin.demote')
+        log(current_user, 'user', editing.id, 'admin.elevate' if elevateForm.admin.data else 'admin.demote')
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
+
+@bp.route('/user/<user_id>/ban', methods=['POST'])
+@admin_required
+def ban(user_id):
+    """Handle user access change (banForm, unbanForm)."""
+    banForm = BanUserForm()
+    editing = get_user_by_id(user_id)
+
+    if banForm.validate_on_submit():
+        invalidate_all_sessions(editing)
+        editing.banned_until = time.time() + (int(banForm.time.data) * 24 * 60 * 60)
+        db.session.commit()
+    return redirect(url_for('admin.edit_user', user_id=editing.id))
+
+@bp.route('/user/<user_id>/unban', methods=['POST'])
+@admin_required
+def unban(user_id):
+    unbanForm = UnbanUserForm()
+    editing = get_user_by_id(user_id)
+
+    if unbanForm.validate_on_submit():
+        editing.banned_until = 0
+        db.session.commit()
+    return redirect(url_for('admin.edit_user', user_id=editing.id))
+
+@bp.route('/message-all', methods=['GET', 'POST'])
+@admin_required
+def message_all():
+    form = MessageAllForm()
+
+    if form.validate_on_submit():
+        content = form.content.data.replace("\r\n", "\n").strip()
+        content = re.sub(r'\n{2,}', '\n\n', content)
+        content = re.sub(r' {2,}', ' ', content)
+        msg = send_message_to_all(sender=current_user, content=content)
+        for user in get_all_users():
+            entry = next((m for m in msg if m.recipient_id == user.id), None)
+            socketio.emit(
+            'new_message',
+            {'id': entry.id, 'sender': current_user.name, 'content': content},
+            room=str(user.id)
+        )
+        flash('Meddelandet har skickats!')
+        return redirect(url_for('admin.message_all'))
+    return render_template('admin/message.html', form=form)
 
 # --- Exercise related routes within /admin. ---
 
@@ -245,19 +297,21 @@ def exercises():
     """Render the exercise search page."""
     return redirect(url_for('main.search', q='*', type='exercises'))
 
-@bp.route('/exercise/<id>')
+@bp.route('/exercise/<exercise_id>')
 @admin_required
-def edit_exercise(id):
+def edit_exercise(exercise_id):
     infoForm = ExerciseInfoForm()
     dataForm = ExerciseDataForm()
     statisticForm = ExerciseStatisticForm()
     htmlForm = ExerciseHTMLForm()
     answerForm = ExerciseAnswerForm()
     deleteForm = DeleteExerciseForm()
-    editing = get_exercise_by_id(id)
+    editing = get_exercise_by_id(exercise_id)
 
     if not editing:
         abort(404)
+
+    exercise_data = {k: v for k, v in vars(editing).items() if not k.startswith('_')}
 
     json = get_exercise_answers(editing)
     html = get_exercise_html(editing)
@@ -274,7 +328,7 @@ def edit_exercise(id):
         answerForm.json.data = json
         htmlForm.html.data = html
 
-    return render_template('admin/exercise.html', user=user, editing=editing,
+    return render_template('admin/exercise.html', user=current_user, editing=editing, exercise_data=exercise_data,
                            basicForm=infoForm,
                            staticForm=dataForm,
                            statisticForm=statisticForm,
@@ -293,9 +347,12 @@ def edit_info(id):
 
     if infoForm.validate_on_submit():
         editing.name = infoForm.name.data
-        editing.description = infoForm.description.data
+        desc = infoForm.description.data.replace("\r\n", "\n").strip()
+        desc = re.sub(r'\n{2,}', '\n\n', desc)
+        desc = re.sub(r' {2,}', ' ', desc)
+        editing.description = desc
         db.session.commit()
-        return redirect(url_for('admin.edit_exercise', id=editing.id))
+        return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/exercise/<id>/static', methods=['POST'])
@@ -309,9 +366,9 @@ def edit_static(id):
 
     if dataForm.validate_on_submit():
         if dataForm.approved.data != editing.approved:
-            log(user, 'exercise', editing.id, 'approve' if dataForm.approved.data else 'unapprove')
+            log(current_user, 'exercise', editing.id, 'approve' if dataForm.approved.data else 'unapprove')
         if dataForm.owner.data != editing.owner_id or dataForm.created.data != editing.created:
-            log(user, 'exercise', editing.id, 'static.update', old_data=json.dumps({
+            log(current_user, 'exercise', editing.id, 'static.update', old_data=json.dumps({
                 'owner_id': editing.owner_id,
                 'created': editing.created
             }), new_data=json.dumps({
@@ -322,7 +379,7 @@ def edit_static(id):
         editing.created = dataForm.created.data
         editing.approved = dataForm.approved.data
         db.session.commit()
-        return redirect(url_for('admin.edit_exercise', id=editing.id))
+        return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/exercise/<id>/statistics', methods=['POST'])
@@ -338,7 +395,7 @@ def edit_stats(id):
         editing.attempts = statisticForm.attempts.data
         editing.finished = statisticForm.completions.data
         db.session.commit()
-        return redirect(url_for('admin.edit_exercise', id=editing.id))
+        return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/exercise/<id>/json', methods=['POST'])
@@ -352,9 +409,9 @@ def edit_json(id):
 
     if answerForm.validate_on_submit():
         json_data = ast.literal_eval(answerForm.json.data)
-        log(user, 'exercise', editing.id, 'json.update', old_data=json.dumps(get_exercise_answers(editing)), new_data=json.dumps(json_data))
+        log(current_user, 'exercise', editing.id, 'json.update', old_data=json.dumps(get_exercise_answers(editing)), new_data=json.dumps(json_data))
         create_exercise_files(editing, get_exercise_html(editing), json_data)
-        return redirect(url_for('admin.edit_exercise', id=editing.id))
+        return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/exercise/<id>/html', methods=['POST'])
@@ -368,9 +425,9 @@ def edit_html(id):
 
     if htmlForm.validate_on_submit():
         html_data = htmlForm.html.data
-        log(user, 'exercise', editing.id, 'html.update', old_data=get_exercise_html(editing), new_data=html_data)
+        log(current_user, 'exercise', editing.id, 'html.update', old_data=get_exercise_html(editing), new_data=html_data)
         create_exercise_files(editing, html_data, get_exercise_answers(editing))
-        return redirect(url_for('admin.edit_exercise', id=editing.id))
+        return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/exercise/<id>/delete', methods=['POST'])
@@ -386,7 +443,7 @@ def delete_exercise(id):
         delete_exercise_files(editing)
         db.session.delete(editing)
         db.session.commit()
-        log(user, 'exercise', editing.id, 'delete')
+        log(current_user, 'exercise', editing.id, 'delete')
         return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))
 
@@ -394,7 +451,7 @@ def delete_exercise(id):
 
 @bp.route('/emblem/<id>')
 @admin_required
-def edit_emblem(id):
+def edit_emblem(emblem_id):
     appearanceForm = EmblemAppearanceForm()
     deleteForm = DeleteEmblemForm()
     editing = get_emblem_by_id(id)
@@ -406,7 +463,7 @@ def edit_emblem(id):
         appearanceForm.name.data = editing.name
         appearanceForm.color.data = editing.color
     
-    return render_template('admin/emblem.html', user=user, editing=editing,
+    return render_template('admin/emblem.html', user=current_user, editing=editing,
                            appearanceForm=appearanceForm,
                            deleteForm=deleteForm)
 
@@ -417,8 +474,8 @@ def create_emblem():
     
     if createForm.validate_on_submit():
         emblem = createEmblem(name=createForm.name.data, color=createForm.color.data)
-        return redirect(url_for('admin.edit_emblem', id=emblem.id))
-    return render_template('admin/create_emblem.html', user=user, createForm=createForm)
+        return redirect(url_for('admin.edit_emblem', emblem_id=emblem.id))
+    return render_template('admin/create_emblem.html', user=current_user, createForm=createForm)
 
 @bp.route('/emblem/<id>/appearance', methods=['POST'])
 @admin_required
@@ -433,7 +490,7 @@ def edit_emblem_appearance(id):
         editing.name = appearanceForm.name.data
         editing.color = appearanceForm.color.data
         db.session.commit()
-        return redirect(url_for('admin.edit_emblem', id=editing.id))
+        return redirect(url_for('admin.edit_emblem', emblem_id=editing.id))
     return redirect(url_for('admin.admin'))
 
 @bp.route('/emblem/<id>/delete', methods=['POST'])
@@ -457,5 +514,5 @@ def invalidate_tokens(id):
     """Path for invalidating tokens."""
     token = get_token_by_id(id)
     invalidate_token(token)
-    log(user, 'token', token.id, 'invalidate')
+    log(current_user, 'token', token.id, 'invalidate')
     return redirect(url_for('admin.tokens'))

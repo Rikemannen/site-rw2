@@ -19,11 +19,19 @@
         </div>
         <div class="bg-gray-100 p-4 rounded-xl shadow-inner mb-4 mt-4 text-slate-700">
             <h2 class="text-xl font-bold">Beskrivning:</h2>
-            <p>{{ user.description if user.description else 'Tomt D;' }}</p>
+            <p class="whitespace-pre-wrap">{{ user.description if user.description else 'Tomt D;' }}</p>
         </div>
-        <div class="flex flex-wrap items-center gap-4">
+        <div class="flex flex-wrap md:flex-row md:items-center text-sm flex-wrap gap-4">
             <span class="bg-gray-200 py-1 px-3 rounded-full">Gick med: {{ user.joined | datetimeformat('date')
                 }}</span>
+            {% if user.banned %}
+            <span class="bg-red-400 py-1 px-3 rounded-full">Bannlyst tills: {{ user.banned_until | datetimeformat
+                }}</span>
+            {% endif %}
+            {% if not user.listed %}
+            <span class="bg-red-400 py-1 px-3 rounded-full cursor-help"
+                title="Användaren visas inte i sökningar, detta beror oftast på att kontot är avaktiverat">Olistad</span>
+            {% endif %}
         </div>
     </div>
     {% set has_approved_exercise = user.exercises | selectattr('approved') | list | length > 0 %}
