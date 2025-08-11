@@ -25,12 +25,15 @@ limiter = Limiter(
 )
 
 def create_app():
-    """Create and configure the Flask application."""
     app = Flask(__name__)
-    socketio.init_app(app)
-    csrf = CSRFProtect(app)
-    logging.basicConfig(filename='error.log', level=logging.WARNING)
 
+    # Set SECRET_KEY before init_app
+    if 'SECRET_KEY' in environ:
+        app.config['SECRET_KEY'] = environ['SECRET_KEY']
+    else:
+        raise KeyError("SECRET_KEY not found in environment variables")
+
+    # Other configs...
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SESSION_COOKIE_SECURE'] = True
@@ -40,21 +43,20 @@ def create_app():
 
     db.init_app(app)
     limiter.init_app(app)
+    login_manager.init_app(app)
+    csrf = CSRFProtect(app)
 
-    if 'SECRET_KEY' in environ:
-        app.config['SECRET_KEY'] = environ['SECRET_KEY']
-    else:
-        raise KeyError("SECRET_KEY not found in environment variables")
+    # IMPORTANT: Initialize socketio with the app here
+    from app.extensions import socketio
+    socketio.init_app(app, message_queue='redis://localhost:6379/0', async_mode='eventlet')
 
-    # Register the main blueprints
+    # Register blueprints (unchanged)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(exercises.bp)
     app.register_blueprint(chat.bp)
     app.register_blueprint(admin.bp)
     app.register_blueprint(messaging.bp)
-
-    login_manager.init_app(app)
 
     @login_manager.request_loader
     def load_user_from_request(request):
