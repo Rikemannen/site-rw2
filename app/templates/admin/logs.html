@@ -27,13 +27,13 @@
             <p>Action: {{ log.action }}</p>
             {% if log.old_data %}
             <div class="bg-gray-200 p-2 rounded-xl mt-2">
-                <p class="text-sm text-gray-500">Old Data:</p>
+                <p class="text-sm text-gray-500">Äldre data:</p>
                 <textarea type="text" class="w-full p-2 bg-gray-100 rounded-md" readonly>{{ log.old_data }}</textarea>
             </div>
             {% endif %}
             {% if log.new_data %}
             <div class="bg-gray-200 p-2 rounded-xl mt-2">
-                <p class="text-sm text-gray-500">New Data:</p>
+                <p class="text-sm text-gray-500">Ny data:</p>
                 <textarea type="text" class="w-full p-2 bg-gray-100 rounded-md" readonly>{{ log.new_data }}</textarea>
             </div>
             {% endif %}
@@ -41,6 +41,5 @@
         </div>
         {% endfor %}
     </div>
-</div>
 </div>
 {% endblock %}

@@ -10,7 +10,7 @@ from redis import Redis
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from app.blueprints.chat import get_messages
-from app.blueprints import main, auth, exercises, chat, admin
+from app.blueprints import main, auth, exercises, chat, admin, messaging
 from app.extensions import login_manager
 from app.services.user_service import get_user_by_id
 from app.services.session_token_service import get_user_from_token
@@ -41,18 +41,18 @@ def create_app():
     db.init_app(app)
     limiter.init_app(app)
 
-
     if 'SECRET_KEY' in environ:
         app.config['SECRET_KEY'] = environ['SECRET_KEY']
     else:
         raise KeyError("SECRET_KEY not found in environment variables")
 
-    # Register the main blueprint
+    # Register the main blueprints
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(exercises.bp)
     app.register_blueprint(chat.bp)
     app.register_blueprint(admin.bp)
+    app.register_blueprint(messaging.bp)
 
     login_manager.init_app(app)
 
@@ -65,6 +65,11 @@ def create_app():
 
     @app.template_filter('datetimeformat')
     def datetimeformat(value, variant="full"):
+        try:
+            # Accept numeric string or int/float timestamp
+            ts = int(value)
+        except (ValueError, TypeError):
+            return None
         dt = datetime.fromtimestamp(value)
         if variant == "full":
             return dt.strftime('%Y-%m-%d %H:%M:%S')
@@ -75,7 +80,7 @@ def create_app():
         elif variant == "date":
             return dt.strftime('%Y-%m-%d')
         return dt.strftime('%Y-%m-%d %H:%M:%S') # Fallback
-    
+
     @app.template_filter('format_user')
     def format_user(user):
         """Format user object for display."""
@@ -87,9 +92,7 @@ def create_app():
     def format_user_id(id):
         """Format user object for display."""
         user = get_user_by_id(id)
-        if user:
-            return f"{user.display_name} (@{user.name})" if user.display_name else user.name
-        return None
+        return format_user(user)
 
     @app.errorhandler(404)
     def not_found(error):
@@ -118,10 +121,15 @@ def create_app():
 
     @app.context_processor
     def inject_user():
-        return {'current_user': current_user}
+        return dict(current_user=current_user)
 
     @app.context_processor
     def inject_messages():
         return dict(messages=get_messages())
+
+    @app.context_processor
+    def inject_show_banner():
+        show_banner = request.cookies.get('saw_banner') != 'yes'
+        return dict(show_banner=show_banner)
 
     return app

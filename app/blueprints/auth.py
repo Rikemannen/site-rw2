@@ -1,11 +1,12 @@
 """Handles user authentication routes and views."""
 
-from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json
 import time
 import re
 from urllib.parse import urlparse, urljoin
+from datetime import datetime
+from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json
 from flask_login import current_user, login_required
-from app.services.user_service import get_user_by_username, create_user, get_user_by_id
+from app.services.user_service import get_user_by_username, create_user, get_user_by_id, delete_user
 from app.services.token_service import get_token_by_secret, invalidate_token
 from app.services.session_token_service import login_user, logout_user, invalidate_all_sessions
 from app.utils.security import verify_password, hash_password
@@ -34,6 +35,13 @@ def login():
             flash('Ogiltigt användarnamn eller lösenord.')
             return redirect(url_for('auth.login'))
 
+        if user.banned:
+            flash(f'Detta konto är bannlyst tills {datetime.fromtimestamp(user.banned_until).strftime('%Y-%m-%d %H:%M:%S')}!')
+            return redirect(url_for('auth.login'))
+
+        current_user.last_login = time.time()
+        current_user.listed = True
+        db.session.commit()
         next_url = request.form.get('next')
         if not next_url or not is_safe_url(next_url):
             next_url = url_for('main.index')
@@ -51,7 +59,7 @@ def register():
     if form.validate_on_submit():
         password = hash_password(form.password.data)
 
-        if user_exists := get_user_by_username(form.username.data):
+        if get_user_by_username(form.username.data):
             flash('Användarnamnet taget, använd ett annat!')
             return redirect(url_for('auth.register'))
         
@@ -93,10 +101,15 @@ def profile_settings():
     if request.method == 'GET':
         form.display_name.data = current_user.display_name
         form.emblem.data = current_user.equipped_emblem_id
+        form.description.data = current_user.description
 
     if form.validate_on_submit():
         current_user.display_name = form.display_name.data
         current_user.equipped_emblem_id = form.emblem.data
+        desc = form.description.data.replace("\r\n", "\n").strip()
+        desc = re.sub(r'\n{2,}', '\n\n', desc)
+        desc = re.sub(r' {2,}', ' ', desc)
+        current_user.description = desc
 
         if form.emblem.data == 0:
             current_user.equipped_emblem_id = None
@@ -130,6 +143,7 @@ def account_settings():
 @bp.route('/settings/account/username', methods=['POST'])
 @login_required
 def username_change():
+    """Handle nameForm submissions"""
     nameForm = UsernameChangeForm()
 
     if nameForm.validate_on_submit():
@@ -143,13 +157,11 @@ def username_change():
                 current_user.name_last_change = now
                 db.session.commit()
                 flash('Användarnamnet har ändrats!')
-                return redirect(url_for('auth.account_settings'))
             else:
                 flash('Användarnamnet får bara inehålla bokstäver och siffror, och vara max 20 tecken!')
-                return redirect(url_for('auth.account_settings'))
         else:
             flash('Du måste vänta 14 dagar innan du ändrar ditt namn igen.')
-            return redirect(url_for('auth.account_settings'))
+    return redirect(url_for('auth.account_settings'))
 
 @bp.route('/settings/account/password', methods=['POST'])
 @login_required
@@ -159,12 +171,10 @@ def password_change():
     if passForm.validate_on_submit():
         if not passForm.new_password.data == passForm.confirm_password.data:
             flash('Lösenorden matchar inte!')
-            return redirect(url_for('auth.account_settings'))
         if verify_password(current_user.password_hash, passForm.current_password.data):
             current_user.password_hash = hash_password(passForm.new_password.data)
             db.session.commit()
             flash('Lösenordet har ändrats!')
-            return redirect(url_for('auth.account_settings'))
     return redirect(url_for('auth.account_settings'))
 
 @bp.route('/settings/account/delete', methods=['POST'])
@@ -177,9 +187,8 @@ def account_deletion():
             flash('Felaktig information!')
             return redirect(url_for('auth.account_settings'))
 
-        db.session.delete(current_user)
-        db.session.commit()
-        return redirect(url_for('main.index'))
+        delete_user(current_user, full=deleteForm.full.data)
+    return redirect(url_for('main.index'))
 
 @bp.route('/settings')
 def settings_redirect():

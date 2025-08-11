@@ -20,15 +20,11 @@ def create_exercise(name, owner, html_data, json_data, description=None, approve
     create_exercise_files(exercise, html_data, json_data)
     return exercise
 
-def delete_exercise(exercise_id):
+def delete_exercise(exercise):
     """Delete an exercise by its ID."""
-    exercise = get_exercise_by_id(exercise_id)
-    if exercise:
-        db.session.delete(exercise)
-        db.session.commit()
-        delete_exercise_files(exercise_id)
-    else:
-        raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
+    db.session.delete(exercise)
+    db.session.commit()
+    delete_exercise_files(exercise)
 
 def update_exercise(exercise_id, name=None, description=None):
     """Update an existing exercise's name and/or description. (For users to update exercise data, they need to remove and reupload the exercise.)"""
@@ -95,6 +91,6 @@ def unliked(user, exercise):
     else:
         raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
 
-def get_all_exercises():
+def get_all_exercises(c=None):
     """Returns a list with every exercise object."""
-    return Exercise.query.all()
+    return Exercise.query.limit(c).all()

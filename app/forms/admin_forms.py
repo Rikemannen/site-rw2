@@ -3,12 +3,18 @@ from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectM
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired, Length
 
+class MessageAllForm(FlaskForm):
+    """Form for sending a message to everyone."""
+    content = TextAreaField('Meddelande', validators=[DataRequired(), Length(max=500, min=1)])
+    send = SubmitField('Skicka')
+
 # User forms
 
 class ProfileSettingsForm(FlaskForm):
     """Form for profile settings."""
     display_name = StringField('Visningsnamn', validators=[Length(max=20)])
     emblem = SelectField('Utrustad Emblem', coerce=int, choices=[])
+    description = TextAreaField('Beskrivning', validators=[Length(max=200)])
     submit = SubmitField('Uppdatera')
 
 class EmblemAssignmentForm(FlaskForm):
@@ -27,6 +33,7 @@ class PasswordResetForm(FlaskForm):
 
 class DeleteUserForm(FlaskForm):
     """Form for deleting account."""
+    full = BooleanField('Ta bort allt (av = anonymisera)')
     submit = SubmitField('Ta bort kontot')
 
 class VerifyUserForm(FlaskForm):
@@ -39,12 +46,21 @@ class ElevateUserForm(FlaskForm):
     admin = BooleanField('Admin')
     submit = SubmitField('Uppdatera (Bara om du litar på denna användare!)')
 
+class BanUserForm(FlaskForm):
+    """Form for banning a user."""
+    time = IntegerField('Tid (Dagar)', validators=[DataRequired()])
+    submit = SubmitField('Bannlys')
+
+class UnbanUserForm(FlaskForm):
+    """Form for unbanning a user."""
+    submit = SubmitField('Tillåt åtkomst igen')
+
 # Exercise forms
 
 class ExerciseInfoForm(FlaskForm):
     """Form for setting basic data, name and description."""
     name = StringField('Namn', validators=[DataRequired()])
-    description = StringField('Beskrivning', validators=[DataRequired()])
+    description = TextAreaField('Beskrivning', validators=[DataRequired()])
     submit = SubmitField('Uppdatera')
 
 class ExerciseDataForm(FlaskForm):

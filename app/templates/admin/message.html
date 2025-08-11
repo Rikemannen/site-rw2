@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Meddelanden{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 gap-6">
+    <div id="compose" class="bg-white p-6 rounded-2xl shadow-xl space-y-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold">
+                Skicka meddelande:
+            </h1>
+            <p class="text-slate-600 italic cursor-help p-1" title="Meddelanden är inte krypterade i databasen">?</p>
+        </div>
+        <form method="POST" action="/admin/message-all" class="space-y-4">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.content.label(class="block text-sm font-md text-slate-600")}}
+                {{ form.content(class="text-field") }}
+                <p id="cont-counter" class="text-slate-600 text-s"></p>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const contInput = document.getElementById("{{ form.content.id }}");
+                        const counter = document.getElementById("cont-counter");
+                        if (contInput && counter) {
+                            function updateCounter() {
+                                const maxLength = contInput.getAttribute('maxlength') || 500;
+                                const currentLength = contInput.value.length;
+                                counter.textContent = `${currentLength} / ${maxLength} tecken`;
+                                // Add or remove text-red-500 based on remaining length
+                                if ((maxLength - currentLength) / maxLength < 0.1) {
+                                    counter.classList.add('text-red-500');
+                                } else {
+                                    counter.classList.remove('text-red-500');
+                                }
+                            }
+                            contInput.addEventListener('input', updateCounter);
+                            updateCounter();
+                        }
+                    });
+                </script>
+                {% for error in form.content.errors %}
+                <span class="text-red-500 text-xs">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {{ form.send(class="button-blue") }}
+        </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul id="flash" class="flash-messages">
+            <script>
+                window.location.href = `#flash`;
+            </script>
+            {% for msg in messages %}
+            <li>{{ msg }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+    </div>
+</div>
+{% endblock %}

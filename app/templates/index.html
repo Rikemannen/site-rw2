@@ -45,9 +45,7 @@
                         <a href="/user/{{ exercise.owner.id }}"
                             class="text-sm font-medium hover:underline text-slate-700"
                             style="color: {{ exercise.owner.color }};">
-                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
-                            exercise.owner.display_name and exercise.owner.display_name != exercise.owner.name
-                            else exercise.owner.name }}
+                            {{ exercise.owner | format_user }}
                         </a>
                     </div>
                     <p class="text-slate-600 text-sm mt-2">Skapades: {{ exercise.created |
@@ -70,9 +68,7 @@
                         <a href="/user/{{ exercise.owner.id }}"
                             class="text-sm font-medium hover:underline text-slate-700"
                             style="color: {{ exercise.owner.color }};">
-                            {{ exercise.owner.display_name ~ ' (@' ~ exercise.owner.name ~ ')' if
-                            exercise.owner.display_name and exercise.owner.display_name !=
-                            exercise.owner.name else exercise.owner.name }}
+                            {{ exercise.owner | format_user }}
                         </a>
                     </div>
                     <p class="text-slate-600 text-sm mt-2 flex items-center gap-1">
@@ -85,9 +81,12 @@
             </ul>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl p-2" id="chat-window-card">
+        <div class="bg-white rounded-2xl shadow-xl" id="chat-window-card">
             {% include 'chat/chat_window.html' %}
         </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 p-6 bg-white rounded-2xl shadow-xl">
+        <p>Detta är en tidig version av sidan! Rapportera buggar eller kom med förslag genom att skicka ett meddelande <a class="text-blue-600 hover:underline" href="http://localhost:5000/messages?c=Jag%20har%20hittat%20en%20bugg/jag%20har%20ett%20f%C3%B6rslag:%0A&r=1&hide=1">här</a>!</p>
     </div>
 </div>
 {% endblock %}

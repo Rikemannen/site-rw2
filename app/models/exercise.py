@@ -18,11 +18,12 @@ class Exercise(db.Model):
     name = Column(String(100), nullable=False)
     description = Column(String(500), nullable=False)
     owner_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
-    owner = relationship('User', back_populates='exercises')
     created = Column(Integer, nullable=False)
     attempts = Column(Integer, default=0)
     finished = Column(Integer, default=0)
     approved = Column(Boolean, default=False)
+
+    owner = relationship('User', back_populates='exercises')
     liked_by = relationship('User', secondary='exercise_likes', back_populates='liked_exercises')
 
     @property

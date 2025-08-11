@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Meddelanden{% endblock %}
+
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"
+    integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css"
+    integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+<div class="grid grid-cols-1 gap-6">
+    <div id="compose" class="bg-white p-6 rounded-2xl shadow-xl space-y-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold">
+                Skicka meddelande:
+            </h1>
+            <p class="text-slate-600 italic cursor-help p-1" title="Meddelanden är inte krypterade i databasen">?</p>
+        </div>
+        <form method="POST" action="/send" class="space-y-4">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.recipient.label(class="block text-sm font-md text-slate-600")}}
+                <select id="select" name="recipient" placeholder="Välj en användare...">
+                    <option value="" class="bg-slate-100">Välj en användare...</option>
+                    {% for id, name, color in form.recipient.choices %}
+                    <option value="{{ id }}" style="color: {{ color }}; background-color: {{ color }}33" {% if
+                        form.recipient.data==id %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% for error in form.recipient.errors %}
+                <span class="text-red-500 text-xs">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.content.label(class="block text-sm font-md text-slate-600")}}
+                {{ form.content(class="text-field") }}
+                <p id="cont-counter" class="text-slate-600 text-s"></p>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const contInput = document.getElementById("{{ form.content.id }}");
+                        const counter = document.getElementById("cont-counter");
+                        if (contInput && counter) {
+                            function updateCounter() {
+                                const maxLength = contInput.getAttribute('maxlength') || 500;
+                                const currentLength = contInput.value.length;
+                                counter.textContent = `${currentLength} / ${maxLength} tecken`;
+                                // Add or remove text-red-500 based on remaining length
+                                if ((maxLength - currentLength) / maxLength < 0.1) {
+                                    counter.classList.add('text-red-500');
+                                } else {
+                                    counter.classList.remove('text-red-500');
+                                }
+                            }
+                            contInput.addEventListener('input', updateCounter);
+                            updateCounter();
+                        }
+                    });
+                </script>
+                {% for error in form.content.errors %}
+                <span class="text-red-500 text-xs">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {{ form.send(class="button-blue") }}
+        </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul id="flash" class="flash-messages">
+            {% for msg in messages %}
+            <li>{{ msg }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('select').selectize({
+                sortField: 'text'
+            });
+        });
+    </script>
+    {% if not request.args.get('hide') %}
+    <div class="bg-white p-6 rounded-2xl shadow-xl space-y-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Dina meddelanden:</h1>
+            <div class="flex items-center space-x-5">
+                <form action="/read-all" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="submit" value="Markera alla som lästa" class="button-blue">
+                </form>
+                <p class="text-slate-600 italic cursor-help p-1" title="Meddelanden äldre än 30 dagar tas bort">?</p>
+            </div>
+        </div>
+        {% for message in messages %}
+        <div id="M{{ message.id }}"
+            class="p-3 rounded-lg {% if not message.read %}bg-yellow-100 dark:bg-yellow-700{% else %}bg-gray-100"
+            style="background-color: {{ message.sender.color }}33{% endif %}">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p><a href="/user/{{ message.sender.id }}" class="text-blue-600 hover:underline"
+                            style="color: {{ message.sender.color }}">{{ message.sender | format_user
+                            }}
+                        </a>
+                    </p>
+                    <p class="text-sm text-gray-500">{{ message.timestamp | datetimeformat }}</p>
+                </div>
+                {% if not message.read %}
+                <form action="/{{ message.id }}/read" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="submit" value="Markera som läst" class="button-blue">
+                </form>
+                {% endif %}
+            </div>
+            <div class="bg-gray-200 p-2 rounded-xl mt-2 border-gray-400 border">
+                <p class="whitespace-pre-wrap">{{ message.content | urlize | safe }}</p>
+            </div>
+            <script>
+                document.querySelectorAll('p.whitespace-pre-wrap a').forEach(a => {
+                    a.classList.add('text-blue-600', 'hover:underline');
+                });
+            </script>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

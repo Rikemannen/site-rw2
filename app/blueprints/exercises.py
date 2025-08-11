@@ -1,11 +1,12 @@
 """Handles exercise-related routes and views."""
 
+import re
 import json
 from flask_login import login_required
 from flask import Blueprint, flash, render_template, url_for, redirect, request, jsonify, abort
 from flask_login import current_user as user
-from app.services.exercise_service import get_exercise_by_id, liked, unliked, increment_finishes, increment_attempts, create_exercise
-from app.services.file_service import create_exercise_files, get_exercise_html, get_exercise_answers, delete_exercise_files
+from app.services.exercise_service import get_exercise_by_id, liked, unliked, increment_finishes, increment_attempts, create_exercise, delete_exercise
+from app.services.file_service import create_exercise_files, get_exercise_html, get_exercise_answers
 from app.forms.exercise_forms import CreateExerciseForm, EditExerciseForm, DeleteExerciseForm
 from app.extensions import db
 
@@ -36,7 +37,12 @@ def settings(exercise_id):
 
     if editForm.validate_on_submit():
         editing.name = editForm.name.data
-        editing.description = editForm.description.data
+        desc = editForm.description.data.replace("\r\n", "\n").strip()
+        # Replace multiple newlines with a single newline
+        desc = re.sub(r'\n{2,}', '\n\n', desc)
+        # Replace multiple spaces with a single space
+        desc = re.sub(r' {2,}', ' ', desc)
+        editing.description = desc
         if editForm.answers.data:
             json_file = editForm.answers.data
             json_content = json_file.read().decode('utf-8')
@@ -52,9 +58,7 @@ def settings(exercise_id):
         return redirect(url_for('exercise.settings', exercise_id=editing.id))
     
     if deleteForm.validate_on_submit():
-        db.session.delete(editing)
-        delete_exercise_files(editing)
-        db.session.commit()
+        delete_exercise(editing)
 
         flash('Övningen har raderats!', 'success')
         return redirect(url_for('exercise.settings', exercise_id=editing.id))
@@ -120,9 +124,12 @@ def create():
         html_file = form.html.data
         html_content = html_file.read().decode('utf-8')
         data = json.loads(json_content)
+        desc = form.description.data.replace("\r\n", "\n").strip()
+        desc = re.sub(r'\n{2,}', '\n\n', desc)
+        desc = re.sub(r' {2,}', ' ', desc)
         exercise = create_exercise(
             name=form.name.data,
-            description=form.description.data,
+            description=desc,
             json_data=data,
             html_data=html_content,
             owner=user,

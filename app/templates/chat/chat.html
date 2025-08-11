@@ -3,5 +3,7 @@
 {% block title %}Chatt{% endblock %}
 
 {% block content %}
-{% include "chat/chat_window.html" %}
+<div class="h-[calc(100vh-10rem)] overflow-auto -mb-6">
+    {% include "chat/chat_window.html" %}
+</div>
 {% endblock %}

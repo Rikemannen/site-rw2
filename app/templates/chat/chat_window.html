@@ -1,18 +1,28 @@
-<div class="bg-white rounded-2xl h-full flex flex-col p-4 dark:bg-slate-800">
-    <h1 class="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100"><a href="/chat" class="hover:underline hover:text-blue-600 dark:hover:text-blue-400">Chatt</a></h1>
-    <div id="chat-box" class="bg-gray-100 flex-grow overflow-y-scroll h-64 p-4 mb-4 rounded-lg border border-gray-300 custom-scrollbar dark:bg-slate-700 dark:border-slate-600">
+<style>
+    a {
+        @apply text-blue-600 dark:text-blue-400 hover:underline;
+    }
+</style>
+<div class="bg-white rounded-2xl h-full flex flex-col p-6 dark:bg-slate-800">
+    <h1 class="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100"><a href="/chat"
+            class="hover:underline hover:text-blue-600 dark:hover:text-blue-400">Chatt</a></h1>
+    <div id="chat-box"
+        class="bg-gray-100 flex-grow overflow-y-scroll {% if request.path != '/chat' %} h-64 {% endif %}p-4 mb-4 rounded-lg border border-gray-300 custom-scrollbar dark:bg-slate-700 dark:border-slate-600">
     </div>
     {% if current_user.is_authenticated %}
     <form id="chat-form" class="flex items-center gap-2">
         <input id="message-input" type="text" placeholder="Skriv ett meddelande..."
             class="flex-grow p-3 rounded-lg bg-gray-200 text-slate-900 border-2 border-gray-400 focus:outline-none focus:border-blue-500 placeholder:text-gray-500 transition-colors duration-200 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 dark:placeholder:text-slate-400">
-        <button type="submit" class="px-5 py-3 bg-blue-600 text-white font-bold rounded-md shadow-md hover:bg-blue-700 transition-all duration-200 cursor-pointer">
+        <button type="submit"
+            class="px-5 py-3 bg-blue-600 text-white font-bold rounded-md shadow-md hover:bg-blue-700 transition-all duration-200 cursor-pointer">
             Skicka
         </button>
     </form>
     {% else %}
-    <div class="flex-grow p-3 rounded-lg bg-gray-200 text-slate-900 border-2 border-gray-400 focus:outline-none focus:border-blue-500 placeholder:text-gray-500 transition-colors duration-200 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 dark:placeholder:text-slate-400">
-        <p class="text-slate-600 dark:text-slate-400"><a href="/login" class="text-blue-600 hover:underline dark:text-blue-400">Logga in</a> för att delta i chatten.</p>
+    <div
+        class="flex-grow p-3 rounded-lg bg-gray-200 text-slate-900 border-2 border-gray-400 focus:outline-none focus:border-blue-500 placeholder:text-gray-500 transition-colors duration-200 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 dark:placeholder:text-slate-400">
+        <p class="text-slate-600 dark:text-slate-400"><a href="/login"
+                class="text-blue-600 hover:underline dark:text-blue-400">Logga in</a> för att delta i chatten.</p>
     </div>
     {% endif %}
 </div>
@@ -24,33 +34,38 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-track {
-        background: #e5e7eb; /* gray-100 */
+        background: #e5e7eb;
+        /* gray-100 */
         border-radius: 10px;
     }
 
     .dark .custom-scrollbar::-webkit-scrollbar-track {
-        background: #475569; /* slate-700 */
+        background: #475569;
+        /* slate-700 */
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #9ca3af; /* gray-400 */
+        background: #9ca3af;
+        /* gray-400 */
         border-radius: 10px;
     }
 
     .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #64748b; /* slate-500 */
+        background: #64748b;
+        /* slate-500 */
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #6b7280; /* gray-500 */
+        background: #6b7280;
+        /* gray-500 */
     }
 
     .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; /* slate-400 */
+        background: #94a3b8;
+        /* slate-400 */
     }
 </style>
 
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
     const chatBox = document.getElementById('chat-box');
 
@@ -65,11 +80,35 @@
             ? `${data.display_name} (@${data.name})`
             : data.name;
 
-        // Enhanced styling for chat messages
+        function linkify(text) {
+            const urlPattern = /(\b((https?:\/\/)?(www\.)?[\w-]+(\.[\w.-]+)+)(\/[^\s]*)?)/gi;
+            const smallUrlPattern = /^[a-z0-9-]+\.[a-z]{2,63}$/i;
+
+            return text.replace(urlPattern, url => {
+                let href = url;
+
+                // Remove protocol if present for matching
+                let urlToCheck = url.replace(/^https?:\/\//i, '').toLowerCase();
+                // Remove trailing slash for matching
+                urlToCheck = urlToCheck.replace(/\/$/, '');
+
+                if (smallUrlPattern.test(urlToCheck) && !urlToCheck.startsWith('www.')) {
+                    href = 'http://www.' + urlToCheck;
+                } else if (!/^https?:\/\//i.test(href)) {
+                    href = 'http://' + href;
+                }
+
+                return `<a href="${href}" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            });
+        }
+
         msg.innerHTML = `
             <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between p-3 my-2 rounded-lg" style="background-color: ${data.color}15;">
-                <p class="flex-grow"><a href="/user/${data.id}" class="hover:underline font-semibold" style="color: ${data.color};">${nameText}</a>: <span class="text-slate-900 dark:text-slate-200">${data.message}</span></p>
-                <p class="text-sm mt-1 sm:mt-0 text-slate-600 dark:text-slate-400" style="color: ${data.color};">${formatTime(data.time)}</p>
+              <p class="flex-grow">
+                <a href="/user/${data.id}" class="hover:underline font-semibold" style="color: ${data.color};">${nameText}</a>: 
+                <span class="text-slate-900 dark:text-slate-200">${linkify(data.message)}</span>
+              </p>
+              <p class="text-sm mt-1 sm:mt-0 text-slate-600 dark:text-slate-400" style="color: ${data.color};">${formatTime(data.time)}</p>
             </div>`;
         chatBox.appendChild(msg);
     }
@@ -81,7 +120,6 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     };
 
-    const socket = io();
     const form = document.getElementById('chat-form');
     const input = document.getElementById('message-input');
 

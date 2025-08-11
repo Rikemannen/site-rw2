@@ -1,7 +1,7 @@
 import sqlalchemy.exc
-import time
 from app.extensions import db
 from app.models.user import User
+from app.services.exercise_service import delete_exercise
 
 def get_user_by_id(user_id):
     """Retrieve user data based on their ID."""
@@ -30,6 +30,34 @@ def create_user(username, display_name, password_hash):
         db.session.rollback()
         return None
 
-def get_all_users():
+def get_all_users(c=None):
     """Returns a list with every user object."""
-    return User.query.all()
+    return User.query.filter_by(listed=True).limit(c).all()
+
+def delete_user(user, full=False):
+    """Delete a user and all their traces."""
+    if full:
+        for exercise in user.exercises:
+            delete_exercise(exercise)
+
+        for session in user.sessions:
+            db.session.delete(session)
+
+        for token in user.tokens:
+            db.session.delete(token)
+
+        db.session.delete(user)
+        db.session.commit()
+    else:
+        for session in user.sessions:
+            session.valid = False
+        for token in user.tokens:
+            token.valid = False
+        user.display_name = None
+        user.name = "AVAKTIVERAD_" + str(user.id)
+        user.description = "Användarens konto är avaktiverat!"
+        user.equipped_emblem_id = None
+        user.admin = False
+        user.password_hash = ""
+        user.listed = False
+        db.session.commit()

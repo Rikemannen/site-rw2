@@ -7,7 +7,7 @@ def search_users(query):
     if not query:
         return []
 
-    results = User.query.filter(User.name.ilike(f'%{query}%')).all()
+    results = User.query.filter(User.name.ilike(f'%{query}%')).filter_by(listed=True).all()
     # Returns a list of user objects that match the query username,
     # has to later be linked to profile(s) via id
     return results
@@ -19,7 +19,7 @@ def search_users_by_id_partial(user_id):
 
     # Convert user_id to string for partial matching
     user_id_str = str(user_id)
-    results = User.query.filter(User.id.cast(db.String).like(f'{user_id_str}%')).all()
+    results = User.query.filter(User.id.cast(db.String).like(f'{user_id_str}%')).filter_by(listed=True).all()
     # Returns users whose IDs start with the given digits
     return results
 
@@ -28,7 +28,7 @@ def search_users_by_display_name(display_name):
     if not display_name:
         return []
 
-    results = User.query.filter(User.display_name.ilike(f'%{display_name}%')).all()
+    results = User.query.filter(User.display_name.ilike(f'%{display_name}%')).filter_by(listed=True).all()
     return results
 
 def search_exercises(query):
