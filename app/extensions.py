@@ -4,4 +4,4 @@ from flask_socketio import SocketIO
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-socketio = SocketIO()
+socketio = SocketIO(message_queue='redis://localhost:6379/0')
