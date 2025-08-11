@@ -454,7 +454,7 @@ def delete_exercise(id):
 def edit_emblem(emblem_id):
     appearanceForm = EmblemAppearanceForm()
     deleteForm = DeleteEmblemForm()
-    editing = get_emblem_by_id(id)
+    editing = get_emblem_by_id(emblem_id)
 
     if not editing:
         abort(404)
@@ -477,11 +477,11 @@ def create_emblem():
         return redirect(url_for('admin.edit_emblem', emblem_id=emblem.id))
     return render_template('admin/create_emblem.html', user=current_user, createForm=createForm)
 
-@bp.route('/emblem/<id>/appearance', methods=['POST'])
+@bp.route('/emblem/<emblem_id>/appearance', methods=['POST'])
 @admin_required
-def edit_emblem_appearance(id):
+def edit_emblem_appearance(emblem_id):
     appearanceForm = EmblemAppearanceForm()
-    editing = get_emblem_by_id(id)
+    editing = get_emblem_by_id(emblem_id)
 
     if not editing:
         abort(404)
@@ -493,11 +493,11 @@ def edit_emblem_appearance(id):
         return redirect(url_for('admin.edit_emblem', emblem_id=editing.id))
     return redirect(url_for('admin.admin'))
 
-@bp.route('/emblem/<id>/delete', methods=['POST'])
+@bp.route('/emblem/<emblem_id>/delete', methods=['POST'])
 @admin_required
-def delete_emblem(id):
+def delete_emblem(emblem_id):
     deleteForm = DeleteEmblemForm()
-    editing = get_emblem_by_id(id)
+    editing = get_emblem_by_id(emblem_id)
 
     if not editing:
         abort(404)
@@ -508,11 +508,11 @@ def delete_emblem(id):
         return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))
 
-@bp.route('/tokens/<id>/invalidate', methods=['POST'])
+@bp.route('/tokens/<token_id>/invalidate', methods=['POST'])
 @admin_required
-def invalidate_tokens(id):
+def invalidate_tokens(token_id):
     """Path for invalidating tokens."""
-    token = get_token_by_id(id)
+    token = get_token_by_id(token_id)
     invalidate_token(token)
     log(current_user, 'token', token.id, 'invalidate')
     return redirect(url_for('admin.tokens'))
