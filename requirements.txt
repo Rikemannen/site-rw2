@@ -4,6 +4,7 @@ flask-login
 flask-wtf
 flask-socketio
 flask-limiter
+flask-session
 argon2-cffi
 pytest
 bleach
