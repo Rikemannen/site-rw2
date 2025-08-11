@@ -1,0 +1,16 @@
+<!-- Du kan ändra utseendet på sidan nästan överallt, förutom där det står att du inte får -->
+<div class="bg-white rounded-2xl shadow-xl p-6">
+    <form id="exercise-form" class="space-y-2"> <!-- Klassen här kan du ändra, inget annat på denna rad -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Ändra inte denna rad, behövs för att övningen ska fungera! -->
+        <div class="flex items-center"> <!-- Kopiera allt från denna rad... -->
+            <label for="q1" class="w-32">Hej!</label> <!-- Texten på svenska -->
+            <input type="text" id="q1" name="q1" class="border p-1 m-2 flex-1">
+            <!-- Här skriver användaren svaret/översättningen.
+                 Du kan ändra id:t, men det måste stämma överens med svarsfilen.
+                 Öka siffran med 1 för varje ny fråga, både här och i svarsfilen -->
+        </div> <!-- ...till denna rad, och klistra in under för att lägga till fler frågor -->
+        <button type="button" id="submit-btn" class="button-blue mt-2">Kolla svar</button>
+        <!-- Knappen för att kontrollera svaren -->
+    </form>
+</div>
+<script src="/static/exercise_submit.js"></script> <!-- Scriptet som hanterar svaren, ändra inte denna rad -->
