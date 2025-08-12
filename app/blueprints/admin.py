@@ -14,6 +14,7 @@ from app.services.emblem_service import get_emblem_by_id, create_emblem as creat
 from app.services.logging_service import log
 from app.services.session_token_service import invalidate_all_sessions
 from app.services.message_service import send_message_to_all
+from app.services.chat_message_service import clear_user_messages as clear_user_msgs
 from app.models.logs import Log
 from app.models.emblems import Emblem
 from app.models.token import Token
@@ -267,6 +268,14 @@ def unban(user_id):
         editing.banned_until = 0
         db.session.commit()
     return redirect(url_for('admin.edit_user', user_id=editing.id))
+
+@bp.route('/user/<user_id>/clear-messages', methods=['POST'])
+@admin_required
+def clear_user_messages(user_id):
+    """Remove all messages from user."""
+    user = get_user_by_id(user_id)
+    clear_user_msgs(user)
+    return redirect(url_for('admin.edit_user', user_id=user.id))
 
 @bp.route('/message-all', methods=['GET', 'POST'])
 @admin_required

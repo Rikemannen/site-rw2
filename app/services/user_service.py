@@ -2,6 +2,7 @@ import sqlalchemy.exc
 from app.extensions import db
 from app.models.user import User
 from app.services.exercise_service import delete_exercise
+from app.services.chat_message_service import clear_user_messages
 
 def get_user_by_id(user_id):
     """Retrieve user data based on their ID."""
@@ -45,6 +46,8 @@ def delete_user(user, full=False):
 
         for token in user.tokens:
             db.session.delete(token)
+
+        clear_user_messages(user)
 
         db.session.delete(user)
         db.session.commit()

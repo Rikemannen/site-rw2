@@ -15,7 +15,7 @@ from app.blueprints import main, auth, exercises, chat, admin, messaging
 from app.extensions import login_manager
 from app.services.user_service import get_user_by_id
 from app.services.session_token_service import get_user_from_token
-from app.extensions import socketio, db
+from app.extensions import db
 
 redis_client = Redis(host="localhost", port=6379, db=0)
 
@@ -46,13 +46,14 @@ def create_app():
     Session(app)
 
     db.init_app(app)
-    limiter.init_app(app)
+    # limiter.init_app(app)
     login_manager.init_app(app)
     csrf = CSRFProtect(app)
+    logging.basicConfig(filename='error.log', level=logging.WARNING)
 
     # IMPORTANT: Initialize socketio with the app here
     from app.extensions import socketio
-    socketio.init_app(app, message_queue='redis://localhost:6379/0', async_mode='eventlet', logger=True, engineio_logger=True)
+    socketio.init_app(app, message_queue='redis://localhost:6379/0', async_mode='eventlet')
 
     # Register blueprints (unchanged)
     app.register_blueprint(main.bp)

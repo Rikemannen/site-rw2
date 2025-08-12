@@ -38,6 +38,14 @@
             <li><a href="/admin/logs" class="text-blue-600 hover:underline">Loggar</a></li>
             <li><a href="/admin/tokens" class="text-blue-600 hover:underline">Återställningslänkar</a></li>
             <li><a href="/admin/emblem" class="text-blue-600 hover:underline">Skapa emblem</a></li>
+            <li>
+                <form action="{{ url_for('chat.clear') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="text-blue-600 hover:underline cursor-pointer">
+                        Töm chatt
+                    </button>
+                </form>
+            </li>
         </ul>
     </div>
 </div>
