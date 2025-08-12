@@ -51,7 +51,10 @@ def delete_user(user, full=False):
         clear_user_messages(user)
 
         db.session.delete(user)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
     else:
         for session in user.sessions:
             session.valid = False
@@ -64,4 +67,7 @@ def delete_user(user, full=False):
         user.admin = False
         user.password_hash = ""
         user.listed = False
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()

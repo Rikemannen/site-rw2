@@ -1,3 +1,4 @@
+import sqlalchemy.exc
 import time
 from app.models.messages import Message
 from app.extensions import db
@@ -15,8 +16,12 @@ def send_message(sender, recipient, content):
         content=content
     )
     db.session.add(message)
-    db.session.commit()
-    return message
+    try:
+        db.session.commit()
+        return message
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        return None
 
 def get_user_messages(user, c=25):
     """Get a user's received messages, can also include a limit."""
@@ -33,23 +38,36 @@ def send_message_to_all(sender, content):
         for user in get_all_users()
     ]
     db.session.bulk_save_objects(messages)
-    db.session.commit()
-    return messages
+    try:
+        db.session.commit()
+        return messages
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        return None
 
 def read_message(message):
     """Mark the message as read."""
     message.read = True
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
 
 def read_all_messages(user):
     """Set all user's messages as read."""
     Message.query.filter_by(recipient_id=user.id, read=False).update(
         {Message.read: True}, synchronize_session=False
     )
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
 
 def delete_all_sent_messages(user):
     """Delete all messages sent from user."""
     for message in user.sent_messages:
         db.session.delete(message)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()

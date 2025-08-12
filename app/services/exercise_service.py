@@ -1,5 +1,6 @@
-from sqlalchemy import func
+import sqlalchemy.exc
 import time
+from sqlalchemy import func
 from app.extensions import db
 from app.models.exercise import Exercise, exercise_likes
 from app.services.file_service import create_exercise_files, delete_exercise_files
@@ -16,29 +17,40 @@ def create_exercise(name, owner, html_data, json_data, description=None, approve
     """Create a new exercise with the given name and optional description."""
     exercise = Exercise(name=name, owner=owner, description=description, approved=approved, created=time.time())
     db.session.add(exercise)
-    db.session.commit()
     create_exercise_files(exercise, html_data, json_data)
-    return exercise
+    try:
+        db.session.commit()
+        return exercise
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        return None
 
 def delete_exercise(exercise):
     """Delete an exercise by its ID."""
     db.session.delete(exercise)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
     delete_exercise_files(exercise)
 
 def update_exercise(exercise_id, name=None, description=None):
-    """Update an existing exercise's name and/or description. (For users to update exercise data, they need to remove and reupload the exercise.)"""
+    """Update an existing exercise's name and/or description."""
     exercise = get_exercise_by_id(exercise_id)
     if not exercise:
         raise ValueError(f"Exercise with ID {exercise_id} does not exist.")
-    
+
     if name:
         exercise.name = name
     if description:
         exercise.description = description
-    
-    db.session.commit()
-    return exercise
+
+    try:
+        db.session.commit()
+        return exercise
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        return None
 
 def get_popular_exercises(amount=3):
     """Retrieve the most popular exercises based on the number of likes."""
@@ -60,7 +72,10 @@ def increment_attempts(exercise):
     """Increment the attempt count for a specific exercise."""
     if exercise:
         exercise.attempts += 1
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
     else:
         raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
 
@@ -68,7 +83,10 @@ def increment_finishes(exercise):
     """Increment the finish count for a specific exercise."""
     if exercise:
         exercise.finished += 1
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
     else:
         raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
 
@@ -76,7 +94,10 @@ def liked(user, exercise):
     """Add a user to the "liked users" of an exercise."""
     if exercise:
         exercise.liked_by.append(user)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
     else:
         raise ValueError(f"Exercise with ID {exercise.id} does not exist.")
 
@@ -85,7 +106,10 @@ def unliked(user, exercise):
     if exercise:
         if user in exercise.liked_by:
             exercise.liked_by.remove(user)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except sqlalchemy.exc.IntegrityError:
+                db.session.rollback()
         else:
             raise ValueError(f"User {user.name} has not liked exercise {exercise.id}.")
     else:

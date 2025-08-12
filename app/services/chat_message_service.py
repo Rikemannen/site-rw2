@@ -2,6 +2,7 @@ import time
 from app.models.chat import ChatMessage
 from app.extensions import db
 from sqlalchemy import delete
+import sqlalchemy.exc
 
 def get_chat_by_id(msg_id):
     """Retrieve the message object based on its ID."""
@@ -14,7 +15,10 @@ def get_all_chats(c=75):
 def delete_chat_message(msg):
     """Delete a chat message."""
     db.session.delete(msg)
-    db.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
 
 def create_chat_message(user_id, content):
     """Create a chat message entry in the database."""
@@ -24,15 +28,24 @@ def create_chat_message(user_id, content):
         timestamp=time.time()
     )
     db.session.add(msg)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
 
 def clear_chat():
     """Delete all message columns."""
     db.session.execute(delete(ChatMessage))
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
 
 def clear_user_messages(user):
     """Delete all messages from a user."""
     for message in user.chat_messages:
         db.session.delete(message)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()

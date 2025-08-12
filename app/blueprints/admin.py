@@ -1,6 +1,7 @@
 import ast
 import re
 import time
+import sqlalchemy.exc
 from flask import Blueprint, json, render_template, request, abort, redirect, url_for, flash
 from flask_login import current_user
 from app.models.user import User
@@ -133,7 +134,10 @@ def profile_editing(user_id):
         desc = re.sub(r'\n{2,}', '\n\n', desc)
         desc = re.sub(r' {2,}', ' ', desc)
         editing.description = desc
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -153,7 +157,10 @@ def emblems(user_id):
         selected_ids = [int(e_id) for e_id in emblemForm.emblems.data]
         selected_emblems = Emblem.query.filter(Emblem.id.in_(selected_ids)).all()
         editing.emblems.extend(selected_emblems)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -170,7 +177,10 @@ def username_editing(user_id):
     if usernameForm.validate_on_submit():
         log(current_user, 'user', editing.id, 'name.change', old_data=editing.name, new_data=usernameForm.username.data)
         editing.name = usernameForm.username.data
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -223,7 +233,10 @@ def verify(user_id):
 
     if verifyForm.validate_on_submit():
         editing.verified = verifyForm.verified.data
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         log(current_user, 'user', editing.id, 'verified.verify' if verifyForm.verified.data else 'verified.unverify')
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
@@ -240,7 +253,10 @@ def elevate(user_id):
 
     if elevateForm.validate_on_submit():
         editing.admin = elevateForm.admin.data
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         log(current_user, 'user', editing.id, 'admin.elevate' if elevateForm.admin.data else 'admin.demote')
         return redirect(url_for('admin.edit_user', user_id=editing.id))
     return redirect(url_for('admin.admin'))
@@ -255,7 +271,10 @@ def ban(user_id):
     if banForm.validate_on_submit():
         invalidate_all_sessions(editing)
         editing.banned_until = time.time() + (int(banForm.time.data) * 24 * 60 * 60)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
     return redirect(url_for('admin.edit_user', user_id=editing.id))
 
 @bp.route('/user/<user_id>/unban', methods=['POST'])
@@ -266,7 +285,10 @@ def unban(user_id):
 
     if unbanForm.validate_on_submit():
         editing.banned_until = 0
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
     return redirect(url_for('admin.edit_user', user_id=editing.id))
 
 @bp.route('/user/<user_id>/clear-messages', methods=['POST'])
@@ -360,7 +382,10 @@ def edit_info(id):
         desc = re.sub(r'\n{2,}', '\n\n', desc)
         desc = re.sub(r' {2,}', ' ', desc)
         editing.description = desc
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -387,7 +412,10 @@ def edit_static(id):
         editing.owner_id = dataForm.owner.data
         editing.created = dataForm.created.data
         editing.approved = dataForm.approved.data
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -403,7 +431,10 @@ def edit_stats(id):
     if statisticForm.validate_on_submit():
         editing.attempts = statisticForm.attempts.data
         editing.finished = statisticForm.completions.data
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.edit_exercise', exercise_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -451,7 +482,10 @@ def delete_exercise(id):
     if deleteForm.validate_on_submit():
         delete_exercise_files(editing)
         db.session.delete(editing)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         log(current_user, 'exercise', editing.id, 'delete')
         return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))
@@ -498,7 +532,10 @@ def edit_emblem_appearance(emblem_id):
     if appearanceForm.validate_on_submit():
         editing.name = appearanceForm.name.data
         editing.color = appearanceForm.color.data
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.edit_emblem', emblem_id=editing.id))
     return redirect(url_for('admin.admin'))
 
@@ -513,7 +550,10 @@ def delete_emblem(emblem_id):
 
     if deleteForm.validate_on_submit():
         db.session.delete(editing)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         return redirect(url_for('admin.admin'))
     return redirect(url_for('admin.admin'))
 

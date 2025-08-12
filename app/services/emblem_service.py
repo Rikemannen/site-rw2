@@ -1,3 +1,4 @@
+import sqlalchemy.exc
 from app.models.emblems import Emblem
 from app.extensions import db
 
@@ -9,5 +10,9 @@ def create_emblem(name, color):
     """Create a new emblem."""
     emblem = Emblem(name=name, color=color)
     db.session.add(emblem)
-    db.session.commit()
-    return emblem
+    try:
+        db.session.commit()
+        return emblem
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        return None

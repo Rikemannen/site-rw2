@@ -2,6 +2,7 @@
 
 import time
 import re
+import sqlalchemy.exc
 from urllib.parse import urlparse, urljoin
 from datetime import datetime
 from flask import Blueprint, flash, redirect, request, render_template, url_for, abort, json
@@ -41,7 +42,10 @@ def login():
 
         current_user.last_login = time.time()
         current_user.listed = True
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         next_url = request.form.get('next')
         if not next_url or not is_safe_url(next_url):
             next_url = url_for('main.index')
@@ -119,7 +123,10 @@ def profile_settings():
         else:
             current_user.equipped_emblem_id = form.emblem.data
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         flash('Inställningarna har uppdaterats!', 'success')
         return redirect(url_for('auth.profile_settings'))
 
@@ -158,7 +165,10 @@ def username_change():
             if re.match(pattern, nameForm.username.data) is not None:
                 current_user.name = nameForm.username.data
                 current_user.name_last_change = now
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except sqlalchemy.exc.IntegrityError:
+                    db.session.rollback()
                 flash('Användarnamnet har ändrats!')
             else:
                 flash('Användarnamnet får bara inehålla bokstäver och siffror, och vara max 20 tecken!')
@@ -176,7 +186,10 @@ def password_change():
             flash('Lösenorden matchar inte!')
         if verify_password(current_user.password_hash, passForm.current_password.data):
             current_user.password_hash = hash_password(passForm.new_password.data)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except sqlalchemy.exc.IntegrityError:
+                db.session.rollback()
             flash('Lösenordet har ändrats!')
     return redirect(url_for('auth.account_settings'))
 
@@ -209,7 +222,10 @@ def recovery(secret):
     
     if recoveryForm.validate_on_submit():
         user.password_hash = hash_password(recoveryForm.new_password.data)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         invalidate_token(token)
         log(None, 'user', token.user_id, 'recovery.token_used', new_data=json.dumps({'token_id': token.id, 'token': token.secret[:10] + '...'}))
         return redirect(url_for('auth.login'))

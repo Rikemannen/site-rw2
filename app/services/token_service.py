@@ -24,10 +24,15 @@ def invalidate_token(token):
     if token.is_valid:
         token.valid = False
         token.used_timestamp = time.time()
-        db.session.commit()
         from app.services.logging_service import log
         log(None, 'token', token.id, 'invalidated')
-    return token
+        try:
+            db.session.commit()
+            return token
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            return None
+    return None
 
 def generate_token(user, creator):
     """Create a token for a user."""

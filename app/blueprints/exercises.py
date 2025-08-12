@@ -2,6 +2,7 @@
 
 import re
 import json
+import sqlalchemy.exc
 from flask_login import login_required
 from flask import Blueprint, flash, render_template, url_for, redirect, request, jsonify, abort
 from flask_login import current_user as user
@@ -53,7 +54,10 @@ def settings(exercise_id):
             html_content = html_file.read().decode('utf-8')
             create_exercise_files(editing, html_content, get_exercise_answers(editing))
     
-        db.session.commit()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
         flash('Övningen har uppdaterats!', 'success')
         return redirect(url_for('exercise.settings', exercise_id=editing.id))
     
