@@ -55,6 +55,9 @@ def login():
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     """Handle user registration."""
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+
     form = SignupForm()
     if form.validate_on_submit():
         password = hash_password(form.password.data)
