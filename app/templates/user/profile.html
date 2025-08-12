@@ -5,7 +5,7 @@
 {% block content %}
 <div class="space-y-8">
     <div class="bg-white p-6 rounded-2xl shadow-xl">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div class="flex items-center">
                 {% set emblem_color = user.equipped_emblem.color if user.equipped_emblem else 'inherit' %}
                 <h1 class="text-3xl font-bold" style="color: {{ emblem_color }};">
