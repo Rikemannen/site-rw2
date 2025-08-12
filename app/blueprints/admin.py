@@ -218,8 +218,8 @@ def deletion(user_id):
         log(current_user, 'user', editing.id, 'delete', new_data=json.dumps({'full': deleteForm.full.data}))
 
     if deleteForm.full.data:
-        return redirect(url_for('admin.edit_user', user_id=editing.id))
-    return redirect(url_for('admin.admin'))
+        return redirect(url_for('admin.admin'))
+    return redirect(url_for('admin.edit_user', user_id=editing.id))
 
 @bp.route('/user/<user_id>/verify', methods=['POST'])
 @admin_required
