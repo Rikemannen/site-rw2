@@ -51,7 +51,7 @@ def settings(exercise_id):
         if editForm.html.data:
             html_file = editForm.html.data
             html_content = html_file.read().decode('utf-8')
-            create_exercise_files(editing, html_content, get_exercise_answers(editing.id))
+            create_exercise_files(editing, html_content, get_exercise_answers(editing))
     
         db.session.commit()
         flash('Övningen har uppdaterats!', 'success')

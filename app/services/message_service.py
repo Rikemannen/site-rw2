@@ -1,6 +1,7 @@
 import time
 from app.models.messages import Message
 from app.extensions import db
+from app.services.user_service import get_all_users
 
 def get_message_by_id(id):
     """Get a message object based on the id."""
@@ -27,7 +28,6 @@ def get_user_sent_messages(user, c=25):
 
 def send_message_to_all(sender, content):
     """Create a message entry for every user in the database."""
-    from app.services.user_service import get_all_users
     messages = [
         Message(sender_id=sender.id, recipient_id=user.id, content=content, timestamp=time.time())
         for user in get_all_users()

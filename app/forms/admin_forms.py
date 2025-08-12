@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField, IntegerField, TextAreaField, ColorField
+from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField, IntegerField, TextAreaField, ColorField, FloatField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired, Length
 
@@ -66,7 +66,7 @@ class ExerciseInfoForm(FlaskForm):
 class ExerciseDataForm(FlaskForm):
     """Form for setting static data, owner_id, created (date+time), approval status."""
     owner = IntegerField('Ägare (id)', validators=[DataRequired()])
-    created = IntegerField('Skapad (unix)', validators=[DataRequired()])
+    created = FloatField('Skapad (unix)', validators=[DataRequired()])
     approved = BooleanField('Godkänd')
     submit = SubmitField('Uppdatera')
 
