@@ -4,8 +4,24 @@
     }
 </style>
 <div class="bg-white rounded-2xl h-full flex flex-col p-6 dark:bg-slate-800">
-    <h1 class="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100"><a href="/chat"
-            class="hover:underline hover:text-blue-600 dark:hover:text-blue-400">Chatt</a></h1>
+    {% if current_user.admin %}
+    <h1 class="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">
+        <a href="/chat" class="hover:underline hover:text-blue-600 dark:hover:text-blue-400" onclick="if(event.shiftKey){
+       event.preventDefault();
+       fetch('/chat/clear', {
+         method: 'POST',
+         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+         body: new URLSearchParams({
+           csrf_token: '{{ csrf_token() }}'
+         })
+       });
+     }">Chatt</a>
+    </h1>
+    {% else %}
+    <h1 class="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">
+        <a href="/chat" class="hover:underline hover:text-blue-600 dark:hover:text-blue-400">Chatt</a>
+    </h1>
+    {% endif %}
     <div id="chat-box"
         class="bg-gray-100 flex-grow overflow-y-scroll {% if request.path != '/chat' %} h-64 {% endif %}p-4 mb-4 rounded-lg border border-gray-300 custom-scrollbar dark:bg-slate-700 dark:border-slate-600">
     </div>
@@ -104,9 +120,9 @@
 
         msg.innerHTML = `
             <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between p-3 my-2 rounded-lg" style="background-color: ${data.color}15;">
-              <p class="flex-grow">
+              <p class="flex-grow min-w-0 break-words">
                 <a href="/user/${data.id}" class="hover:underline font-semibold" style="color: ${data.color};">${nameText}</a>: 
-                <span class="text-slate-900 dark:text-slate-200">${linkify(data.message)}</span>
+                <span class="text-slate-900 dark:text-slate-200 break-all">${linkify(data.message)}</span>
               </p>
               <p class="text-sm mt-1 sm:mt-0 text-slate-600 dark:text-slate-400" style="color: ${data.color};">${formatTime(data.time)}</p>
             </div>`;

@@ -39,6 +39,7 @@ class User(db.Model, UserMixin):
     sessions = relationship('SessionToken', back_populates='user', foreign_keys='SessionToken.user_id')
     sent_messages = relationship("Message", foreign_keys='Message.sender_id', back_populates="sender")
     received_messages = relationship("Message", foreign_keys='Message.recipient_id', back_populates="recipient")
+    chat_messages = relationship("ChatMessage", back_populates='user')
 
     # Additional columns to consider:
     #profile_picture = Column(String(), nullable=True) # Url

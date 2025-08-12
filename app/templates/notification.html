@@ -2,7 +2,7 @@
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-    const socket = io("https://golden-marmot-closing.ngrok-free.app/", { transports: ['websocket', 'polling'] });
+    const socket = io();
 
     socket.emit('join', { user_id: "{{ current_user.id }}" });
 
