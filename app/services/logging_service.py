@@ -21,5 +21,9 @@ def log(user, entity, affected_id, action, new_data=None, old_data=None):
         old_data=old_data  # Old data can be empty even if data changed has a value
     )
     db.session.add(log)
-    db.session.commit()
-    return log
+    try:
+        db.session.commit()
+        return log
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        return None

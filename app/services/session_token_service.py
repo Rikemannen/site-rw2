@@ -1,3 +1,4 @@
+import sqlalchemy.exc
 import secrets
 import time
 from flask import make_response, redirect, request
@@ -13,8 +14,12 @@ def create_session_token(user):
         expires=int(time.time()) + 60 * 60 * 24 * 7  # 7 days
     )
     db.session.add(session_token)
-    db.session.commit()
-    return token
+    try:
+        db.session.commit()
+        return token
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
+        return None
 
 def get_user_from_token(token_str):
     """Get the user object associated with a token."""
@@ -27,13 +32,19 @@ def invalidate_session_token(token_str):
     """Invalidate specified session token."""
     token = SessionToken.query.filter_by(token=token_str, valid=True).first()
     token.valid = False
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
 
 def invalidate_all_sessions(user):
     """Invalidate all sessions for a user."""
     for session in user.sessions:
         session.valid = False
-    db.session.commit()
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
 
 def login_user(user):
     """Create session for user and set cookie."""
