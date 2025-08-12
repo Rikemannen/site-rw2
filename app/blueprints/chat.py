@@ -27,7 +27,7 @@ def handle_send_message(data):
         return
     color = "#949494"
     if current_user.equipped_emblem:
-        color = current_user.equipped_emblem.color
+        color = current_user.equipped_emblem.color if not current_user.equipped_emblem.name in {"Rainbow", "Shift", "Regnbåge"} else "shift"
     clean_message = bleach.clean(message)
     now = time.time()
     emit('receive_message',
@@ -51,7 +51,7 @@ def get_messages():
         user = msg.user
         color = "#949494"
         if user and user.equipped_emblem:
-            color = user.equipped_emblem.color
+            color = user.equipped_emblem.color if not user.equipped_emblem.name in {"Rainbow", "Shift", "Regnbåge"} else "shift"
         
         if user:
             result.append({

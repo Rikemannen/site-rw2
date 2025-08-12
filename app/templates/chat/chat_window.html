@@ -2,6 +2,37 @@
     a {
         @apply text-blue-600 dark:text-blue-400 hover:underline;
     }
+
+    @keyframes colorShift {
+        0% {
+            background-color: #ff7f7f25;
+            color: #7f0000;
+        }
+
+        25% {
+            background-color: #7fff7f25;
+            color: #007f00;
+        }
+
+        50% {
+            background-color: #7f7fff25;
+            color: #00007f;
+        }
+
+        75% {
+            background-color: #ffff7f25;
+            color: #7f7f00;
+        }
+
+        100% {
+            background-color: #ff7f7f25;
+            color: #7f0000;
+        }
+    }
+
+    .color-shift {
+        animation: colorShift 10s linear infinite;
+    }
 </style>
 <div class="bg-white rounded-2xl h-full flex flex-col p-6 dark:bg-slate-800">
     {% if current_user.admin %}
@@ -90,43 +121,53 @@
         return date.toLocaleTimeString(undefined, { hour12: false });
     }
 
+    function linkify(text) {
+        const urlPattern = /(\b((https?:\/\/)?(www\.)?[\w-]+(\.[\w.-]+)+)(\/[^\s]*)?)/gi;
+        const smallUrlPattern = /^[a-z0-9-]+\.[a-z]{2,63}$/i;
+
+        return text.replace(urlPattern, url => {
+            let href = url;
+            let urlToCheck = url.replace(/^https?:\/\//i, '').toLowerCase();
+            urlToCheck = urlToCheck.replace(/\/$/, '');
+
+            if (smallUrlPattern.test(urlToCheck) && !urlToCheck.startsWith('www.')) {
+                href = 'http://www.' + urlToCheck;
+            } else if (!/^https?:\/\//i.test(href)) {
+                href = 'http://' + href;
+            }
+
+            return `<a href="${href}" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        });
+    }
+
+    const COLOR_SHIFT_NAME = "shift";
+
     function renderMessage(data) {
         const msg = document.createElement('div');
         const nameText = (data.display_name && data.display_name !== data.name)
             ? `${data.display_name} (@${data.name})`
             : data.name;
 
-        function linkify(text) {
-            const urlPattern = /(\b((https?:\/\/)?(www\.)?[\w-]+(\.[\w.-]+)+)(\/[^\s]*)?)/gi;
-            const smallUrlPattern = /^[a-z0-9-]+\.[a-z]{2,63}$/i;
+        let bgColorStyle = `background-color: ${data.color}15;`;
+        let colorStyle = `color: ${data.color};`;
+        let classes = "flex flex-col sm:flex-row sm:items-baseline sm:justify-between p-3 my-2 rounded-lg";
 
-            return text.replace(urlPattern, url => {
-                let href = url;
-
-                // Remove protocol if present for matching
-                let urlToCheck = url.replace(/^https?:\/\//i, '').toLowerCase();
-                // Remove trailing slash for matching
-                urlToCheck = urlToCheck.replace(/\/$/, '');
-
-                if (smallUrlPattern.test(urlToCheck) && !urlToCheck.startsWith('www.')) {
-                    href = 'http://www.' + urlToCheck;
-                } else if (!/^https?:\/\//i.test(href)) {
-                    href = 'http://' + href;
-                }
-
-                return `<a href="${href}" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">${url}</a>`;
-            });
+        if (data.color === COLOR_SHIFT_NAME) {
+            classes += " color-shift";
+            bgColorStyle = "";
+            colorStyle = "";
         }
 
         msg.innerHTML = `
-            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between p-3 my-2 rounded-lg" style="background-color: ${data.color}15;">
-              <p class="flex-grow min-w-0 break-words">
-                <a href="/user/${data.id}" class="hover:underline font-semibold" style="color: ${data.color};">${nameText}</a>: 
-                <span class="text-slate-900 dark:text-slate-200 break-all">${linkify(data.message)}</span>
-              </p>
-              <p class="text-sm mt-1 sm:mt-0 text-slate-600 dark:text-slate-400" style="color: ${data.color};">${formatTime(data.time)}</p>
-            </div>`;
+        <div class="${classes}" style="${bgColorStyle}">
+          <p class="flex-grow min-w-0 break-words">
+            <a href="/user/${data.id}" class="hover:underline font-semibold" style="${colorStyle}">${nameText}</a>:
+            <span class="text-slate-900 dark:text-slate-200 break-all" style="${colorStyle}">${linkify(data.message)}</span>
+          </p>
+          <p class="text-sm mt-1 sm:mt-0 text-slate-600 dark:text-slate-400" style="${colorStyle}">${formatTime(data.time)}</p>
+        </div>`;
         chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     window.onload = async function () {
@@ -148,7 +189,7 @@
     });
 
     socket.on('receive_message', function (data) {
+        console.log(data)
         renderMessage(data);
-        chatBox.scrollTop = chatBox.scrollHeight;
     });
 </script>
