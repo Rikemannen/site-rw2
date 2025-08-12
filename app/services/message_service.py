@@ -47,3 +47,9 @@ def read_all_messages(user):
         {Message.read: True}, synchronize_session=False
     )
     db.session.commit()
+
+def delete_all_sent_messages(user):
+    """Delete all messages sent from user."""
+    for message in user.sent_messages:
+        db.session.delete(message)
+    db.session.commit()
