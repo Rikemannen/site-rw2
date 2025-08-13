@@ -2,6 +2,7 @@ import sqlalchemy.exc
 import secrets
 import time
 from flask import make_response, redirect, request
+from datetime import datetime, timedelta, timezone
 from app.models.session_tokens import SessionToken
 from app.extensions import db
 
@@ -50,7 +51,14 @@ def login_user(user):
     """Create session for user and set cookie."""
     token = create_session_token(user)
     resp = make_response(redirect('/'))
-    resp.set_cookie('session_token', token, httponly=True, secure=True, samesite='Lax')
+    resp.set_cookie(
+    'session_token',
+    token,
+    httponly=True,
+    secure=True,
+    samesite='Lax',
+    expires=datetime.now(timezone.utc) + timedelta(weeks=2)
+)
     return resp
 
 def logout_user():
