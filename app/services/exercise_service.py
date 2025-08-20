@@ -17,9 +17,9 @@ def create_exercise(name, owner, html_data, json_data, description=None, approve
     """Create a new exercise with the given name and optional description."""
     exercise = Exercise(name=name, owner=owner, description=description, approved=approved, created=time.time())
     db.session.add(exercise)
-    create_exercise_files(exercise, html_data, json_data)
     try:
         db.session.commit()
+        create_exercise_files(exercise, html_data, json_data)
         return exercise
     except sqlalchemy.exc.IntegrityError:
         db.session.rollback()
