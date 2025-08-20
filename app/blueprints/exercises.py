@@ -139,6 +139,7 @@ def create():
             owner=user,
             approved=user.verified or user.admin
         )
-        flash('Övningen har skapats'+' och kommer att visas när den har godkänts.' if not user.verified and not user.admin else '!', 'success')
+        if not user.verified and not user.admin:
+            flash('Övningen har skapats och kommer att visas när den har godkänts.', 'success')
         return redirect(url_for('exercise.view', exercise_id=exercise.id)) if user.verified or user.admin else redirect(url_for('exercise.create'))
     return render_template('exercises/create.html', form=form)
