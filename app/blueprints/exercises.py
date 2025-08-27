@@ -63,13 +63,20 @@ def settings(exercise_id):
         flash('Övningen har uppdaterats!', 'success')
         return redirect(url_for('exercise.settings', exercise_id=editing.id))
     
-    if deleteForm.validate_on_submit():
+    return render_template('exercises/settings.html', editing=editing, editForm=editForm, deleteForm=deleteForm)
+
+@bp.route('/<exercise_id>/delete', methods=['POST'])
+@login_required
+def exercise_deletion(exercise_id):
+    form = DeleteExerciseForm()
+    editing = get_exercise_by_id(exercise_id)
+
+    if form.validate_on_submit():
         delete_exercise(editing)
 
         flash('Övningen har raderats!', 'success')
         return redirect(url_for('exercise.settings', exercise_id=editing.id))
-
-    return render_template('exercises/settings.html', editing=editing, editForm=editForm, deleteForm=deleteForm)
+    return redirect(url_for('main.index'))
 
 @bp.route('/<exercise_id>/likes')
 def likes(exercise_id):
