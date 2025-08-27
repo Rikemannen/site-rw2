@@ -16,18 +16,20 @@ document.getElementById("submit-btn").addEventListener("click", (e) => {
 
     if (!allFilled) {
         console.log("All values aren't full!")
-        btn.classList.add("cursor-not-allowed")
-        btn.classList.add("bg-red-400")
+        btn.classList.remove("button-blue");
+        btn.classList.add("button-red-disabled");
+        btn.disabled = true
         setTimeout(() => {
-            btn.classList.remove("bg-red-400");
-            btn.classList.remove("cursor-not-allowed");
+            btn.classList.remove("button-red-disabled");
+            btn.classList.add("button-blue");
+            btn.disabled = false
         }, 1000);
         return;
     }
 
     btn.disabled = true;
-    btn.classList.add("cursor-not-allowed");
-    btn.classList.add("bg-slate-500");
+    btn.classList.remove("button-red");
+    btn.classList.add("button-red-disabled");
 
     fetch(`${window.location.pathname}/submit`, {
         method: "POST",
@@ -52,4 +54,28 @@ document.getElementById("submit-btn").addEventListener("click", (e) => {
                 }
             });
         });
+});
+document.getElementById("reveal-btn").addEventListener("click", async (e) => {
+    const btn = e.target;
+    const btn2 = document.getElementById("submit-btn")
+    const inputs = form.querySelectorAll("input[id]");
+    const res = await fetch(`${window.location.href}/answers`)
+    const answers = await res.json();
+
+    btn.disabled = true
+    btn.classList.remove("button-red")
+    btn.classList.add("button-red-disabled")
+    btn2.disabled = true
+    btn2.classList.remove("button-blue")
+    btn2.classList.add("button-red-disabled")
+
+    Object.entries(answers).forEach(([key, value]) => {
+        const input = document.getElementById(key);
+        if (input) {
+            input.classList.remove("bg-green-500", "bg-red-400");
+            input.readonly = true
+            input.value = value[0]
+            input.classList.add("bg-green-500");
+        }
+    });
 });

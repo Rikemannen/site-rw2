@@ -38,7 +38,19 @@
     .dark .hover\:bg-gray-200:hover {
         @apply bg-slate-600;
     }
-
+    .dark .bg-blue-600 {
+        @apply bg-blue-700;
+    }
+    .dark .hover\:bg-blue-700:hover {
+        @apply bg-blue-600;
+    }
+    .dark .bg-red-500 {
+        @apply bg-rose-700;
+    }
+    .dark .bg-green-500 {
+        @apply bg-green-700
+    }
+    
     /* Text colors */
     .dark .text-slate-900 {
         @apply text-slate-100;
@@ -66,15 +78,6 @@
     }
     .dark .text-red-500 {
         @apply text-red-400;
-    }
-    .dark .bg-blue-600 {
-        @apply bg-blue-700;
-    }
-    .dark .hover\:bg-blue-700:hover {
-        @apply bg-blue-600;
-    }
-    .dark .bg-red-500 {
-        @apply bg-rose-700;
     }
 
     /* Borders */

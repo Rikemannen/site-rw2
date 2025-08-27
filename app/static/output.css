@@ -16,6 +16,7 @@
     --color-yellow-100: oklch(97.3% 0.071 103.193);
     --color-yellow-700: oklch(55.4% 0.135 66.442);
     --color-green-500: oklch(72.3% 0.219 149.579);
+    --color-green-700: oklch(52.7% 0.154 150.069);
     --color-blue-400: oklch(70.7% 0.165 254.624);
     --color-blue-500: oklch(62.3% 0.214 259.815);
     --color-blue-600: oklch(54.6% 0.245 262.881);
@@ -385,6 +386,9 @@
   .w-full {
     width: 100%;
   }
+  .min-w-0 {
+    min-width: calc(var(--spacing) * 0);
+  }
   .min-w-\[200px\] {
     min-width: 200px;
   }
@@ -549,9 +553,6 @@
   .border-gray-400 {
     border-color: var(--color-gray-400);
   }
-  .bg-blue-500 {
-    background-color: var(--color-blue-500);
-  }
   .bg-blue-600 {
     background-color: var(--color-blue-600);
   }
@@ -679,6 +680,12 @@
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
+  }
+  .break-words {
+    overflow-wrap: break-word;
+  }
+  .break-all {
+    word-break: break-all;
   }
   .whitespace-pre-wrap {
     white-space: pre-wrap;
@@ -906,6 +913,11 @@
       align-items: center;
     }
   }
+  .md\:justify-between {
+    @media (width >= 48rem) {
+      justify-content: space-between;
+    }
+  }
   .md\:p-8 {
     @media (width >= 48rem) {
       padding: calc(var(--spacing) * 8);
@@ -1060,6 +1072,18 @@
   .dark .hover\:bg-gray-200:hover {
     background-color: var(--color-slate-600);
   }
+  .dark .bg-blue-600 {
+    background-color: var(--color-blue-700);
+  }
+  .dark .hover\:bg-blue-700:hover {
+    background-color: var(--color-blue-600);
+  }
+  .dark .bg-red-500 {
+    background-color: var(--color-rose-700);
+  }
+  .dark .bg-green-500 {
+    background-color: var(--color-green-700);
+  }
   .dark .text-slate-900 {
     color: var(--color-slate-100);
   }
@@ -1086,15 +1110,6 @@
   }
   .dark .text-red-500 {
     color: var(--color-red-400);
-  }
-  .dark .bg-blue-600 {
-    background-color: var(--color-blue-700);
-  }
-  .dark .hover\:bg-blue-700:hover {
-    background-color: var(--color-blue-600);
-  }
-  .dark .bg-red-500 {
-    background-color: var(--color-rose-700);
   }
   .dark .border-gray-200 {
     border-color: var(--color-slate-700);
