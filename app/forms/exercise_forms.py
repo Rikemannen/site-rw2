@@ -1,4 +1,4 @@
-from wtforms import StringField, FileField, SubmitField, TextAreaField
+from wtforms import StringField, FileField, SubmitField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Length
 from flask_wtf import FlaskForm
 
@@ -14,6 +14,7 @@ class EditExerciseForm(FlaskForm):
     """Form for editing an existing exercise."""
     name = StringField('Namn', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Beskrivning', validators=[DataRequired(), Length(max=500)])
+    public_answers = BooleanField('Alla kan se svaren')
     answers = FileField('Svar (.json)', render_kw={"accept": ".json"})
     html = FileField('Utseende (.html)', render_kw={"accept": ".html"})
     submit = SubmitField('Uppdatera Övning')

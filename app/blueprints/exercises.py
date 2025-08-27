@@ -35,6 +35,7 @@ def settings(exercise_id):
     if request.method == 'GET':
         editForm.name.data = editing.name
         editForm.description.data = editing.description
+        editForm.public_answers.data = editing.public_answers
 
     if editForm.validate_on_submit():
         editing.name = editForm.name.data
@@ -44,6 +45,7 @@ def settings(exercise_id):
         # Replace multiple spaces with a single space
         desc = re.sub(r' {2,}', ' ', desc)
         editing.description = desc
+        editing.public_answers = editForm.public_answers.data
         if editForm.answers.data:
             json_file = editForm.answers.data
             json_content = json_file.read().decode('utf-8')
@@ -61,13 +63,20 @@ def settings(exercise_id):
         flash('Övningen har uppdaterats!', 'success')
         return redirect(url_for('exercise.settings', exercise_id=editing.id))
     
-    if deleteForm.validate_on_submit():
+    return render_template('exercises/settings.html', editing=editing, editForm=editForm, deleteForm=deleteForm)
+
+@bp.route('/<exercise_id>/delete', methods=['POST'])
+@login_required
+def exercise_deletion(exercise_id):
+    form = DeleteExerciseForm()
+    editing = get_exercise_by_id(exercise_id)
+
+    if form.validate_on_submit():
         delete_exercise(editing)
 
         flash('Övningen har raderats!', 'success')
         return redirect(url_for('exercise.settings', exercise_id=editing.id))
-
-    return render_template('exercises/settings.html', editing=editing, editForm=editForm, deleteForm=deleteForm)
+    return redirect(url_for('main.index'))
 
 @bp.route('/<exercise_id>/likes')
 def likes(exercise_id):
@@ -95,6 +104,7 @@ def like(exercise_id):
 
 @bp.route('/<exercise_id>/submit', methods=['POST'])
 def submit(exercise_id):
+    """Correct the submitted answers against the exercise answers."""
     exercise = get_exercise_by_id(exercise_id)
 
     correct_answers = get_exercise_answers(exercise)
@@ -116,6 +126,16 @@ def submit(exercise_id):
         increment_finishes(exercise)
 
     return jsonify(results)
+
+@bp.route('/<exercise_id>/answers')
+@login_required
+def show_answers(exercise_id):
+    exercise = get_exercise_by_id(exercise_id)
+    if not exercise.public_answers:
+        abort(403)
+    answers = get_exercise_answers(exercise)
+
+    return jsonify(answers)
 
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required

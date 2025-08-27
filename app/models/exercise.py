@@ -22,6 +22,7 @@ class Exercise(db.Model):
     attempts = Column(Integer, default=0)
     finished = Column(Integer, default=0)
     approved = Column(Boolean, default=False)
+    public_answers = Column(Boolean, default=True)
 
     owner = relationship('User', back_populates='exercises')
     liked_by = relationship('User', secondary='exercise_likes', back_populates='liked_exercises')
