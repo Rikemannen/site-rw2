@@ -116,7 +116,7 @@ def submit(exercise_id):
         submitted = submitted_answers.get(key)
 
         # split strings and optional boolean
-        strings = [v for v in val if isinstance(v, str)]
+        strings = [v.strip() for v in val if isinstance(v, str)]
         case_sensitive = next((v for v in val if isinstance(v, bool)), False)
 
         if submitted is None:
