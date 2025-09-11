@@ -114,10 +114,18 @@ def submit(exercise_id):
 
     for key, val in correct_answers.items():
         submitted = submitted_answers.get(key)
-        if val[1]:
-            results[key] = submitted == val[0]
+
+        # split strings and optional boolean
+        strings = [v.strip() for v in val if isinstance(v, str)]
+        case_sensitive = next((v for v in val if isinstance(v, bool)), False)
+
+        if submitted is None:
+            results[key] = False
         else:
-            results[key] = submitted.lower() == val[0].lower()
+            if case_sensitive:
+                results[key] = submitted in strings
+            else:
+                results[key] = submitted.lower() in [s.lower() for s in strings]
 
         all_correct = all(results.values())
 
