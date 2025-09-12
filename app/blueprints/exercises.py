@@ -17,10 +17,10 @@ bp = Blueprint('exercise', __name__, url_prefix='/exercise')
 def view(exercise_id):
     """Render the exercise page."""
     exercise = get_exercise_by_id(exercise_id)
+    if not exercise.approved and user.admin:
+        return redirect(url_for('admin.preview_exercise', exercise_id=exercise_id))
     if not exercise or not exercise.approved:
         abort(404)
-    if not exercise.approved:
-        return redirect(url_for('admin.preview_exercise', exercise_id=exercise_id))
     return render_template('exercises/exercise.html', exercise=exercise, show_edit_links=True)
 
 @bp.route('/<exercise_id>/settings', methods=['GET', 'POST'])
