@@ -17,7 +17,7 @@ bp = Blueprint('exercise', __name__, url_prefix='/exercise')
 def view(exercise_id):
     """Render the exercise page."""
     exercise = get_exercise_by_id(exercise_id)
-    if not exercise.approved and user.admin:
+    if user and not exercise.approved and user.admin:
         return redirect(url_for('admin.preview_exercise', exercise_id=exercise_id))
     if not exercise or not exercise.approved:
         abort(404)
