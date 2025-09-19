@@ -4,6 +4,7 @@ document.getElementById("submit-btn").addEventListener("click", (e) => {
     const form = document.getElementById("exercise-form");
     const inputs = form.querySelectorAll("input[id]");
     const csrfToken = document.querySelector("input[name=csrf_token]").value;
+    const requiresAll = document.querySelector("input[name=requires_all]").value;
     const answers = {};
 
     let allFilled = true;
@@ -14,7 +15,7 @@ document.getElementById("submit-btn").addEventListener("click", (e) => {
         }
     });
 
-    if (!allFilled) {
+    if (!allFilled && requiresAll) {
         console.log("All values aren't full!")
         btn.classList.remove("button-blue");
         btn.classList.add("button-red-disabled");

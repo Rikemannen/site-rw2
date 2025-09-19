@@ -40,6 +40,7 @@ def settings(exercise_id):
         editForm.name.data = editing.name
         editForm.description.data = editing.description
         editForm.public_answers.data = editing.public_answers
+        editForm.requires_all.data = editing.requires_all
 
     if editForm.validate_on_submit():
         editing.name = editForm.name.data
@@ -50,6 +51,7 @@ def settings(exercise_id):
         desc = re.sub(r' {2,}', ' ', desc)
         editing.description = desc
         editing.public_answers = editForm.public_answers.data
+        editing.requires_all = editForm.requires_all.data
         if editForm.answers.data:
             json_file = editForm.answers.data
             json_content = json_file.read().decode('utf-8')
@@ -113,6 +115,9 @@ def submit(exercise_id):
 
     correct_answers = get_exercise_answers(exercise)
     submitted_answers = request.get_json()
+
+    if len(correct_answers) != len(submitted_answers) and exercise.requires_all:
+        abort(400)
 
     results = {}
 
