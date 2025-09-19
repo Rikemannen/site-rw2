@@ -64,7 +64,8 @@
     </div>
 
     <hr class="break">
-
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="requires_all" value="{{ exercise.requires_all }}">
     {% include "exercises/" ~ exercise.id ~ "/exercise.html" %}
 </div>
 {% endblock %}

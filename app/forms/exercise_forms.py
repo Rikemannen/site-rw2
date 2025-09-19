@@ -15,7 +15,7 @@ class EditExerciseForm(FlaskForm):
     name = StringField('Namn', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Beskrivning', validators=[DataRequired(), Length(max=500)])
     public_answers = BooleanField('Alla kan se svaren')
-    requires_all = BooleanField('Går att rätta utan alla fält')
+    requires_all = BooleanField('Alla fält måste fyllas i')
     answers = FileField('Svar (.json)', render_kw={"accept": ".json"})
     html = FileField('Utseende (.html)', render_kw={"accept": ".html"})
     submit = SubmitField('Uppdatera Övning')
