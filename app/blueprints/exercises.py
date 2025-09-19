@@ -26,6 +26,7 @@ def view(exercise_id):
     return render_template('exercises/exercise.html', exercise=exercise, show_edit_links=True)
 
 @bp.route('/<exercise_id>/settings', methods=['GET', 'POST'])
+@login_required
 def settings(exercise_id):
     """Render the exercise settings page."""
     editing = get_exercise_by_id(exercise_id)
@@ -76,6 +77,9 @@ def settings(exercise_id):
 def exercise_deletion(exercise_id):
     form = DeleteExerciseForm()
     editing = get_exercise_by_id(exercise_id)
+
+    if not user.owns_exercise(editing):
+        abort(403)
 
     if form.validate_on_submit():
         delete_exercise(editing)
