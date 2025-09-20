@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Skapa övning{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow-xl p-6">
+    <h2 class="text-3xl font-bold mb-4">Skapa en övning</h2>
+    <form method="POST" action="{{ url_for('exercise.create') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            {{ form.name.label(class="block text-sm font-md text-slate-600")}}
+            {{ form.name(class="mt-1 block input") }}
+            {% for error in form.name.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ form.description.label(class="block text-sm font-md text-slate-600")}}
+            {{ form.description(class="mt-1 input") }}
+            {% for error in form.description.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ form.answers.label(class="block text-sm font-md text-slate-600")}}
+            {{ form.answers(class="mt-1 input") }}
+            {% for error in form.answers.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ form.html.label(class="block text-sm font-md text-slate-600")}}
+            {{ form.html(class="mt-1 input") }}
+            {% for error in form.html.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ form.submit(class="button-blue") }}
+    </form>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul id="flash" class="flash-messages">
+        <script>
+            window.location.href = `#flash`;
+        </script>
+        {% for msg in messages %}
+        <li>{{ msg }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}

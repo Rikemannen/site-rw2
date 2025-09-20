@@ -164,6 +164,62 @@ def create():
     """Create a new exercise."""
     form = CreateExerciseForm()
     if form.validate_on_submit():
+        desc = form.description.data.replace("\r\n", "\n").strip()
+        desc = re.sub(r'\n{2,}', '\n\n', desc)
+        desc = re.sub(r' {2,}', ' ', desc)
+        questions = []
+        for key in request.form:
+            if key.startswith(("q")):
+                questions.append(request.form[key])
+
+        answers = {}
+        for key in request.form:
+            if key.startswith(("a")):
+                answers["q"+key[1:]] = request.form[key]
+
+        html_header = """
+<div class="bg-white rounded-2xl shadow-xl p-6">
+    <form id="exercise-form" class="space-y-2">"""
+        
+        html_footer = """
+        <button type="button" id="submit-btn" class="button-blue mt-2">Rätta</button>
+        <button type="button" id="reveal-btn" class="button-red mt-2">Kolla svar</button>
+    </form>
+</div>
+<script src="/static/exercise_submit.js"></script> <!-- Scriptet som hanterar svaren, ändra inte denna rad -->
+"""
+
+        rows_html = ""
+        for idx, question in enumerate(questions, 1):
+            rows_html += f"""
+        <div class="flex items-center">
+            <label for="q{idx}" class="w-32">{question}</label>
+            <input type="text" id="q{idx}" name="q{idx}" class="border p-1 m-2 flex-1">
+        </div>
+"""
+
+        full_html = html_header + rows_html + html_footer
+        print("full_html", full_html, "\nrows_html", rows_html, "\nquestions/answers", questions, answers)
+
+        exercise = create_exercise(
+            name=form.name.data,
+            description=desc,
+            json_data=answers,
+            html_data=full_html,
+            owner=user,
+            approved=user.verified or user.admin
+        )
+        if not user.verified and not user.admin:
+            flash('Övningen har skapats och kommer att visas när den har godkänts.', 'success')
+        return redirect(url_for('exercise.view', exercise_id=exercise.id)) if user.verified or user.admin else redirect(url_for('exercise.create'))
+    return render_template('exercises/create.html', form=form)
+
+@bp.route('/create/legacy', methods=['GET', 'POST'])
+@login_required
+def legacy_create():
+    """Create a new exercise."""
+    form = CreateExerciseForm()
+    if form.validate_on_submit():
         json_file = form.answers.data
         json_content = json_file.read().decode('utf-8')
         html_file = form.html.data
@@ -183,4 +239,4 @@ def create():
         if not user.verified and not user.admin:
             flash('Övningen har skapats och kommer att visas när den har godkänts.', 'success')
         return redirect(url_for('exercise.view', exercise_id=exercise.id)) if user.verified or user.admin else redirect(url_for('exercise.create'))
-    return render_template('exercises/create.html', form=form)
+    return render_template('exercises/create_old.html', form=form)

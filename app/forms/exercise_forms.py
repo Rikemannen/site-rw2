@@ -6,6 +6,12 @@ class CreateExerciseForm(FlaskForm):
     """Form for creating a new exercise."""
     name = StringField('Namn', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Beskrivning', validators=[DataRequired(), Length(max=500)])
+    submit = SubmitField('Skapa Övning')
+
+class CreateExerciseFormLegacy(FlaskForm):
+    """Form for creating a new exercise."""
+    name = StringField('Namn', validators=[DataRequired(), Length(max=100)])
+    description = TextAreaField('Beskrivning', validators=[DataRequired(), Length(max=500)])
     answers = FileField('Svar (.json)', render_kw={"accept": ".json"}, validators=[DataRequired()])
     html = FileField('Utseende (.html)', render_kw={"accept": ".html"}, validators=[DataRequired()])
     submit = SubmitField('Skapa Övning')

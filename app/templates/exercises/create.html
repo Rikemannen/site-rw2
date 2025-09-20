@@ -5,7 +5,8 @@
 {% block content %}
 <div class="bg-white rounded-2xl shadow-xl p-6">
     <h2 class="text-3xl font-bold mb-4">Skapa en övning</h2>
-    <form method="POST" action="{{ url_for('exercise.create') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('exercise.create') }}" class="grid-cols-2 gap-6 space-y-4"
+        id="exercise-form">
         {{ form.hidden_tag() }}
         <div class="mb-4">
             {{ form.name.label(class="block text-sm font-md text-slate-600")}}
@@ -21,21 +22,50 @@
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            {{ form.answers.label(class="block text-sm font-md text-slate-600")}}
-            {{ form.answers(class="mt-1 input") }}
-            {% for error in form.answers.errors %}
-            <span class="text-red-500 text-xs">{{ error }}</span>
-            {% endfor %}
+        <div id="inputs" class="space-y-4">
+            <div class="flex flex-row justify-between items-center m-4">
+                <p class="text-xl flex-1 text-center">Fråga</p>
+                <p class="text-xl flex-1 text-center">Svar</p>
+            </div>
+            <div class="flex flex-row justify-between">
+                <input id="q1" class="input" name="q1">
+                <input id="a1" class="input" name="a1">
+            </div>
         </div>
-        <div class="mb-4">
-            {{ form.html.label(class="block text-sm font-md text-slate-600")}}
-            {{ form.html(class="mt-1 input") }}
-            {% for error in form.html.errors %}
-            <span class="text-red-500 text-xs">{{ error }}</span>
-            {% endfor %}
-        </div>
-        {{ form.submit(class="button-blue") }}
+        <button class="button-blue w-full" type="button" id="add-row-btn">Lägg till rad</button>
+        {{ form.submit(class="button-blue w-full") }}
+        <script>
+            const addBtn = document.getElementById('add-row-btn')
+            let rowIndex = 2
+
+            function createQA(id) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "flex flex-row justify-between";
+
+                const q = document.createElement("input");
+                q.id = `q${id}`;
+                q.name = `q${id}`;
+                q.className = "input";
+
+                const a = document.createElement("input");
+                a.id = `a${id}`;
+                a.name = `a${id}`;
+                a.className = "input";
+
+                wrapper.appendChild(q);
+                wrapper.appendChild(a);
+
+                return wrapper;
+            }
+
+            function addRow() {
+                const container = document.getElementById("inputs");
+                container.appendChild(createQA(rowIndex));
+                rowIndex++;
+            }
+
+            addBtn.addEventListener("click", addRow);
+        </script>
     </form>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
