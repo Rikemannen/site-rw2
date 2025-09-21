@@ -179,24 +179,21 @@ def create():
 
         html_header = """
 <div class="bg-white rounded-2xl shadow-xl p-6">
-    <form id="exercise-form" class="space-y-2">"""
+    <form id="exercise-form" class="grid grid-cols-[auto_1fr] gap-4 items-center">"""
         
         html_footer = """
-        <button type="button" id="submit-btn" class="button-blue mt-2">Rätta</button>
-        <button type="button" id="reveal-btn" class="button-red mt-2">Kolla svar</button>
+        <button type="button" id="submit-btn" class="button-blue mt-2 col-span-2">Rätta</button>
+        <button type="button" id="reveal-btn" class="button-red mt-2 col-span-2">Kolla svar</button>
     </form>
 </div>
-<script src="/static/exercise_submit.js"></script> <!-- Scriptet som hanterar svaren, ändra inte denna rad -->
+<script src="/static/exercise_submit.js"></script>
 """
 
         rows_html = ""
         for idx, question in enumerate(questions, 1):
             rows_html += f"""
-        <div class="flex items-center">
-            <label for="q{idx}" class="w-32">{question}</label>
-            <input type="text" id="q{idx}" name="q{idx}" class="border p-1 m-2 flex-1">
-        </div>
-"""
+            <label for="q{idx}" class="text-md text-right mr-2">{question}</label>
+            <input type="text" id="q{idx}" name="q{idx}" class="input">"""
 
         full_html = html_header + rows_html + html_footer
         print("full_html", full_html, "\nrows_html", rows_html, "\nquestions/answers", questions, answers)
