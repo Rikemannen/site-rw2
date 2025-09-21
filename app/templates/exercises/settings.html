@@ -62,7 +62,7 @@
         {{ editForm.submit(class="button-blue") }}
     </form>
     <hr class="break">
-    <form method="POST" action="{{ url_for('exercise.settings', exercise_id=editing.id) }}">
+    <form method="POST" action="{{ url_for('exercise.exercise_deletion', exercise_id=editing.id) }}">
         {{ deleteForm.hidden_tag() }}
         {{ deleteForm.submit(class="button-red") }}
     </form>
