@@ -196,7 +196,6 @@ def create():
             <input type="text" id="q{idx}" name="q{idx}" class="input">"""
 
         full_html = html_header + rows_html + html_footer
-        print("full_html", full_html, "\nrows_html", rows_html, "\nquestions/answers", questions, answers)
 
         exercise = create_exercise(
             name=form.name.data,
