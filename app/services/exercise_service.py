@@ -117,4 +117,4 @@ def unliked(user, exercise):
 
 def get_all_exercises(c=None):
     """Returns a list with every exercise object."""
-    return Exercise.query.limit(c).filter(Exercise.approved).all()
+    return Exercise.query.filter(Exercise.approved).limit(c).all()
