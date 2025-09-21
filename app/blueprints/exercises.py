@@ -17,11 +17,16 @@ bp = Blueprint('exercise', __name__, url_prefix='/exercise')
 def view(exercise_id):
     """Render the exercise page."""
     exercise = get_exercise_by_id(exercise_id)
+    if not exercise:
+        abort(404)
     if not exercise or not exercise.approved:
+        if exercise and user.admin and not exercise.approved:
+            return redirect(url_for('admin.preview_exercise', exercise_id=exercise_id))
         abort(404)
     return render_template('exercises/exercise.html', exercise=exercise, show_edit_links=True)
 
 @bp.route('/<exercise_id>/settings', methods=['GET', 'POST'])
+@login_required
 def settings(exercise_id):
     """Render the exercise settings page."""
     editing = get_exercise_by_id(exercise_id)
@@ -36,6 +41,7 @@ def settings(exercise_id):
         editForm.name.data = editing.name
         editForm.description.data = editing.description
         editForm.public_answers.data = editing.public_answers
+        editForm.requires_all.data = editing.requires_all
 
     if editForm.validate_on_submit():
         editing.name = editForm.name.data
@@ -46,6 +52,7 @@ def settings(exercise_id):
         desc = re.sub(r' {2,}', ' ', desc)
         editing.description = desc
         editing.public_answers = editForm.public_answers.data
+        editing.requires_all = editForm.requires_all.data
         if editForm.answers.data:
             json_file = editForm.answers.data
             json_content = json_file.read().decode('utf-8')
@@ -70,6 +77,9 @@ def settings(exercise_id):
 def exercise_deletion(exercise_id):
     form = DeleteExerciseForm()
     editing = get_exercise_by_id(exercise_id)
+
+    if not user.owns_exercise(editing):
+        abort(403)
 
     if form.validate_on_submit():
         delete_exercise(editing)
@@ -109,6 +119,9 @@ def submit(exercise_id):
 
     correct_answers = get_exercise_answers(exercise)
     submitted_answers = request.get_json()
+
+    if len(correct_answers) != len(submitted_answers) and exercise.requires_all:
+        abort(400)
 
     results = {}
 
@@ -151,6 +164,58 @@ def create():
     """Create a new exercise."""
     form = CreateExerciseForm()
     if form.validate_on_submit():
+        desc = form.description.data.replace("\r\n", "\n").strip()
+        desc = re.sub(r'\n{2,}', '\n\n', desc)
+        desc = re.sub(r' {2,}', ' ', desc)
+        questions = []
+        for key in request.form:
+            if key.startswith(("q")):
+                questions.append(request.form[key])
+
+        answers = {}
+        for key in request.form:
+            if key.startswith(("a")):
+                answers["q"+key[1:]] = request.form[key]
+
+        html_header = """
+<div class="bg-white rounded-2xl shadow-xl p-6">
+    <form id="exercise-form" class="grid grid-cols-[auto_1fr] gap-4 items-center">"""
+        
+        html_footer = """
+        <button type="button" id="submit-btn" class="button-blue mt-2 col-span-2">Rätta</button>
+        <button type="button" id="reveal-btn" class="button-red mt-2 col-span-2">Kolla svar</button>
+    </form>
+</div>
+<script src="/static/exercise_submit.js"></script>
+"""
+
+        rows_html = ""
+        for idx, question in enumerate(questions, 1):
+            rows_html += f"""
+            <label for="q{idx}" class="text-md text-right mr-2">{question}</label>
+            <input type="text" id="q{idx}" name="q{idx}" class="input">"""
+
+        full_html = html_header + rows_html + html_footer
+
+        exercise = create_exercise(
+            name=form.name.data,
+            description=desc,
+            json_data=answers,
+            html_data=full_html,
+            owner=user,
+            approved=user.verified or user.admin
+        )
+        if not user.verified and not user.admin:
+            flash('Övningen har skapats och kommer att visas när den har godkänts.', 'success')
+        return redirect(url_for('exercise.view', exercise_id=exercise.id)) if user.verified or user.admin else redirect(url_for('exercise.create'))
+    return render_template('exercises/create.html', form=form)
+
+@bp.route('/create/legacy', methods=['GET', 'POST'])
+@login_required
+def legacy_create():
+    """Create a new exercise."""
+    form = CreateExerciseForm()
+    if form.validate_on_submit():
         json_file = form.answers.data
         json_content = json_file.read().decode('utf-8')
         html_file = form.html.data
@@ -170,4 +235,4 @@ def create():
         if not user.verified and not user.admin:
             flash('Övningen har skapats och kommer att visas när den har godkänts.', 'success')
         return redirect(url_for('exercise.view', exercise_id=exercise.id)) if user.verified or user.admin else redirect(url_for('exercise.create'))
-    return render_template('exercises/create.html', form=form)
+    return render_template('exercises/create_old.html', form=form)

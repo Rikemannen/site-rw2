@@ -328,6 +328,15 @@ def exercises():
     """Render the exercise search page."""
     return redirect(url_for('main.search', q='*', type='exercises'))
 
+@bp.route('/exercise/preview/<exercise_id>')
+@admin_required
+def preview_exercise(exercise_id):
+    """Allow admins to preview unapproved exercises."""
+    exercise = get_exercise_by_id(exercise_id)
+    if not exercise:
+        abort(404)
+    return render_template('exercises/exercise.html', exercise=exercise, show_edit_links=True)
+
 @bp.route('/exercise/<exercise_id>')
 @admin_required
 def edit_exercise(exercise_id):

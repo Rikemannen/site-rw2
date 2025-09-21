@@ -1,17 +1,16 @@
 <!-- Du kan ändra utseendet på sidan nästan överallt, förutom där det står att du inte får -->
 <div class="bg-white rounded-2xl shadow-xl p-6">
-    <form id="exercise-form" class="space-y-2"> <!-- Klassen här kan du ändra, inget annat på denna rad -->
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Ändra inte denna rad, behövs för att övningen ska fungera! -->
-        <div class="flex items-center"> <!-- Kopiera allt från denna rad... -->
-            <label for="q1" class="w-32">Hej!</label> <!-- Texten på svenska -->
-            <input type="text" id="q1" name="q1" class="border p-1 m-2 flex-1">
-            <!-- Här skriver användaren svaret/översättningen.
-                 Du kan ändra id:t, men det måste stämma överens med svarsfilen.
-                 Öka siffran med 1 för varje ny fråga, både här och i svarsfilen -->
-        </div> <!-- ...till denna rad, och klistra in under för att lägga till fler frågor -->
-        <button type="button" id="submit-btn" class="button-blue mt-2">Rätta</button>
+    <form id="exercise-form" class="grid grid-cols-[auto_1fr] gap-4 items-center"> <!-- Klassen här kan du ändra, inget annat på denna rad -->
+        <!-- Kopiera allt från denna rad... -->
+        <label for="q1" class="text-md text-right mr-2">Hej!</label> <!-- Texten på svenska -->
+        <input type="text" id="q1" name="q1" class="input">
+        <!-- Här skriver användaren svaret/översättningen.
+            Du kan ändra id:t, men det måste stämma överens med svarsfilen.
+            Öka siffran med 1 för varje ny fråga, både här och i svarsfilen -->
+        <!-- ...till denna rad, och klistra in under för att lägga till fler frågor -->
+        <button type="button" id="submit-btn" class="button-blue mt-2 col-span-2">Rätta</button>
         <!-- Knappen för att kontrollera svaren -->
-        <button type="button" id="reveal-btn" class="button-red mt-2">Kolla svar</button>
+        <button type="button" id="reveal-btn" class="button-red mt-2 col-span-2">Kolla svar</button>
         <!-- Knappen för att visa svaren, VIKTIGT: Ta bort denna rad om du ej vill att användare ska kunna se din övnings svar! -->
     </form>
 </div>

@@ -26,7 +26,7 @@
             {% endfor %}
         </div>
         <div class="flex justify-between items-center mb-1">
-            <h3 class="text-xl mb-1">Offentliga svar</h3>
+            <h3 class="text-xl mb-1">Andra inställningar</h3>
             <p class="text-slate-600 italic cursor-help p-1"
                 title="Vill du att inloggade användare ska kunna trycka på en knapp i din övning för att få de rätta svar ifyllda (kan ej skickas in)">
                 ?</p>
@@ -35,6 +35,13 @@
             {{ editForm.public_answers(class="checkbox mr-2") }}
             {{ editForm.public_answers.label(class="block text-sm font-md text-slate-600")}}
             {% for error in editForm.public_answers.errors %}
+            <span class="text-red-500 text-xs">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="flex items-center">
+            {{ editForm.requires_all(class="checkbox mr-2") }}
+            {{ editForm.requires_all.label(class="block text-sm font-md text-slate-600")}}
+            {% for error in editForm.requires_all.errors %}
             <span class="text-red-500 text-xs">{{ error }}</span>
             {% endfor %}
         </div>
