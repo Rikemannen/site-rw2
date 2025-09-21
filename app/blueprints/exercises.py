@@ -75,6 +75,7 @@ def settings(exercise_id):
 @bp.route('/<exercise_id>/delete', methods=['POST'])
 @login_required
 def exercise_deletion(exercise_id):
+    """Handle exercise deletion form submissions."""
     form = DeleteExerciseForm()
     editing = get_exercise_by_id(exercise_id)
 
