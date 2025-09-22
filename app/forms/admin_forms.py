@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField, IntegerField, TextAreaField, ColorField, FloatField
+from wtforms import SelectField, StringField, SubmitField, BooleanField, SelectMultipleField, IntegerField, TextAreaField, ColorField, FloatField, DateTimeLocalField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired, Length
 
@@ -106,4 +106,11 @@ class EmblemCreationForm(FlaskForm):    # Used in separate template
     """Form for creating an emblem"""
     name = StringField('Namn', validators=[DataRequired()])
     color = ColorField('Färg', validators=[DataRequired()])
+    submit = SubmitField('Skapa')
+
+class EventCreationForm(FlaskForm):
+    """Form for creating events."""
+    event_type = StringField('Typ', validators=[DataRequired()])
+    event_data = TextAreaField('Data', validators=[DataRequired()])
+    expires = DateTimeLocalField('Går ut', validators=[DataRequired()])
     submit = SubmitField('Skapa')

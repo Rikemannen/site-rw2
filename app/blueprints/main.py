@@ -1,5 +1,6 @@
 """Handles main application routes and views."""
 
+import time
 from flask import Blueprint, abort, render_template, request, redirect, make_response
 from flask_login import current_user, login_required
 from app.models.emblems import Emblem
@@ -13,15 +14,20 @@ from app.services.search_service import (
     search_exercises,
     search_exercises_by_id_partial
 )
+from app.services.event_service import get_event
 
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
     """Render the index page."""
+    change_obj = get_event("change")
+    change = None
+    if change_obj and (not change_obj.expires or change_obj.expires > time.time()):
+        change = {"content": change_obj.data["content"], "created": change_obj.created}
     return render_template('index.html',
                            popular_exercises=get_popular_exercises(),
-                           recent_exercises=get_recent_exercises(), show_chat_window=False)
+                           recent_exercises=get_recent_exercises(), show_chat_window=False, change=change)
 
 @bp.route('/dismiss-banner')
 def dismiss_banner():
