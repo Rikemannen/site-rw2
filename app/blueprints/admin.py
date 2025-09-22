@@ -78,7 +78,6 @@ def manage_events():
     if form.validate_on_submit():
         # Convert form.expires.data (a datetime object) to a Unix timestamp
         expires_ts = int(form.expires.data.timestamp())
-        print(form.event_data.data)
         raw_data = form.event_data.data
         try:
             data = json.loads(raw_data) if raw_data else {}
