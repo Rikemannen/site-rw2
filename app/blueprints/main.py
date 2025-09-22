@@ -23,7 +23,7 @@ def index():
     """Render the index page."""
     change_obj = get_event("change")
     change = None
-    if change_obj and (not change_obj.expires or change_obj.expires > time.time()):
+    if change_obj and (not change_obj.expires or change_obj.expires > time.time()) and change_obj.data["content"]:
         change = {"content": change_obj.data["content"], "created": change_obj.created}
     return render_template('index.html',
                            popular_exercises=get_popular_exercises(),
