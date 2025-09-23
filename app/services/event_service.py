@@ -1,4 +1,5 @@
 import time
+import sqlalchemy
 from app.extensions import db
 from app.models.events import Event
 
@@ -15,7 +16,11 @@ def create_event(event_type, data, expires=time.time() + 259200): # expiry is to
         event_type=event_type,
         data=data,
         expires=expires
-    )
+)
+    others = Event.query.filter(Event.event_type == event_type).all()
+    for old_event in others:
+        db.session.delete(old_event)
+    db.session.flush()  # Ensure deletions are processed before adding new event
     db.session.add(event)
     try:
         db.session.commit()
