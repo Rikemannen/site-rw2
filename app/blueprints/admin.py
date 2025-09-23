@@ -2,7 +2,8 @@ import ast
 import re
 import time
 import sqlalchemy.exc
-from flask import Blueprint, json, render_template, request, abort, redirect, url_for, flash
+import json
+from flask import Blueprint, render_template, request, abort, redirect, url_for, flash
 from flask_login import current_user
 from app.models.user import User
 from app.models.exercise import Exercise
@@ -16,6 +17,7 @@ from app.services.logging_service import log
 from app.services.session_token_service import invalidate_all_sessions
 from app.services.message_service import send_message_to_all
 from app.services.chat_message_service import clear_user_messages as clear_user_msgs
+from app.services.event_service import get_event, create_event, get_all_events, delete_event
 from app.models.logs import Log
 from app.models.emblems import Emblem
 from app.models.token import Token
@@ -63,6 +65,45 @@ def bans():
     """Show all banned users."""
     banned_users = User.query.filter(User.banned_until > time.time()).all()
     return render_template('admin/bans.html', bans=banned_users)
+
+# --- Event related routes within /admin. ---
+
+@bp.route('/events', methods=['GET', 'POST'])
+@admin_required
+def manage_events():
+    """Manage events."""
+    events = get_all_events()
+    form = EventCreationForm()
+
+    if form.validate_on_submit():
+        # Convert form.expires.data (a datetime object) to a Unix timestamp
+        expires_ts = int(form.expires.data.timestamp())
+        raw_data = form.event_data.data
+        try:
+            data = json.loads(raw_data) if raw_data else {}
+        except json.JSONDecodeError:
+            flash("Ogiltig json!")
+            return redirect(url_for('admin.manage_events'))
+        create_event(
+            event_type=form.event_type.data,
+            data=data,
+            expires=expires_ts
+        )
+        return redirect(url_for('admin.manage_events'))
+
+    return render_template('admin/events.html', events=events, form=form)
+
+@bp.route('/events/<event_type>/delete', methods=['POST'])
+@admin_required
+def event_deletion(event_type):
+    """Delete an event."""
+    event = get_event(event_type)
+
+    if not event:
+        abort(404)
+
+    delete_event(event)
+    return redirect(url_for('admin.manage_events'))
 
 # --- User related routes within /admin. ---
 
