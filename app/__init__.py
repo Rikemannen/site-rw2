@@ -1,6 +1,7 @@
 """Application factory for the Flask application."""
 
 from datetime import datetime, timedelta
+import time
 from os import environ
 from flask import Flask, render_template, redirect, url_for, request
 from flask_login import current_user
@@ -71,22 +72,22 @@ def create_app():
         return get_user_from_token(token)
 
     @app.template_filter('datetimeformat')
-    def datetimeformat(value, variant="full"):
+    def datetimeformat(timestamp, variant="full"):
         try:
             # Accept numeric string or int/float timestamp
-            ts = int(value)
+            ts = int(timestamp)
         except (ValueError, TypeError):
             return None
-        dt = datetime.fromtimestamp(value)
+        
         if variant == "full":
-            return dt.strftime('%Y-%m-%d %H:%M:%S')
+            return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp))
         elif variant == "datetime":
-            return dt.strftime('%d/%m %H:%M')
+            return time.strftime("%d/%m %H:%M", time.localtime(timestamp))
         elif variant == "time":
-            return dt.strftime('%H:%M:%S')
+            return time.strftime("%H:%M:%S", time.localtime(timestamp))
         elif variant == "date":
-            return dt.strftime('%Y-%m-%d')
-        return dt.strftime('%Y-%m-%d %H:%M:%S') # Fallback
+            return time.strftime("%Y-%m-%d", time.localtime(timestamp))
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp)) # Fallback
 
     @app.template_filter('format_user')
     def format_user(user):
