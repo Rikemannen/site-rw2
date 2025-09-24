@@ -18,12 +18,12 @@ from app.services.user_service import get_user_by_id
 from app.services.session_token_service import get_user_from_token
 from app.extensions import db
 
-# redis_client = Redis(host="localhost", port=6379, db=0)
+redis_client = Redis(host="localhost", port=6379, db=0)
 
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["120 per hour"],
-    # storage_uri="redis://localhost:6379"
+    storage_uri="redis://localhost:6379"
 )
 
 def create_app():
@@ -42,9 +42,9 @@ def create_app():
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(weeks=1)
     app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB
-    # app.config['SESSION_TYPE'] = 'redis'
-    # app.config['SESSION_REDIS'] = redis_client  # your Redis instance
-    # Session(app)
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = redis_client  # your Redis instance
+    Session(app)
 
     db.init_app(app)
     # limiter.init_app(app)
