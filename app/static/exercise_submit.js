@@ -75,7 +75,7 @@ document.getElementById("reveal-btn").addEventListener("click", async (e) => {
         const input = document.getElementById(key);
         if (input) {
             input.classList.remove("bg-green-500", "bg-red-400");
-            input.readonly = true
+            input.readOnly = true
             input.value = value[0]
             input.classList.add("bg-green-500");
         }
