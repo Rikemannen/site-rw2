@@ -176,7 +176,7 @@ def create():
         answers = {}
         for key in request.form:
             if key.startswith(("a")):
-                answers["q"+key[1:]] = request.form[key]
+                answers["q" + key[1:]] = [request.form[key], True] # Creates {'q1': ["hello!", True]}
 
         html_header = """
 <div class="bg-white rounded-2xl shadow-xl p-6">
