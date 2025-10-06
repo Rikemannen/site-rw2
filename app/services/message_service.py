@@ -71,3 +71,12 @@ def delete_all_sent_messages(user):
         db.session.commit()
     except sqlalchemy.exc.IntegrityError:
         db.session.rollback()
+
+def purge_messages():
+    """Delete all messages older than 30 days."""
+    threshold = time.time() - (30 * 24 * 60 * 60)
+    Message.query.filter(Message.timestamp < threshold).delete(synchronize_session=False)
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()

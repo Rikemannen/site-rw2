@@ -49,3 +49,14 @@ def clear_user_messages(user):
         db.session.commit()
     except sqlalchemy.exc.IntegrityError:
         db.session.rollback()
+
+def purge_chat():
+    """Purge chat messages older than 7 days."""
+    threshold = time.time() - (7 * 24 * 60 * 60)  # 7 days ago
+    old_messages = ChatMessage.query.filter(ChatMessage.timestamp < threshold).all()
+    for msg in old_messages:
+        db.session.delete(msg)
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()

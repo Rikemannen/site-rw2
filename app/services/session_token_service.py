@@ -69,3 +69,15 @@ def logout_user():
     resp = make_response(redirect('/login'))
     resp.delete_cookie('session_token')
     return resp
+
+def purge_expired_tokens():
+    """Purge all expired session tokens from the database."""
+    now = int(time.time())
+    expired_tokens = SessionToken.query.filter(SessionToken.expires < now).all()
+    expired_tokens += SessionToken.query.filter_by(valid=False).all()
+    for token in expired_tokens:
+        db.session.delete(token)
+    try:
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        db.session.rollback()
