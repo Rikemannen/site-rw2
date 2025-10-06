@@ -12,7 +12,7 @@ def create_session_token(user):
     session_token = SessionToken(
         user_id=user.id,
         token=token,
-        expires=int(time.time()) + 60 * 60 * 24 * 7  # 7 days
+        expires=int(time.time()) + 365.25 * 24 * 60 * 60  # 1 year
     )
     db.session.add(session_token)
     try:

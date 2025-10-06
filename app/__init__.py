@@ -43,7 +43,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SESSION_COOKIE_SECURE'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(weeks=1)
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365.25)
     app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB
     app.config['SESSION_TYPE'] = 'redis'
     app.config['SESSION_REDIS'] = redis_client  # your Redis instance
