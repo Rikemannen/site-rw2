@@ -23,7 +23,7 @@ def messages():
     form = SendMessageForm()
     messages = get_user_messages(current_user)
     form.recipient.choices = [
-        (u.id, u.name if not u.display_name or u.display_name == u.name else f"{u.name} (@{u.display_name})", u.color) for u in get_all_users() if u.id != current_user.id
+        (u.id, u.name if not u.display_name or u.display_name == u.name else f"{u.display_name} (@{u.name})", u.color) for u in get_all_users() if u.id != current_user.id
     ]
     r = request.args.get('r')
     if r and r.isdigit():
