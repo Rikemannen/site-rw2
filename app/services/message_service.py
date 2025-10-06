@@ -13,7 +13,8 @@ def send_message(sender, recipient, content):
     message = Message(
         sender_id=sender.id,
         recipient_id=recipient.id,
-        content=content
+        content=content,
+        timestamp=time.time()
     )
     db.session.add(message)
     try:
