@@ -16,6 +16,9 @@ from app.blueprints import main, auth, exercises, chat, admin, messaging
 from app.extensions import login_manager
 from app.services.user_service import get_user_by_id
 from app.services.session_token_service import get_user_from_token
+from app.services.message_service import purge_messages
+from app.services.chat_message_service import purge_chat
+from app.services.session_token_service import purge_expired_tokens
 from app.extensions import db
 
 redis_client = Redis(host="localhost", port=6379, db=0)
@@ -63,6 +66,12 @@ def create_app():
     app.register_blueprint(chat.bp)
     app.register_blueprint(admin.bp)
     app.register_blueprint(messaging.bp)
+
+    # Purge old messages etc.
+    with app.app_context():
+        purge_messages()
+        purge_chat()
+        purge_expired_tokens()
 
     @login_manager.request_loader
     def load_user_from_request(request):
