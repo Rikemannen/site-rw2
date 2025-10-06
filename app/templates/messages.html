@@ -57,6 +57,15 @@
                             contInput.addEventListener('input', updateCounter);
                             updateCounter();
                         }
+                        // Focus input if URL parameter focus=1 is present
+                        const params = new URLSearchParams(window.location.search);
+                        if (params.get('focus') === '1' && contInput) {
+                            contInput.focus();
+                            // Move cursor to the end
+                            const val = contInput.value;
+                            contInput.value = '';
+                            contInput.value = val;
+                        }
                     });
                 </script>
                 {% for error in form.content.errors %}
